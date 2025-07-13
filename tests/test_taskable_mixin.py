@@ -11,33 +11,39 @@ class TestTaskableMixin:
     """Test cases for TaskableMixin functionality."""
 
     def test_event_loop_property(self):
-        """Test that event_loop property returns the default event loop."""
+        """Test that event_loop property returns an event loop."""
         mixin = TaskableMixin()
         
-        with patch('asyncio.get_event_loop') as mock_get_loop:
+        with patch('asyncio.get_running_loop') as mock_get_running, \
+             patch('asyncio.new_event_loop') as mock_new_loop:
             mock_loop = Mock()
-            mock_get_loop.return_value = mock_loop
+            mock_get_running.side_effect = RuntimeError("no running loop")
+            mock_new_loop.return_value = mock_loop
             
             # Access the property to trigger the call
             result = mixin.event_loop
             
-            mock_get_loop.assert_called_once()
+            mock_get_running.assert_called_once()
+            mock_new_loop.assert_called_once()
             assert result is mock_loop
 
     def test_event_loop_cached_property(self):
-        """Test that event_loop is cached and only calls get_event_loop once."""
+        """Test that event_loop is cached and only calls event loop functions once."""
         mixin = TaskableMixin()
         
-        with patch('asyncio.get_event_loop') as mock_get_loop:
+        with patch('asyncio.get_running_loop') as mock_get_running, \
+             patch('asyncio.new_event_loop') as mock_new_loop:
             mock_loop = Mock()
-            mock_get_loop.return_value = mock_loop
+            mock_get_running.side_effect = RuntimeError("no running loop")
+            mock_new_loop.return_value = mock_loop
             
             # Access the property multiple times
             result1 = mixin.event_loop
             result2 = mixin.event_loop
             
-            # Should only call get_event_loop once due to caching
-            mock_get_loop.assert_called_once()
+            # Should only call event loop functions once due to caching
+            mock_get_running.assert_called_once()
+            mock_new_loop.assert_called_once()
             assert result1 is mock_loop
             assert result2 is mock_loop
             assert result1 is result2

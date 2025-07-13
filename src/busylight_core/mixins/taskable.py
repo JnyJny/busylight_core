@@ -14,7 +14,10 @@ class TaskableMixin:
     @cached_property
     def event_loop(self):
         """The default event loop."""
-        return asyncio.get_event_loop()
+        try:
+            return asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.new_event_loop()
 
     @cached_property
     def tasks(self) -> dict[str, asyncio.Task]:

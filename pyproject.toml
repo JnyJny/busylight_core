@@ -44,6 +44,7 @@ dev = [
     "mypy",
     "poethepoet",
     "pytest",
+    "pytest-asyncio",
     "pytest-cov",
     "ruff",
     "ty",
