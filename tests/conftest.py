@@ -1,7 +1,7 @@
 """ """
 
 from pathlib import Path
-import tomlkit
+import toml
 import pytest
 from busylight_core.hardware import ConnectionType, Hardware
 from serial.tools.list_ports_common import ListPortInfo
@@ -22,7 +22,7 @@ def pyproject_path(project_root: Path) -> Path:
 @pytest.fixture(scope="session")
 def pyproject_toml(pyproject_path: Path) -> dict:
     """Return the contents of the pyproject.toml file."""
-    yield tomlkit.load(pyproject_path.open("rb"))
+    yield toml.load(pyproject_path.open("rb"))
 
 
 @pytest.fixture(scope="session")
