@@ -47,6 +47,7 @@ dev = [
     "pytest-asyncio",
     "pytest-cov",
     "ruff",
+    "tomlkit>=0.13.3",
     "ty",
 ]
 docs = [
