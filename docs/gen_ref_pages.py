@@ -9,6 +9,24 @@ nav = mkdocs_gen_files.Nav()
 src = Path(__file__).parent.parent / "src"
 package_name = "busylight_core"
 
+# Define device vendors and their main classes for better organization
+VENDOR_INFO = {
+    "agile_innovative": ("Agile Innovative", "BlinkStick devices with multi-LED support"),
+    "embrava": ("Embrava", "Blynclight series with audio capabilities"),
+    "kuando": ("Kuando", "Busylight Alpha and Omega devices"),
+    "luxafor": ("Luxafor", "Flag, Mute, Orb, and Bluetooth devices"),
+    "thingm": ("ThingM", "Blink(1) devices with fade effects"),
+    "muteme": ("MuteMe", "MuteMe devices with button input"),
+    "mutesync": ("MuteSync", "MuteSync button devices"),
+    "plantronics": ("Plantronics", "Status indicator devices"),
+    "compulab": ("CompuLab", "fit-statUSB devices"),
+    "busytag": ("BusyTag", "Busy Tag devices"),
+    "epos": ("EPOS", "EPOS status devices"),
+}
+
+# Build a mapping of all modules as we process them
+nav_dict = {}
+
 for path in sorted(src.rglob("*.py")):
     module_path = path.relative_to(src).with_suffix("")
     doc_path = path.relative_to(src).with_suffix(".md")
@@ -24,6 +42,8 @@ for path in sorted(src.rglob("*.py")):
         continue
 
     nav[parts] = doc_path.as_posix()
+    # Store in our dict for later use
+    nav_dict[parts] = doc_path.as_posix()
 
     with mkdocs_gen_files.open(full_doc_path, "w") as fd:
         ident = ".".join(parts)
@@ -31,5 +51,78 @@ for path in sorted(src.rglob("*.py")):
 
     mkdocs_gen_files.set_edit_path(full_doc_path, path)
 
+# Create custom SUMMARY with better organization  
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
-    nav_file.writelines(nav.build_literate_nav())
+    nav_file.write("# API Reference\n\n")
+    nav_file.write("## Core Components\n\n")
+    
+    # Core modules
+    core_modules = [
+        ("busylight_core", "Busylight_Core"),
+        ("busylight_core.light", "Light"),
+        ("busylight_core.hardware", "Hardware"),
+        ("busylight_core.exceptions", "Exceptions"),
+        ("busylight_core.settings", "Settings"),
+    ]
+    
+    for module, display_name in core_modules:
+        parts = tuple(module.split("."))
+        if parts in nav_dict:
+            nav_file.write(f"- [{display_name}]({nav_dict[parts]})\n")
+    
+    nav_file.write("\n## Mixins\n\n")
+    
+    # Mixins
+    mixin_modules = [
+        ("busylight_core.mixins.colorable", "Colorable"),
+        ("busylight_core.mixins.taskable", "Taskable"),
+    ]
+    
+    for module, display_name in mixin_modules:
+        parts = tuple(module.split("."))
+        if parts in nav_dict:
+            nav_file.write(f"- [{display_name}]({nav_dict[parts]})\n")
+    
+    nav_file.write("\n## Hardware Vendors\n\n")
+    
+    # Vendor modules
+    for vendor_module, (vendor_name, vendor_desc) in VENDOR_INFO.items():
+        vendor_parts = ("busylight_core", "vendors", vendor_module)
+        if vendor_parts in nav_dict:
+            nav_file.write(f"### {vendor_name}\n\n")
+            
+            # Find all submodules for this vendor
+            vendor_submodules = []
+            for parts, path in nav_dict.items():
+                if (len(parts) >= 4 and 
+                    parts[0] == "busylight_core" and 
+                    parts[1] == "vendors" and 
+                    parts[2] == vendor_module and
+                    parts != vendor_parts):
+                    
+                    # Get the actual class name (last part)
+                    class_name = parts[-1]
+                    # Convert snake_case to Title Case and clean up
+                    display_name = class_name.replace("_", " ").title()
+                    if display_name.startswith("Blynclight"):
+                        display_name = display_name.replace("Blynclight", "Blynclight ")
+                    vendor_submodules.append((display_name, path, parts))
+            
+            # Sort and display submodules
+            for display_name, path, parts in sorted(vendor_submodules):
+                nav_file.write(f"- [{display_name}]({path})\n")
+            
+            nav_file.write("\n")
+    
+    nav_file.write("## Utilities\n\n")
+    
+    # Utility modules
+    utility_modules = [
+        ("busylight_core.hid", "HID"),
+        ("busylight_core.word", "Word"),
+    ]
+    
+    for module, display_name in utility_modules:
+        parts = tuple(module.split("."))
+        if parts in nav_dict:
+            nav_file.write(f"- [{display_name}]({nav_dict[parts]})\n")

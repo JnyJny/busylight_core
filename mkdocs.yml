@@ -26,11 +26,16 @@ theme:
     - navigation.sections
     - navigation.expand
     - navigation.indexes
+    - navigation.top
+    - navigation.tracking
     - toc.integrate
+    - toc.follow
     - search.highlight
     - search.share
+    - search.suggest
     - content.code.copy
     - content.code.annotate
+    - content.tabs.link
 
 plugins:
   - search
