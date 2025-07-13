@@ -54,12 +54,21 @@ for path in sorted(src.rglob("*.py")):
 # Create custom SUMMARY with better organization  
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     nav_file.write("# API Reference\n\n")
-    nav_file.write("## Core Components\n\n")
     
-    # Core modules
+    # Highlight the main Light class first
+    nav_file.write("## Main Classes\n\n")
+    nav_file.write("**Primary interface for controlling busylights:**\n\n")
+    
+    # Main Light class
+    light_parts = ("busylight_core", "light")
+    if light_parts in nav_dict:
+        nav_file.write(f"- **[Light Class]({nav_dict[light_parts]})** - Main abstract base class for all busylight devices\n")
+    
+    nav_file.write("\n## Core Components\n\n")
+    
+    # Core modules (excluding light since it's featured above)
     core_modules = [
         ("busylight_core", "Busylight_Core"),
-        ("busylight_core.light", "Light"),
         ("busylight_core.hardware", "Hardware"),
         ("busylight_core.exceptions", "Exceptions"),
         ("busylight_core.settings", "Settings"),
