@@ -1,0 +1,490 @@
+"""Tests for the Embrava Blynclight device."""
+
+import pytest
+from unittest.mock import Mock, patch
+
+from busylight_core.vendors.embrava.blynclight import Blynclight, FlashSpeed
+from busylight_core.vendors.embrava._blynclight import State
+from busylight_core.hardware import Hardware, ConnectionType
+
+
+def create_mock_blynclight_hardware():
+    """Create a properly configured mock hardware for Blynclight device."""
+    mock_hardware = Mock(spec=Hardware)
+    mock_hardware.device_id = (0x2C0D, 0x0001)
+    mock_hardware.device_type = ConnectionType.HID
+    mock_hardware.path = b"/dev/hidraw0"
+    mock_hardware.product_string = "Blynclight"
+    mock_hardware.vendor_id = 0x2C0D
+    mock_hardware.product_id = 0x0001
+    return mock_hardware
+
+
+class TestBlynclightDeviceSupport:
+    """Test device identification and support."""
+
+    def test_supported_device_ids(self):
+        """Test that supported_device_ids returns correct device mapping."""
+        device_ids = Blynclight.supported_device_ids()
+        
+        assert isinstance(device_ids, dict)
+        assert (0x2C0D, 0x0001) in device_ids
+        assert (0x2C0D, 0x000C) in device_ids
+        assert (0x0E53, 0x2516) in device_ids
+        assert device_ids[(0x2C0D, 0x0001)] == "Blynclight"
+
+    def test_device_claiming_logic(self):
+        """Test that Blynclight can properly claim devices using inherited logic."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        result = Blynclight.claims(mock_hardware)
+        assert result is True
+
+    def test_device_claiming_wrong_device(self):
+        """Test that Blynclight rejects devices it doesn't support."""
+        mock_hardware = Mock(spec=Hardware)
+        mock_hardware.vendor_id = 0x1234
+        mock_hardware.product_id = 0x5678
+        mock_hardware.device_id = (0x1234, 0x5678)
+        mock_hardware.product_string = "Other Device"
+        
+        result = Blynclight.claims(mock_hardware)
+        assert result is False
+
+
+class TestBlynclightProperties:
+    """Test Blynclight properties and initialization."""
+
+    def test_state_property_cached(self):
+        """Test that state property is cached and returns State object."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'):
+            blynclight = Blynclight(mock_hardware)
+            
+            state1 = blynclight.state
+            state2 = blynclight.state
+            
+            assert isinstance(state1, State)
+            assert state1 is state2  # Should be cached
+
+    def test_struct_property_cached(self):
+        """Test that struct property is cached and has correct format."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'):
+            blynclight = Blynclight(mock_hardware)
+            
+            struct1 = blynclight.struct
+            struct2 = blynclight.struct
+            
+            assert struct1 is struct2  # Should be cached
+            assert struct1.format == "!xBBBBBBH"
+
+
+class TestBlynclightBytes:
+    """Test Blynclight bytes conversion and state management."""
+
+    def test_bytes_conversion_light_on(self):
+        """Test __bytes__ method when light is on."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'):
+            blynclight = Blynclight(mock_hardware)
+            blynclight.color = (255, 128, 64)  # Set RGB values - this makes is_lit True
+            
+            result = bytes(blynclight)
+                
+            assert isinstance(result, bytes)
+            assert len(result) == 9  # Expected struct size
+            assert blynclight.state.off == 0  # Should set off=False when lit
+
+    def test_bytes_conversion_light_off(self):
+        """Test __bytes__ method when light is off."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'):
+            blynclight = Blynclight(mock_hardware)
+            blynclight.color = (0, 0, 0)  # Set RGB to zero - this makes is_lit False
+            
+            result = bytes(blynclight)
+                
+            assert isinstance(result, bytes)
+            assert blynclight.state.off == 1  # Should set off=True when not lit
+
+    def test_bytes_flash_disabled_when_off(self):
+        """Test that flash is disabled when light is off."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'):
+            blynclight = Blynclight(mock_hardware)
+            blynclight.state.flash = True
+            blynclight.color = (0, 0, 0)  # Set RGB to zero - this makes is_lit False
+            
+            bytes(blynclight)
+                
+            # Flash should be disabled when light is off
+            assert blynclight.state.flash == 0
+
+    def test_bytes_dim_disabled_when_off(self):
+        """Test that dim is disabled when light is off."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'):
+            blynclight = Blynclight(mock_hardware)
+            blynclight.state.dim = True
+            blynclight.color = (0, 0, 0)  # Set RGB to zero - this makes is_lit False
+            
+            bytes(blynclight)
+                
+            # Dim should be disabled when light is off
+            assert blynclight.state.dim == 0
+
+    def test_bytes_flash_preserved_when_on(self):
+        """Test that flash is preserved when light is on."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'):
+            blynclight = Blynclight(mock_hardware)
+            blynclight.state.flash = True
+            blynclight.color = (255, 0, 0)  # Set RGB to non-zero - this makes is_lit True
+            
+            bytes(blynclight)
+                
+            # Flash should be preserved when light is on
+            assert blynclight.state.flash == 1
+
+
+class TestBlynclightDimming:
+    """Test dimming functionality."""
+
+    def test_dim_method(self):
+        """Test dim method sets dim state."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'), \
+             patch.object(Blynclight, 'update') as mock_update:
+            blynclight = Blynclight(mock_hardware)
+            
+            blynclight.dim()
+                
+            mock_update.assert_called_once()
+            assert blynclight.state.dim == 1
+
+    def test_bright_method(self):
+        """Test bright method clears dim state."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'), \
+             patch.object(Blynclight, 'update') as mock_update:
+            blynclight = Blynclight(mock_hardware)
+            blynclight.state.dim = True  # Start dimmed
+            
+            blynclight.bright()
+                
+            mock_update.assert_called_once()
+            assert blynclight.state.dim == 0
+
+
+class TestBlynclightSound:
+    """Test sound functionality."""
+
+    def test_play_sound_default_parameters(self):
+        """Test play_sound with default parameters."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'), \
+             patch.object(Blynclight, 'update') as mock_update:
+            blynclight = Blynclight(mock_hardware)
+            
+            blynclight.play_sound()
+                
+            mock_update.assert_called_once()
+            assert blynclight.state.repeat == 0
+            assert blynclight.state.play == 1
+            assert blynclight.state.music == 0
+            assert blynclight.state.mute == 0
+
+    def test_play_sound_custom_parameters(self):
+        """Test play_sound with custom parameters."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'), \
+             patch.object(Blynclight, 'update') as mock_update:
+            blynclight = Blynclight(mock_hardware)
+            
+            blynclight.play_sound(music=5, volume=10, repeat=True)
+                
+            mock_update.assert_called_once()
+            assert blynclight.state.repeat == 1
+            assert blynclight.state.play == 1
+            assert blynclight.state.music == 5
+            assert blynclight.state.mute == 0
+
+    def test_stop_sound_method(self):
+        """Test stop_sound method."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'), \
+             patch.object(Blynclight, 'update') as mock_update:
+            blynclight = Blynclight(mock_hardware)
+            blynclight.state.play = True  # Start playing
+            
+            blynclight.stop_sound()
+                
+            mock_update.assert_called_once()
+            assert blynclight.state.play == 0
+
+    def test_mute_method(self):
+        """Test mute method."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'), \
+             patch.object(Blynclight, 'update') as mock_update:
+            blynclight = Blynclight(mock_hardware)
+            
+            blynclight.mute()
+                
+            mock_update.assert_called_once()
+            assert blynclight.state.mute == 1
+
+    def test_unmute_method(self):
+        """Test unmute method."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'), \
+             patch.object(Blynclight, 'update') as mock_update:
+            blynclight = Blynclight(mock_hardware)
+            blynclight.state.mute = True  # Start muted
+            
+            blynclight.unmute()
+                
+            mock_update.assert_called_once()
+            assert blynclight.state.mute == 0
+
+
+class TestBlynclightFlashing:
+    """Test flashing functionality."""
+
+    def test_flash_method_default_speed(self):
+        """Test flash method with default speed."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'), \
+             patch.object(Blynclight, 'update') as mock_update:
+            blynclight = Blynclight(mock_hardware)
+            
+            blynclight.flash((255, 0, 0))  # Red color
+                
+            mock_update.assert_called_once()
+            assert blynclight.color == (255, 0, 0)
+            assert blynclight.state.flash == 1
+            assert blynclight.state.speed == FlashSpeed.slow.value
+
+    def test_flash_method_custom_speed(self):
+        """Test flash method with custom speed."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'), \
+             patch.object(Blynclight, 'update') as mock_update:
+            blynclight = Blynclight(mock_hardware)
+            
+            blynclight.flash((0, 255, 0), FlashSpeed.fast)  # Green color, fast speed
+                
+            mock_update.assert_called_once()
+            assert blynclight.color == (0, 255, 0)
+            assert blynclight.state.flash == 1
+            assert blynclight.state.speed == FlashSpeed.fast.value
+
+    def test_stop_flashing_method(self):
+        """Test stop_flashing method."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'), \
+             patch.object(Blynclight, 'update') as mock_update:
+            blynclight = Blynclight(mock_hardware)
+            blynclight.state.flash = True  # Start flashing
+            
+            blynclight.stop_flashing()
+                
+            mock_update.assert_called_once()
+            assert blynclight.state.flash == 0
+
+
+class TestBlynclightReset:
+    """Test reset functionality."""
+
+    def test_reset_method(self):
+        """Test reset method clears all state."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'):
+            # Don't mock reset during initialization
+            with patch.object(Blynclight, 'reset'):
+                blynclight = Blynclight(mock_hardware)
+            
+            # Set various states
+            blynclight.state.off = False
+            blynclight.state.dim = True
+            blynclight.state.flash = True
+            blynclight.state.speed = FlashSpeed.fast.value
+            blynclight.state.play = True
+            blynclight.state.mute = True
+            blynclight.state.repeat = True
+            blynclight.state.music = 10
+            blynclight.state.volume = 15
+            
+            # Mock update method and super().reset() for the actual reset call
+            with patch.object(blynclight, 'update') as mock_update, \
+                 patch('busylight_core.vendors.embrava.blynclight.super') as mock_super:
+                
+                blynclight.reset()
+                
+            mock_update.assert_called_once()
+            mock_super().reset.assert_called_once()
+            
+            # Verify all state is reset
+            assert blynclight.state.off == 1
+            assert blynclight.state.dim == 0
+            assert blynclight.state.flash == 0
+            assert blynclight.state.speed == FlashSpeed.slow.value
+            assert blynclight.state.play == 0
+            assert blynclight.state.mute == 0
+            assert blynclight.state.repeat == 0
+            assert blynclight.state.music == 0
+            assert blynclight.state.volume == 0
+
+
+class TestFlashSpeedEnum:
+    """Test FlashSpeed enum."""
+
+    def test_flash_speed_values(self):
+        """Test FlashSpeed enum values."""
+        assert FlashSpeed.slow == 1
+        assert FlashSpeed.medium == 2
+        assert FlashSpeed.fast == 4
+
+    def test_flash_speed_is_int(self):
+        """Test that FlashSpeed values are integers."""
+        assert isinstance(FlashSpeed.slow.value, int)
+        assert isinstance(FlashSpeed.medium.value, int)
+        assert isinstance(FlashSpeed.fast.value, int)
+
+
+class TestBlynclightIntegration:
+    """Integration tests for Blynclight."""
+
+    def test_complete_workflow(self):
+        """Test a complete workflow with multiple operations."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'update'):
+            # Only mock reset during initialization
+            with patch.object(Blynclight, 'reset'):
+                blynclight = Blynclight(mock_hardware)
+            
+            # Test sequence of operations
+            blynclight.dim()
+            blynclight.flash((255, 0, 0), FlashSpeed.medium)
+            blynclight.play_sound(music=3, repeat=True)
+            blynclight.mute()
+            
+            # Mock super().reset() for the actual reset call
+            with patch('busylight_core.vendors.embrava.blynclight.super'):
+                blynclight.reset()
+                
+            # Verify final state after reset
+            assert blynclight.state.off == 1
+            assert blynclight.state.dim == 0
+            assert blynclight.state.flash == 0
+            assert blynclight.state.play == 0
+            assert blynclight.state.mute == 0
+
+    def test_state_interactions(self):
+        """Test interactions between different state settings."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'):
+            blynclight = Blynclight(mock_hardware)
+            
+            # Test flash and dim both set, then light turned off
+            blynclight.state.flash = True
+            blynclight.state.dim = True
+            blynclight.color = (0, 0, 0)  # Set color to zero to make is_lit False
+            
+            bytes(blynclight)
+                
+            # Both should be disabled when light is off
+            assert blynclight.state.flash == 0
+            assert blynclight.state.dim == 0
+
+
+class TestBlynclightEdgeCases:
+    """Test edge cases and error conditions."""
+
+    def test_flash_with_none_speed(self):
+        """Test flash method with None speed falls back to default."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'), \
+             patch.object(Blynclight, 'update') as mock_update:
+            blynclight = Blynclight(mock_hardware)
+            
+            blynclight.flash((255, 255, 255), None)
+                
+            assert blynclight.state.speed == FlashSpeed.slow.value
+
+    def test_bytes_with_specific_rgb_values(self):
+        """Test __bytes__ method with specific RGB values."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with patch.object(mock_hardware, 'acquire'), \
+             patch.object(Blynclight, 'reset'):
+            blynclight = Blynclight(mock_hardware)
+            
+            # Set specific RGB values to test struct packing - this makes is_lit True
+            blynclight.red = 255
+            blynclight.blue = 128
+            blynclight.green = 64
+            
+            result = bytes(blynclight)
+                
+            # Verify the bytes contain the RGB values in the correct positions
+            # struct format is "!xBBBBBBH" - skip first byte, then R,B,G...
+            assert result[1] == 255  # Red
+            assert result[2] == 128  # Blue
+            assert result[3] == 64   # Green
+
+    def test_multiple_device_ids_support(self):
+        """Test that all supported device IDs work."""
+        device_ids = [(0x2C0D, 0x0001), (0x2C0D, 0x000C), (0x0E53, 0x2516)]
+        
+        for vendor_id, product_id in device_ids:
+            mock_hardware = Mock(spec=Hardware)
+            mock_hardware.vendor_id = vendor_id
+            mock_hardware.product_id = product_id
+            mock_hardware.device_id = (vendor_id, product_id)
+            mock_hardware.product_string = "Blynclight"
+            
+            result = Blynclight.claims(mock_hardware)
+            assert result is True, f"Failed to claim device {vendor_id:04X}:{product_id:04X}"
