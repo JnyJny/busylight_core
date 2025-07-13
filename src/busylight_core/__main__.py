@@ -1,4 +1,4 @@
-"""busylight_core CLI implementation.
+"""blc CLI implementation.
 
 Busylight Core Implementation for Humans, presumably like you!
 """
