@@ -1,47 +1,98 @@
 # Quick Start
 
-This guide will help you get started with Busylight Core for Humans quickly.
+This guide will help you get started with Busylight Core quickly.
+
+## Installation
+
+First, install busylight_core using pip:
+
+```bash
+pip install busylight_core
+```
+
+Or with uv:
+
+```bash
+uv add busylight_core
+```
 
 ## Basic Usage
 
-After [installing](installation.md) busylight_core, you can use the CLI:
+After [installing](installation.md) busylight_core, you can start controlling lights in your Python code:
 
-```bash
-busylight_core --help
+```python
+from busylight_core import Light
+
+# Find all connected lights
+lights = Light.available()
+print(f"Found {len(lights)} device(s)")
+
+# Control the first light found
+if lights:
+    light = lights[0]
+    light.on((255, 0, 0))  # Turn on red
+    light.off()           # Turn off
 ```
 
-This will show you all available commands and options.
+## Discovering Your Device
 
-## Common Commands
+Check what lights are connected to your system:
 
-Here are some common commands to get you started:
+```python
+from busylight_core import Light
 
-### Help
+# Get all available lights
+lights = Light.available()
 
-Get help for any command:
-
-```bash
-busylight_core --help
-busylight_core [command] --help
+for i, light in enumerate(lights):
+    print(f"Light {i}: {light.vendor} {light.name}")
+    print(f"  Device ID: {light.device_id}")
+    print(f"  Connection: {light.hardware.device_type}")
 ```
 
-### Version
+## Basic Light Control
 
-Check the version:
+### Colors
 
-```bash
-busylight_core --version
+Control your light with RGB colors:
+
+```python
+from busylight_core import Light
+
+light = Light.first_light()  # Get the first available light
+
+# Basic colors (RGB tuples)
+light.on((255, 0, 0))    # Red
+light.on((0, 255, 0))    # Green  
+light.on((0, 0, 255))    # Blue
+light.on((255, 255, 0))  # Yellow
+light.on((255, 0, 255))  # Magenta
+light.on((0, 255, 255))  # Cyan
+light.on((255, 255, 255)) # White
+
+# Turn off
+light.off()
+```
+
+### Flash Patterns
+
+Create attention-getting flash patterns:
+
+```python
+light.flash((255, 0, 0), count=3)        # Flash red 3 times
+light.flash((0, 255, 0), duration=0.5)   # Flash green with custom timing
 ```
 
 ## Configuration
 
-Busylight Core for Humans can be configured using environment variables or a configuration file. See [Configuration](configuration.md) for details.
+Busylight Core can be configured using environment variables or a configuration file. See [Configuration](configuration.md) for details.
+
 ## Examples
 
-For more detailed examples, see the [Examples](../user-guide/examples.md) page.
+For more detailed examples including async usage, multi-device control, and advanced features, see the [Examples](../user-guide/examples.md) page.
 
 ## Next Steps
 
-- Learn more about the [CLI interface](../user-guide/cli.md)
+- Learn about [Advanced Features](../user-guide/examples.md)
 - Check out the [API Reference](../reference/)
 - Read the [Contributing Guide](../contributing.md) if you want to contribute

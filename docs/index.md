@@ -1,10 +1,10 @@
 # Busylight Core for Humans
 
-Busylight Core Implementation for Humans, presumably like you!
+A unified Python library for controlling USB status lights (busylights) from multiple vendors.
 
 ## Overview
 
-Busylight Core for Humans is a Python package that provides a command-line interface for [brief description of what your package does].
+Busylight Core provides a consistent interface to control various USB-connected status lights, commonly used for indicating availability, meeting status, or system notifications. The library abstracts away vendor-specific protocols and provides a clean, unified API for controlling lights from 9+ different manufacturers.
 
 ## Quick Start
 
@@ -14,21 +14,33 @@ Install busylight_core using pip:
 pip install busylight_core
 ```
 
-Then run the CLI:
+Then use it in your Python code:
 
-```bash
-busylight_core --help
+```python
+from busylight_core import Light
+
+# Find all connected lights
+lights = Light.available()
+print(f"Found {len(lights)} device(s)")
+
+# Control a light
+if lights:
+    light = lights[0]
+    light.on((255, 0, 0))  # Turn on red
+    light.off()           # Turn off
 ```
 
 ## Features
 
-- Modern Python packaging with `uv` support
-- CLI interface built with Typer
-- Structured logging with Loguru
-- Configuration management with Pydantic Settings
-- Type checking with mypy
-- Code quality tools (ruff, pytest)
-- Automated testing and CI/CD
+- **Multi-Vendor Support** - Control devices from 9+ vendors (Embrava, Kuando, Luxafor, ThingM, and more)
+- **Multiple Connection Types** - HID, Serial, and Bluetooth device support
+- **Rich Light Control** - Colors, brightness, flash patterns, fade effects
+- **Audio Capabilities** - Sound playback and mute/unmute on supported devices
+- **Input Detection** - Button press handling on interactive devices
+- **Multi-LED Support** - Control devices with 1-192 individual LEDs
+- **Async Task Management** - Built-in support for animations and effects
+- **Extensible Architecture** - Easy to add support for new devices
+- **Object-Oriented API** - Clean, intuitive programming interface
 
 ## Installation
 
@@ -37,7 +49,7 @@ For detailed installation instructions, see [Installation](getting-started/insta
 ## Documentation
 
 - [Getting Started](getting-started/quickstart.md) - Quick start guide
-- [User Guide](user-guide/cli.md) - Detailed usage instructions
+- [Advanced Features](user-guide/cli.md) - Detailed feature documentation
 - [API Reference](reference/) - Complete API documentation
 - [Contributing](contributing.md) - How to contribute to this project
 

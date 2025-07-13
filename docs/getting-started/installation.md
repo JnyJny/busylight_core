@@ -1,6 +1,6 @@
 # Installation
 
-Busylight Core for Humans requires Python 3.8 or later.
+Busylight Core requires Python 3.11 or later.
 
 ## Install from PyPI
 

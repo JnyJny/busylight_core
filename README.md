@@ -5,41 +5,96 @@
 ![Python Version][badge-python-version]
 ![License][badge-license]
 ![Monthly Downloads][badge-monthly-downloads]
-# busylight_core - Busylight Core for Humans
+# busylight-core - Busylight Core for Humans™
 
-> Busylight Core Implementation for Humans, presumably like you!
+> A unified Python library for controlling USB status lights (busylights) from multiple vendors
 
-<!-- project description -->
+**busylight-core** provides a consistent interface to control various
+USB-connected status lights, commonly used for indicating
+availability, meeting status, or system notifications.
 
 ## Features
 
-<!-- project features --> 
+- **Multi-Vendor Support** - Control devices from 9+ vendors (Embrava, Kuando, Luxafor, ThingM, and more)
+- **Multiple Connection Types** - HID, Serial, and Bluetooth device support  
+- **Python Library** - Clean, object-oriented API for easy integration
+- **Rich Light Control** - Colors, brightness, flash patterns, fade effects
+- **Audio Capabilities** - Sound playback and mute/unmute on supported devices
+- **Input Detection** - Button press handling on interactive devices
+- **Multi-LED Support** - Control devices with 1-192 individual LEDs
+- **Async Task Management** - Built-in support for animations and effects
+- **Extensible Architecture** - Easy to add support for new devices 
+
+## Supported Hardware
+
+| Vendor | Device Models | Special Features |
+|--------|---------------|------------------|
+| **Embrava** | Blynclight, Blynclight Mini, Blynclight Plus | Audio playback, flash control, dim/bright |
+| **Kuando** | Busylight Alpha, Busylight Omega | Keepalive functionality |
+| **Luxafor** | Flag, Mute, Orb, Bluetooth | Button input (Mute model) |
+| **ThingM** | Blink(1) | Fade effects, feature reports |
+| **Agile Innovative** | BlinkStick (multiple variants) | 1-192 LEDs, channel control |
+| **MuteMe** | MuteMe, MuteMe Mini | Button input detection |
+| **MuteSync** | Button | Button input detection |
+| **Plantronics** | Status Indicator | Basic light control |
+| **CompuLab** | fit-statUSB | Basic light control |
+
 
 ## Installation
 
-### pip
+### Install with uv
+```console
+uv add busylight_core
+```
 
+### Install with pip
 ```console
 python3 -m pip install busylight_core
 ```
 
-### uvx
-```console
-uvx --from busylight_core busylight_core
-```
-
-### uv
-
-```console
-uvx pip install busylight_core
-```
-
 ## Usage
 
-```console
-busylight_core --help
+```python
+from busylight_core import Light
+
+# Find all connected lights
+lights = Light.available()
+print(f"Found {len(lights)} device(s)")
+
+# Control a specific device
+if lights:
+    light = lights[0]
+    light.on((255, 0, 0))  # Turn on red
+    light.off()            # Turn off
 ```
 
+### Common Use Cases
+
+**Meeting Status Indicator:**
+```python
+from busylight_core import Light
+
+light = Light.first_light()
+
+# Available - green
+light.on((0, 255, 0))
+
+# In meeting - red  
+light.on((255, 0, 0))
+
+# Away - yellow
+light.on((255, 255, 0))
+```
+
+
+## Documentation
+
+For detailed documentation including API reference, advanced usage examples, and device-specific information:
+
+- **Full Documentation**: [https://JnyJny.github.io/busylight_core/](https://JnyJny.github.io/busylight_core/)
+- **Quick Start Guide**: [Getting Started](https://JnyJny.github.io/busylight_core/getting-started/quickstart/)
+- **Examples**: [Usage Examples](https://JnyJny.github.io/busylight_core/user-guide/examples/)
+- **API Reference**: [API Docs](https://JnyJny.github.io/busylight_core/reference/)
 
 ## Development
 
@@ -47,7 +102,7 @@ This project and it's virtual environment is managed using [uv][uv] and
 is configured to support automatic activation of virtual environments
 using [direnv][direnv]. Development activites such as linting and testing
 are automated via [Poe The Poet][poethepoet], run `poe` after cloning
-this repo.
+this repo for a list of tasks.
 
 ### Clone
 ```console
@@ -59,10 +114,6 @@ cd busylight_core
 direnv allow
 ```
 
-### Create a Virtual Environment
-```console
-uv venv
-```
 ### Install Dependencies
 ```console
 uv sync
@@ -78,8 +129,11 @@ This project uses automated release management with GitHub Actions:
 
 #### Version Bumping
 - `poe publish_patch` - Bump patch version, commit, tag, and push
-- `poe publish_minor` - Bump minor version, commit, tag, and push  
+- `poe publish_minor` - Bump minor version, commit, tag, and push
 - `poe publish_major` - Bump major version, commit, tag, and push
+
+Any of the publish tasks will trigger testing, publishing to PyPi, and
+a GitHub release.
 
 #### Release Notes
 - `poe changelog` - Generate changelog since last tag
@@ -91,14 +145,14 @@ When you push a version tag (e.g., `v1.0.0`), the unified GitHub Actions workflo
 2. **Publish** - Build and publish to PyPI (only if tests pass)
 3. **GitHub Release** - Create GitHub release with auto-generated notes and artifacts (only if PyPI publish succeeds)
 
-This ensures a complete release pipeline where each step depends on the previous step's success.
+This ensures a complete release pipeline where each step depends on
+the previous step's success.
 
 #### MkDocs Documentation
 - `poe docs-serve` - Serve documentation locally
 - `poe docs-build` - Build documentation
 - `poe docs-deploy` - Deploy to GitHub Pages
 
-The template includes MkDocs with material theme and automatic deployment to GitHub Pages.
 
 <hr>
 
