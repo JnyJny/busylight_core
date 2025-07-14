@@ -50,7 +50,7 @@ For detailed installation instructions, see [Installation](getting-started/insta
 
 - [Getting Started](getting-started/quickstart.md) - Quick start guide
 - [Advanced Features](user-guide/cli.md) - Detailed feature documentation
-- [API Reference](reference/) - Complete API documentation
+- [API Reference](reference/index.md) - Complete API documentation
 - [Contributing](contributing.md) - How to contribute to this project
 
 ## License

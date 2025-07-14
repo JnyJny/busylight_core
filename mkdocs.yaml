@@ -80,7 +80,7 @@ nav:
   - User Guide:
     - CLI Usage: user-guide/cli.md
     - Examples: user-guide/examples.md
-  - API Reference: reference/
+  - API Reference: reference/index.md
   - Contributing: contributing.md
   - Changelog: changelog.md
 

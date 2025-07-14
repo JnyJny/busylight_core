@@ -420,6 +420,6 @@ For complete usage examples and real-world scenarios, see the [Examples](example
 
 ## Next Steps
 
-- Explore the [API Reference](../reference/) for detailed method documentation
+- Explore the [API Reference](../reference/index.md) for detailed method documentation
 - Check out [Real-World Examples](examples.md) for practical applications
 - Read the [Contributing Guide](../contributing.md) to add support for new devices

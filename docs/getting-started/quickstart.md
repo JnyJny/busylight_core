@@ -94,5 +94,5 @@ For more detailed examples including async usage, multi-device control, and adva
 ## Next Steps
 
 - Learn about [Advanced Features](../user-guide/examples.md)
-- Check out the [API Reference](../reference/)
+- Check out the [API Reference](../reference/index.md)
 - Read the [Contributing Guide](../contributing.md) if you want to contribute

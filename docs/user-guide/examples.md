@@ -410,7 +410,7 @@ if light:
 
 ## Next Steps
 
-- Learn more about the [API Reference](../reference/)
+- Learn more about the [API Reference](../reference/index.md)
 - Check out device-specific documentation for advanced features
 - Read the [Contributing Guide](../contributing.md) to add support for new devices
 - Visit the [GitHub repository](https://github.com/JnyJny/busylight_core) for the latest updates
