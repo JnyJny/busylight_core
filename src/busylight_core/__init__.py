@@ -33,8 +33,7 @@ from .vendors.compulab import Fit_StatUSB
 from .vendors.embrava import Blynclight, Blynclight_Mini, Blynclight_Plus
 from .vendors.kuando import Busylight_Alpha, Busylight_Omega
 from .vendors.luxafor import Bluetooth, BusyTag, Flag, Mute, Orb
-from .vendors.muteme import MuteMe, MuteMe_Mini
-from .vendors.mutesync import MuteSync
+from .vendors.muteme import MuteMe, MuteMe_Mini, MuteSync
 from .vendors.plantronics import Status_Indicator
 from .vendors.thingm import Blink1
 
