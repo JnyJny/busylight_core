@@ -1,19 +1,13 @@
 """ """
 
 import struct
-from enum import Enum
+
 from functools import cached_property, lru_cache
 
 from loguru import logger
 
 from ...light import Light
-from ._blynclight import State
-
-
-class FlashSpeed(int, Enum):
-    slow: int = 1
-    medium: int = 2
-    fast: int = 4
+from ._blynclight import State, FlashSpeed
 
 
 class Blynclight(Light):
@@ -97,14 +91,6 @@ class Blynclight(Light):
             self.state.flash = False
 
     def reset(self) -> None:
-        self.state.off = True
-        self.state.dim = False
-        self.state.flash = False
-        self.state.speed = FlashSpeed.slow.value
-        self.state.play = False
-        self.state.mute = False
-        self.state.repeat = False
-        self.state.music = 0
-        self.state.volume = 0
-
-        super().reset()
+        self.state.reset()
+        self.color = (0, 0, 0)
+        self.update()

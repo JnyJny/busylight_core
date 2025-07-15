@@ -1,9 +1,15 @@
-""" Embrava Blynclight Implementation Details
-"""
+"""Embrava Blynclight Implementation Details"""
 
 import struct
+from enum import Enum
 
 from ...word import BitField, Word
+
+
+class FlashSpeed(int, Enum):
+    slow: int = 1
+    medium: int = 2
+    fast: int = 4
 
 
 class OffBit(BitField):
@@ -70,7 +76,6 @@ class MuteBit(BitField):
 
 
 class State(Word):
-
     def __init__(self) -> None:
         super().__init__(0, 24)
 
@@ -90,6 +95,18 @@ class State(Word):
             f"mute:   {self.mute}",
         ]
         return "\n".join(fields)
+
+    def reset(self) -> None:
+        """Reset the state to default values."""
+        self.off = True
+        self.dim = False
+        self.flash = False
+        self.speed = FlashSpeed.slow.value
+        self.play = False
+        self.mute = False
+        self.repeat = False
+        self.music = 0
+        self.volume = 0
 
     off = OffBit()
     dim = DimBit()
