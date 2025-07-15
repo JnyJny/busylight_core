@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import abc
 import contextlib
-import functools
+
 import platform
-from functools import cached_property
+from functools import cached_property, lru_cache
 from typing import Callable, Generator, Optional
 
 from loguru import logger
@@ -20,13 +20,13 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
     supported_device_ids: dict[tuple[int, int], str] = {}
 
     @classmethod
-    @functools.lru_cache(maxsize=1)
+    @lru_cache(maxsize=1)
     def vendor(cls) -> str:
         """The vendor name in title case."""
         return cls.__module__.split(".")[-2].title()
 
     @classmethod
-    @functools.lru_cache(maxsize=1)
+    @lru_cache(maxsize=1)
     def unique_device_names(cls) -> list[str]:
         """Returns a list of unique device names."""
         return sorted(set(cls.supported_device_ids.values()))
@@ -37,7 +37,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         return hardware.device_id in cls.supported_device_ids
 
     @classmethod
-    @functools.lru_cache(maxsize=None)
+    @lru_cache(maxsize=None)
     def subclasses(cls) -> list[type[Light]]:
         """Returns a list of all subclasses of this class."""
         subclasses = []
@@ -51,7 +51,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         return sorted(subclasses, key=lambda s: s.__module__)
 
     @classmethod
-    @functools.lru_cache(maxsize=1)
+    @lru_cache(maxsize=1)
     def supported_lights(cls) -> dict[str, list[str]]:
         """A dictionary of supported lights by vendor."""
         supported_lights: dict[str, list[str]] = {}
@@ -175,9 +175,12 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
 
         return False
 
-    @cached_property
     def __hash__(self) -> int:
-        return hash(self._sort_key)
+        try:
+            return self._hash
+        except AttributeError:
+            self._hash = hash(self._sort_key)
+            return self._hash
 
     @cached_property
     def name(self) -> str:
