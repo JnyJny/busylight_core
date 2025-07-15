@@ -7,7 +7,7 @@ import contextlib
 import functools
 import platform
 from functools import cached_property
-from typing import Callable, Generator
+from typing import Callable, Generator, Optional
 
 from loguru import logger
 
@@ -17,12 +17,7 @@ from .mixins import ColorableMixin, TaskableMixin
 
 
 class Light(abc.ABC, ColorableMixin, TaskableMixin):
-
-    @abc.abstractclassmethod
-    @functools.lru_cache(maxsize=1)
-    def supported_device_ids(cls) -> dict[tuple[int, int], str]:
-        """A dictionary of supported device id tuples and names."""
-        raise NotImplementedError
+    supported_device_ids: dict[tuple[int, int], str] = {}
 
     @classmethod
     @functools.lru_cache(maxsize=1)
@@ -34,17 +29,17 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
     @functools.lru_cache(maxsize=1)
     def unique_device_names(cls) -> list[str]:
         """Returns a list of unique device names."""
-        return sorted(set(cls.supported_device_ids().values()))
+        return sorted(set(cls.supported_device_ids.values()))
 
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
         """Returns True if the hardware is claimed by this class."""
-        return hardware.device_id in cls.supported_device_ids()
+        return hardware.device_id in cls.supported_device_ids
 
     @classmethod
     @functools.lru_cache(maxsize=None)
     def subclasses(cls) -> list[type[Light]]:
-        """Returns a list of all light subclasses of this class."""
+        """Returns a list of all subclasses of this class."""
         subclasses = []
 
         if cls != Light:
@@ -124,7 +119,6 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         reset: bool = False,
         exclusive: bool = True,
     ):
-
         if not self.__class__.claims(hardware):
             raise LightUnsupported(hardware)
 
@@ -172,7 +166,6 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
             raise NotImplemented from None
 
     def __lt__(self, other: Light) -> bool:
-
         if not isinstance(other, Light):
             return NotImplemented
 
@@ -182,18 +175,14 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
 
         return False
 
+    @cached_property
     def __hash__(self) -> int:
-        try:
-            return self._hash
-        except AttributeError:
-            pass
-        self._hash = hash(self._sort_key)
-        return self._hash
+        return hash(self._sort_key)
 
     @cached_property
     def name(self) -> str:
         """The marketing name of this light."""
-        return self.supported_device_ids()[self.hardware.device_id]
+        return self.supported_device_ids[self.hardware.device_id]
 
     @property
     def hex(self) -> str:
@@ -227,24 +216,27 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
             self.hardware.release()
 
     def update(self) -> None:
-        """Obtains the current state of the light and writes it to the device."""
+        """Obtains the current state of the light and writes it to the device.
 
-        data = bytes(self)
+        Raises:
+        - LightUnavailable
+        """
+
+        state = bytes(self)
 
         match self.platform:
             case "Windows_10":
-                data = bytes([0]) + data
+                state = bytes([0]) + state
             case "Darwin" | "Linux" | "Windows_11":
                 pass
             case _:
                 logger.info(f"Unsupported OS {self.platform}, hoping for the best.")
 
         with self.exclusive_access():
-
-            logger.debug(f"{self.name} payload {data.hex(':')}")
+            logger.debug(f"{self.name} payload {state.hex(':')}")
 
             try:
-                self.write_strategy(data)
+                self.write_strategy(state)
             except Exception as error:
                 logger.error(f"{self}: {error}")
                 raise LightUnavailable(self) from None
@@ -258,17 +250,23 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         yield
         self.update()
 
-    def on(self, color: tuple[int, int, int]) -> None:
+    @abc.abstractmethod
+    def on(
+        self,
+        color: tuple[int, int, int],
+        led: int = 0,
+    ) -> None:
         """Activate the light with the given red, green, blue color tuple."""
-        with self.batch_update():
-            self.color = color
+        raise NotImplemented
+        # with self.batch_update():
+        #     self.color = color
 
-    def off(self) -> None:
+    def off(self, led: int = 0) -> None:
         """Deactivate the light."""
-        self.on((0, 0, 0))
+        self.on((0, 0, 0), led)
 
     def reset(self) -> None:
-        """Quiesce the light and associated asynchronous tasks."""
+        """Turn the light off and cancel associated asynchronous tasks."""
         self.off()
         self.cancel_tasks()
 

@@ -9,11 +9,9 @@ from ._blinkstick import BlinkStickVariant
 
 
 class BlinkStick(Light):
-    @staticmethod
-    def supported_device_ids() -> dict[tuple[int, int], str]:
-        return {
-            (0x20A0, 0x41E5): "BlinkStick",
-        }
+    supported_device_ids: dict[tuple[int, int], str] = {
+        (0x20A0, 0x41E5): "BlinkStick",
+    }
 
     @staticmethod
     def vendor() -> str:
@@ -39,13 +37,11 @@ class BlinkStick(Light):
     def variant(self) -> BlinkStickVariant:
         return BlinkStickVariant.from_hardware(self.hardware)
 
-
     @property
     def name(self) -> str:
         return self.variant.name
 
     def __bytes__(self) -> bytes:
-
         match self.variant.report:
             case 1:
                 buf = [self.variant.report, self.green, self.red, self.blue]
@@ -54,3 +50,7 @@ class BlinkStick(Light):
                 buf.extend([self.green, self.red, self.blue] * self.variant.nleds)
 
         return bytes(buf)
+
+    def on(self, color: tuple[int, int, int], led: int = 0) -> None:
+        with self.batch_update():
+            self.color = color

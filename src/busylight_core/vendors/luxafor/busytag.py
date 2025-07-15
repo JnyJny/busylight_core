@@ -1,24 +1,31 @@
 """BusyTag Light Support"""
 
+from functools import cached_property
 from ...light import Light
-
-# https://luxafor.helpscoutdocs.com/article/47-busy-tag-usb-cdc-command-reference-guide
+from ._busytag import Command
 
 
 class BusyTag(Light):
-
-    @staticmethod
-    def supported_device_ids() -> dict[tuple[int, int], str]:
-        return {
-            (0x303A, 0x81DF): "Busy Tag",
-        }
+    supported_device_ids: dict[tuple[int, int], str] = {
+        (0x303A, 0x81DF): "Busy Tag",
+    }
 
     @staticmethod
     def vendor() -> str:
         return "Busy Tag"
 
+    @property
+    def command(self) -> str:
+        return getattr(self, "_command", "")
+
+    @command.setter
+    def command(self, value: str) -> None:
+        self._command = value
+
     def __bytes__(self) -> bytes:
+        return self.command.encode()
 
-        cmd = f"AT+SC=127,{self.red:02x}{self.green:02x}{self.blue:02x}"
-
-        return buf.encode()
+    def on(self, color: tuple[int, int, int], led: int = 0) -> None:
+        with self.batch_update():
+            self.color = color
+            self.command = Command.solid_color(color, led)

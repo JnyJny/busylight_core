@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from loguru import logger
 
@@ -8,11 +7,9 @@ from ...light import Light
 
 
 class MuteSync(Light):
-    @staticmethod
-    def supported_device_ids() -> dict[tuple[int, int], str]:
-        return {
-            (0x10C4, 0xEA60): "MuteSync Button",
-        }
+    supported_device_ids: dict[tuple[int, int], str] = {
+        (0x10C4, 0xEA60): "MuteSync Button",
+    }
 
     @staticmethod
     def vendor() -> str:
@@ -43,7 +40,6 @@ class MuteSync(Light):
         return claim and (product or manufacturer)
 
     def __bytes__(self) -> bytes:
-
         buf = [65] + [*self.color] * 4
 
         return bytes(buf)
@@ -55,3 +51,7 @@ class MuteSync(Light):
     @property
     def button_on(self) -> bool:
         return False
+
+    def on(self, color: tuple[int, int, int], led: int = 0) -> None:
+        with self.batch_update():
+            self.color = color

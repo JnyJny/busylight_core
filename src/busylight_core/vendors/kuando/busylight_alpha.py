@@ -11,14 +11,12 @@ from ._busylight import State
 
 
 class Busylight_Alpha(Light):
-    @staticmethod
-    def supported_device_ids() -> dict[tuple[int, int], str]:
-        return {
-            (0x04D8, 0xF848): "Busylight Alpha",
-            (0x27BB, 0x3BCA): "Busylight Alpha",
-            (0x27BB, 0x3BCB): "Busylight Alpha",
-            (0x27BB, 0x3BCE): "Busylight Alpha",
-        }
+    supported_device_ids: dict[tuple[int, int], str] = {
+        (0x04D8, 0xF848): "Busylight Alpha",
+        (0x27BB, 0x3BCA): "Busylight Alpha",
+        (0x27BB, 0x3BCB): "Busylight Alpha",
+        (0x27BB, 0x3BCE): "Busylight Alpha",
+    }
 
     @cached_property
     def state(self) -> State:
@@ -27,17 +25,16 @@ class Busylight_Alpha(Light):
     def __bytes__(self) -> bytes:
         return bytes(self.state)
 
-    def on(self, color: tuple[int, int, int]) -> None:
+    def on(self, color: tuple[int, int, int], led: int = 0) -> None:
         self.color = color
         with self.batch_update():
-            self.state.steps[0].jump(color)
-
+            self.state.steps[0].jump(self.color)
         self.add_task("keepalive", _keepalive)
 
-    def off(self) -> None:
+    def off(self, led: int = 0) -> None:
         self.color = (0, 0, 0)
         with self.batch_update():
-            self.state.steps[0].jump((0, 0, 0))
+            self.state.steps[0].jump(self.color)
         self.cancel_task("keepalive")
 
 

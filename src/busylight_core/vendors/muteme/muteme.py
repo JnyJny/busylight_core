@@ -10,12 +10,10 @@ from ._muteme import State
 
 
 class MuteMe(Light):
-    @staticmethod
-    def supported_device_ids() -> dict[tuple[int, int], str]:
-        return {
-            (0x16C0, 0x27DB): "MuteMe Original",
-            (0x20A0, 0x42DA): "MuteMe Original",
-        }
+    supported_device_ids: dict[tuple[int, int], str] = {
+        (0x16C0, 0x27DB): "MuteMe Original",
+        (0x20A0, 0x42DA): "MuteMe Original",
+    }
 
     @staticmethod
     def vendor() -> str:
@@ -35,7 +33,6 @@ class MuteMe(Light):
 
     @property
     def is_pluggedin(self) -> bool:
-
         # EJO No reason for eight, just a power of two.
         try:
             nbytes = self.hardware.send_feature_report([0] * 8)
@@ -51,3 +48,7 @@ class MuteMe(Light):
     @property
     def button_on(self) -> bool:
         raise NotImplementedError()
+
+    def on(self, color: tuple[int, int, int], led: int = 0) -> None:
+        with self.batch_update():
+            self.color = color

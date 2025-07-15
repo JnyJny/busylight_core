@@ -1,5 +1,4 @@
-""" Luxafor Mute
-"""
+"""Luxafor Mute"""
 
 from loguru import logger
 
@@ -7,11 +6,9 @@ from .flag import Flag
 
 
 class Mute(Flag):
-    @staticmethod
-    def supported_device_ids() -> dict[tuple[int, int], str]:
-        return {
-            (0x4D8, 0xF372): "Mute",
-        }
+    supported_device_ids: dict[tuple[int, int], str] = {
+        (0x4D8, 0xF372): "Mute",
+    }
 
     @property
     def is_button(self) -> bool:
@@ -19,7 +16,6 @@ class Mute(Flag):
 
     @property
     def button_on(self) -> bool:
-
         results = self.read_strategy(8, 200)
 
         try:
