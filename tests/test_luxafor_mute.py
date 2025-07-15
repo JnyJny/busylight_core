@@ -23,112 +23,134 @@ class TestLuxaforMute:
     """Test cases for Luxafor Mute device implementation."""
 
     def test_supported_device_ids(self):
-        """Test that supported_device_ids returns correct device mapping."""
-        device_ids = Mute.supported_device_ids()
-        
-        assert isinstance(device_ids, dict)
-        assert (0x4D8, 0xF372) in device_ids
-        assert device_ids[(0x4D8, 0xF372)] == "Mute"
+        """Test that supported_device_ids contains correct device mapping."""
+
+        assert isinstance(Mute.supported_device_ids, dict)
+        assert (0x4D8, 0xF372) in Mute.supported_device_ids
+        assert Mute.supported_device_ids[(0x4D8, 0xF372)] == "Mute"
 
     def test_is_button_property(self):
         """Test that is_button property returns True for Mute device."""
         mock_hardware = create_mock_mute_hardware()
-        
-        with patch.object(mock_hardware, 'acquire'), \
-             patch.object(Mute, 'reset'):
+
+        with patch.object(mock_hardware, "acquire"), patch.object(Mute, "reset"):
             mute = Mute(mock_hardware)
             assert mute.is_button is True
 
     def test_button_on_response_66_sets_button_false(self):
         """Test button_on when device response[0] == 66 sets _button to False."""
         mock_hardware = create_mock_mute_hardware()
-        
-        with patch.object(mock_hardware, 'acquire'), \
-             patch.object(Mute, 'reset'), \
-             patch.object(Mute, 'read_strategy', return_value=[66, 0, 0, 0, 0, 0, 0, 0]) as mock_read:
+
+        with (
+            patch.object(mock_hardware, "acquire"),
+            patch.object(Mute, "reset"),
+            patch.object(
+                Mute, "read_strategy", return_value=[66, 0, 0, 0, 0, 0, 0, 0]
+            ) as mock_read,
+        ):
             mute = Mute(mock_hardware)
             result = mute.button_on
-            
+
             mock_read.assert_called_once_with(8, 200)
-            assert hasattr(mute, '_button')
+            assert hasattr(mute, "_button")
             assert mute._button is False
             assert result is False  # Returns False after processing
 
     def test_button_on_response_131_true(self):
         """Test button_on when device response[0] == 131 and results[1] is truthy."""
         mock_hardware = create_mock_mute_hardware()
-        
-        with patch.object(mock_hardware, 'acquire'), \
-             patch.object(Mute, 'reset'), \
-             patch.object(Mute, 'read_strategy', return_value=[131, 1, 0, 0, 0, 0, 0, 0]) as mock_read:
+
+        with (
+            patch.object(mock_hardware, "acquire"),
+            patch.object(Mute, "reset"),
+            patch.object(
+                Mute, "read_strategy", return_value=[131, 1, 0, 0, 0, 0, 0, 0]
+            ) as mock_read,
+        ):
             mute = Mute(mock_hardware)
             result = mute.button_on
-            
+
             mock_read.assert_called_once_with(8, 200)
             assert result is True
 
     def test_button_on_response_131_false(self):
         """Test button_on when device response[0] == 131 and results[1] is falsy."""
         mock_hardware = create_mock_mute_hardware()
-        
-        with patch.object(mock_hardware, 'acquire'), \
-             patch.object(Mute, 'reset'), \
-             patch.object(Mute, 'read_strategy', return_value=[131, 0, 0, 0, 0, 0, 0, 0]) as mock_read:
+
+        with (
+            patch.object(mock_hardware, "acquire"),
+            patch.object(Mute, "reset"),
+            patch.object(
+                Mute, "read_strategy", return_value=[131, 0, 0, 0, 0, 0, 0, 0]
+            ) as mock_read,
+        ):
             mute = Mute(mock_hardware)
             result = mute.button_on
-            
+
             mock_read.assert_called_once_with(8, 200)
             assert result is False
 
     def test_button_on_response_131_with_nonzero_value(self):
         """Test button_on when device response[0] == 131 and results[1] has non-zero value."""
         mock_hardware = create_mock_mute_hardware()
-        
-        with patch.object(mock_hardware, 'acquire'), \
-             patch.object(Mute, 'reset'), \
-             patch.object(Mute, 'read_strategy', return_value=[131, 255, 0, 0, 0, 0, 0, 0]) as mock_read:
+
+        with (
+            patch.object(mock_hardware, "acquire"),
+            patch.object(Mute, "reset"),
+            patch.object(
+                Mute, "read_strategy", return_value=[131, 255, 0, 0, 0, 0, 0, 0]
+            ) as mock_read,
+        ):
             mute = Mute(mock_hardware)
             result = mute.button_on
-            
+
             mock_read.assert_called_once_with(8, 200)
             assert result is True
 
     def test_button_on_index_error_handling(self):
         """Test button_on handles IndexError gracefully and returns False."""
         mock_hardware = create_mock_mute_hardware()
-        
-        with patch.object(mock_hardware, 'acquire'), \
-             patch.object(Mute, 'reset'), \
-             patch.object(Mute, 'read_strategy', return_value=[]) as mock_read:
+
+        with (
+            patch.object(mock_hardware, "acquire"),
+            patch.object(Mute, "reset"),
+            patch.object(Mute, "read_strategy", return_value=[]) as mock_read,
+        ):
             mute = Mute(mock_hardware)
             result = mute.button_on
-            
+
             mock_read.assert_called_once_with(8, 200)
             assert result is False
 
     def test_button_on_index_error_with_short_response(self):
         """Test button_on handles IndexError when response is too short."""
         mock_hardware = create_mock_mute_hardware()
-        
-        with patch.object(mock_hardware, 'acquire'), \
-             patch.object(Mute, 'reset'), \
-             patch.object(Mute, 'read_strategy', return_value=[131]) as mock_read:  # Missing results[1]
+
+        with (
+            patch.object(mock_hardware, "acquire"),
+            patch.object(Mute, "reset"),
+            patch.object(Mute, "read_strategy", return_value=[131]) as mock_read,
+        ):  # Missing results[1]
             mute = Mute(mock_hardware)
             result = mute.button_on
-            
+
             mock_read.assert_called_once_with(8, 200)
             assert result is False
 
     def test_button_on_unknown_response_code(self):
         """Test button_on with unknown response code returns False."""
         mock_hardware = create_mock_mute_hardware()
-        
-        with patch.object(mock_hardware, 'acquire'), \
-             patch.object(Mute, 'reset'), \
-             patch.object(Mute, 'read_strategy', return_value=[99, 1, 0, 0, 0, 0, 0, 0]) as mock_read:
+
+        with (
+            patch.object(mock_hardware, "acquire"),
+            patch.object(Mute, "reset"),
+            patch.object(
+                Mute, "read_strategy", return_value=[99, 1, 0, 0, 0, 0, 0, 0]
+            ) as mock_read,
+        ):
             mute = Mute(mock_hardware)
             result = mute.button_on
-            
+
             mock_read.assert_called_once_with(8, 200)
             assert result is False
 
@@ -139,22 +161,22 @@ class TestLuxaforMuteInheritance:
     def test_inherits_from_flag(self):
         """Test that Mute properly inherits from Flag class."""
         from busylight_core.vendors.luxafor.flag import Flag
-        
+
         assert issubclass(Mute, Flag)
-        
+
         # Test that Mute has all the Flag methods
         mute_methods = dir(Mute)
         flag_methods = dir(Flag)
-        
+
         # Key Flag methods should be available in Mute
-        expected_methods = ['claims', 'state', '__bytes__', 'supported_device_ids']
+        expected_methods = ["claims", "state", "__bytes__", "supported_device_ids"]
         for method in expected_methods:
             assert method in mute_methods
 
     def test_device_claiming_logic(self):
         """Test that Mute can properly claim devices using inherited logic."""
         mock_hardware = create_mock_mute_hardware()
-        
+
         result = Mute.claims(mock_hardware)
         assert result is True
 
@@ -166,19 +188,21 @@ class TestLuxaforMuteInheritance:
         mock_hardware.product_id = 0x5678
         mock_hardware.device_id = (0x1234, 0x5678)
         mock_hardware.product_string = "Other Device"
-        
+
         result = Mute.claims(mock_hardware)
         assert result is False
 
     def test_bytes_conversion_inheritance(self):
         """Test that __bytes__ method works through inheritance."""
         mock_hardware = create_mock_mute_hardware()
-        
-        with patch.object(mock_hardware, 'acquire'), \
-             patch.object(Mute, 'reset'), \
-             patch.object(Mute, 'color', (255, 0, 0)):  # Red color
+
+        with (
+            patch.object(mock_hardware, "acquire"),
+            patch.object(Mute, "reset"),
+            patch.object(Mute, "color", (255, 0, 0)),
+        ):  # Red color
             mute = Mute(mock_hardware)
-            
+
             # This should not raise an exception and should return bytes
             result = bytes(mute)
             assert isinstance(result, bytes)
@@ -186,18 +210,17 @@ class TestLuxaforMuteInheritance:
     def test_mute_specific_properties_override(self):
         """Test that Mute-specific properties properly override Flag properties."""
         mock_hardware = create_mock_mute_hardware()
-        
-        with patch.object(mock_hardware, 'acquire'), \
-             patch.object(Mute, 'reset'):
+
+        with patch.object(mock_hardware, "acquire"), patch.object(Mute, "reset"):
             mute = Mute(mock_hardware)
-            
+
             # Mute should override is_button to return True
             assert mute.is_button is True
-            
+
             # Mute should have button_on property (not in base Flag)
             # Check that the property exists in the class, not the instance to avoid calling it
-            assert 'button_on' in dir(Mute)
-            assert isinstance(getattr(Mute, 'button_on'), property)
+            assert "button_on" in dir(Mute)
+            assert isinstance(getattr(Mute, "button_on"), property)
 
 
 class TestLuxaforMuteEdgeCases:
@@ -206,12 +229,18 @@ class TestLuxaforMuteEdgeCases:
     def test_button_on_read_strategy_exception(self):
         """Test button_on when read_strategy raises an exception."""
         mock_hardware = create_mock_mute_hardware()
-        
-        with patch.object(mock_hardware, 'acquire'), \
-             patch.object(Mute, 'reset'), \
-             patch.object(Mute, 'read_strategy', side_effect=Exception("Device communication error")):
+
+        with (
+            patch.object(mock_hardware, "acquire"),
+            patch.object(Mute, "reset"),
+            patch.object(
+                Mute,
+                "read_strategy",
+                side_effect=Exception("Device communication error"),
+            ),
+        ):
             mute = Mute(mock_hardware)
-            
+
             # Should not crash, but may raise the exception or return a default value
             # The current implementation doesn't handle this case, so it will raise
             with pytest.raises(Exception, match="Device communication error"):
@@ -220,12 +249,14 @@ class TestLuxaforMuteEdgeCases:
     def test_button_on_none_response(self):
         """Test button_on when read_strategy returns None."""
         mock_hardware = create_mock_mute_hardware()
-        
-        with patch.object(mock_hardware, 'acquire'), \
-             patch.object(Mute, 'reset'), \
-             patch.object(Mute, 'read_strategy', return_value=None):
+
+        with (
+            patch.object(mock_hardware, "acquire"),
+            patch.object(Mute, "reset"),
+            patch.object(Mute, "read_strategy", return_value=None),
+        ):
             mute = Mute(mock_hardware)
-            
+
             # This will likely cause a TypeError when trying to access None[0]
             with pytest.raises(TypeError):
                 mute.button_on
@@ -233,29 +264,31 @@ class TestLuxaforMuteEdgeCases:
     def test_multiple_button_reads(self):
         """Test multiple sequential button reads behave consistently."""
         mock_hardware = create_mock_mute_hardware()
-        
+
         responses = [
             [131, 1, 0, 0, 0, 0, 0, 0],  # Button pressed
             [131, 0, 0, 0, 0, 0, 0, 0],  # Button released
-            [66, 0, 0, 0, 0, 0, 0, 0],   # Status response
+            [66, 0, 0, 0, 0, 0, 0, 0],  # Status response
         ]
-        
-        with patch.object(mock_hardware, 'acquire'), \
-             patch.object(Mute, 'reset'), \
-             patch.object(Mute, 'read_strategy', side_effect=responses) as mock_read:
+
+        with (
+            patch.object(mock_hardware, "acquire"),
+            patch.object(Mute, "reset"),
+            patch.object(Mute, "read_strategy", side_effect=responses) as mock_read,
+        ):
             mute = Mute(mock_hardware)
-            
+
             # First read - button pressed
             assert mute.button_on is True
-            
-            # Second read - button released  
+
+            # Second read - button released
             assert mute.button_on is False
-            
+
             # Third read - status response, sets _button = False
             result = mute.button_on
             assert result is False
             assert mute._button is False
-            
+
             # Verify all calls were made with correct parameters
             assert mock_read.call_count == 3
             for call in mock_read.call_args_list:

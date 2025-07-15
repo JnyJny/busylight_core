@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from typing import Callable
 
@@ -14,8 +13,7 @@ VENDOR_SUBCLASSES = VENDOR_HARDWARE.keys()
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_supported_device_ids(subclass) -> None:
-
-    result = subclass.supported_device_ids()
+    result = subclass.supported_device_ids
     assert isinstance(result, dict)
 
     for key, value in result.items():
@@ -27,14 +25,12 @@ def test_implementation_classmethod_supported_device_ids(subclass) -> None:
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_vendor(subclass) -> None:
-
     result = subclass.vendor()
     assert isinstance(result, str)
 
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_unique_device_names(subclass) -> None:
-
     result = subclass.unique_device_names()
     assert isinstance(result, list)
 
@@ -44,7 +40,6 @@ def test_implementation_classmethod_unique_device_names(subclass) -> None:
 
 @pytest.mark.parametrize("subclass,devices", list(VENDOR_HARDWARE.items()))
 def test_implementation_classmethod_claims(subclass, devices) -> None:
-
     for device in devices:
         result = subclass.claims(device)
         assert isinstance(result, bool)
@@ -56,7 +51,6 @@ def test_implementation_classmethod_does_not_claim_bogus(
     subclass,
     hardware_devices,
 ) -> None:
-
     for device in hardware_devices:
         result = subclass.claims(device)
         assert isinstance(result, bool)
@@ -65,7 +59,6 @@ def test_implementation_classmethod_does_not_claim_bogus(
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_subclasses(subclass) -> None:
-
     results = subclass.subclasses()
     assert isinstance(results, list)
     for item in results:
@@ -74,7 +67,6 @@ def test_implementation_classmethod_subclasses(subclass) -> None:
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_supported_lights(subclass) -> None:
-
     results = subclass.supported_lights()
     assert isinstance(results, dict)
     for key, value in results.items():
@@ -85,7 +77,6 @@ def test_implementation_classmethod_supported_lights(subclass) -> None:
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_available_lights(subclass) -> None:
-
     results = subclass.available_lights()
     assert isinstance(results, dict)
     for subclasses, devices in results.items():
@@ -97,7 +88,6 @@ def test_implementation_classmethod_available_lights(subclass) -> None:
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_all_lights(subclass) -> None:
-
     results = subclass.all_lights()
     assert isinstance(results, list)
     for item in results:
@@ -106,7 +96,6 @@ def test_implementation_classmethod_all_lights(subclass) -> None:
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_first_light(subclass) -> None:
-
     try:
         result = subclass.first_light()
         assert isinstance(result, subclass)
@@ -116,7 +105,6 @@ def test_implementation_classmethod_first_light(subclass) -> None:
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_init_with_bogus_hardware(subclass, hardware_devices) -> None:
-
     for device in hardware_devices:
         with pytest.raises(LightUnsupported):
             result = subclass(device, reset=False, exclusive=False)
@@ -124,9 +112,7 @@ def test_implementation_init_with_bogus_hardware(subclass, hardware_devices) -> 
 
 @pytest.mark.parametrize("subclass,devices", list(VENDOR_HARDWARE.items()))
 def test_implementation_init(subclass, devices) -> None:
-
     for device in devices:
-
         ## EJO The aquire and release methods are monkey patched here to
         ##     to avoid really trying to acquire/release potentially bogus
         ##     hardware devices.  Additionally, the write and read strategy
@@ -136,7 +122,6 @@ def test_implementation_init(subclass, devices) -> None:
         device.release = lambda: None
 
         class TestSubclass(subclass):
-
             @property
             def write_strategy(self) -> Callable[[bytes], int]:
                 return lambda buf: None

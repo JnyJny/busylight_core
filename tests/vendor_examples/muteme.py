@@ -1,5 +1,6 @@
 """ """
 
+from busylight_core.hardware import ConnectionType
 from busylight_core.vendors.muteme import MuteMe, MuteMe_Mini, MuteSync
 
 from .utils import make_hardware

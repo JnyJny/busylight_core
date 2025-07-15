@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from .agile_innovative import AGILE_INNOVATIVE_HARDWARE
 from .compulab import COMPULAB_HARDWARE
@@ -7,7 +6,6 @@ from .embrava import EMBRAVA_HARDWARE
 from .kuando import KUANDO_HARDWARE
 from .luxafor import LUXAFOR_HARDWARE
 from .muteme import MUTEME_HARDWARE
-from .mutesync import MUTESYNC_HARDWARE
 from .plantronics import PLANTRONICS_HARDWARE
 from .thingm import THINGM_HARDWARE
 
@@ -18,7 +16,6 @@ HardwareCatalog = (
     | KUANDO_HARDWARE
     | LUXAFOR_HARDWARE
     | MUTEME_HARDWARE
-    | MUTESYNC_HARDWARE
     | PLANTRONICS_HARDWARE
     | THINGM_HARDWARE
 )
@@ -31,7 +28,6 @@ __all__ = [
     "KUANDO_HARDWARE",
     "LUXAFOR_HARDWARE",
     "MUTEME_HARDWARE",
-    "MUTESYNC_HARDWARE",
     "PLANTRONICS_HARDWARE",
     "THINGM_HARDWARE",
 ]
