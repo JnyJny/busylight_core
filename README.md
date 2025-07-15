@@ -5,7 +5,7 @@
 ![Python Version][badge-python-version]
 ![License][badge-license]
 ![Monthly Downloads][badge-monthly-downloads]
-# busylight-core - Busylight Core for Humans™
+# Busylight Core for Humans™
 
 > A unified Python library for controlling USB status lights (busylights) from multiple vendors
 
@@ -15,15 +15,15 @@ availability, meeting status, or system notifications.
 
 ## Features
 
-- **Multi-Vendor Support** - Control devices from 9+ vendors (Embrava, Kuando, Luxafor, ThingM, and more)
-- **Multiple Connection Types** - HID, Serial, and Bluetooth device support  
-- **Python Library** - Clean, object-oriented API for easy integration
-- **Rich Light Control** - Colors, brightness, flash patterns, fade effects
-- **Audio Capabilities** - Sound playback and mute/unmute on supported devices
-- **Input Detection** - Button press handling on interactive devices
-- **Multi-LED Support** - Control devices with 1-192 individual LEDs
-- **Async Task Management** - Built-in support for animations and effects
-- **Extensible Architecture** - Easy to add support for new devices 
+- **Multi-Vendor Support** - Control devices from nine vendors.
+- **Multiple Connection Types** - HID and Serial device support.
+- **Python Library** - Clean, object-oriented API for easy integration.
+- **Rich Light Control** - Colors, brightness, flash patterns, fade effects.
+- **Audio Capabilities** - Sound playback and mute/unmute on supported devices.
+- **Input Detection** - Button press handling on interactive devices.
+- **Multi-LED Support** - Control devices with 1-192 individual LEDs.
+- **Async Task Management** - Built-in support for animations and effects.
+- **Extensible Architecture** - Easy to add support for new devices.
 
 ## Supported Hardware
 
@@ -84,6 +84,8 @@ light.on((255, 0, 0))
 
 # Away - yellow
 light.on((255, 255, 0))
+
+light.off()
 ```
 
 
@@ -116,7 +118,7 @@ direnv allow
 
 ### Install Dependencies
 ```console
-uv sync
+uv sync --all-groups
 ```
 ### Run `poe`
 ```console
