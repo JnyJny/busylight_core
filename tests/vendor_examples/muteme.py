@@ -1,4 +1,8 @@
-""" """
+"""Hardware examples for MuteMe busylight devices.
+
+This module provides mock hardware definitions for testing MuteMe
+busylight devices, including the MuteMe, MuteMe Mini, and MuteSync product lines.
+"""
 
 from busylight_core.hardware import ConnectionType
 from busylight_core.vendors.muteme import MuteMe, MuteMe_Mini, MuteSync

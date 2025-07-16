@@ -1,4 +1,8 @@
-""" """
+"""Hardware examples for Compulab busylight devices.
+
+This module provides mock hardware definitions for testing Compulab
+busylight devices, including the fit-StatUSB product line.
+"""
 
 from busylight_core.hardware import ConnectionType
 from busylight_core.vendors.compulab import Fit_StatUSB

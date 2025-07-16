@@ -1,4 +1,8 @@
-""" """
+"""Hardware examples for Embrava busylight devices.
+
+This module provides mock hardware definitions for testing Embrava
+busylight devices, including the Blynclight product line.
+"""
 
 from busylight_core.vendors.embrava import Blynclight, Blynclight_Mini, Blynclight_Plus
 

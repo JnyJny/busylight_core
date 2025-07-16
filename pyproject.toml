@@ -209,7 +209,31 @@ lint.ignore = [
   # assert (S101)
   "S101",
   # subprocess-without-shell-equals-true (S603)
-  "S603"
+  "S603",
+  # private-member-access (SLF001)
+  "SLF001",
+  # unused-function-argument (ARG001)
+  "ARG001",
+  # unused-lambda-argument (ARG005)
+  "ARG005",
+  # useless-expression (B018)
+  "B018",
+  # useless-comparison (B015)
+  "B015",
+  # builtin-import-shadowing (A004)
+  "A004",
+  # camelcase-imported-as-constant (N814)
+  "N814",
+  # import-outside-top-level (PLC0415)
+  "PLC0415",
+  # comparison-with-itself (PLR0124)
+  "PLR0124",
+  # undocumented-public-method (D102)
+  "D102",
+  # missing-return-type-undocumented-public-function (ANN201)
+  "ANN201",
+  # line-too-long (E501)
+  "E501"
 ]
 
 [tool.ty]

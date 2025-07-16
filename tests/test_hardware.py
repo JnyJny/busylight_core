@@ -1,4 +1,4 @@
-""" """
+"""Tests for the Hardware class and related functionality."""
 
 import pytest
 
@@ -8,6 +8,7 @@ from busylight_core.hardware import ConnectionType, Hardware
 
 
 def test_hardware_classmethod_enumerate_without_args() -> None:
+    """Test that enumerate() returns a list of Hardware objects."""
     results = Hardware.enumerate()
 
     assert isinstance(results, list)
@@ -16,7 +17,7 @@ def test_hardware_classmethod_enumerate_without_args() -> None:
 
 
 @pytest.mark.parametrize(
-    "connection, implemented",
+    ("connection", "implemented"),
     [
         (ConnectionType.ANY, True),
         (ConnectionType.UNKNOWN, False),
@@ -29,6 +30,7 @@ def test_hardware_classmethod_enumerate_by_connection_type(
     connection,
     implemented,
 ) -> None:
+    """Test enumerate() with different connection types."""
     if not implemented:
         with pytest.raises(NotImplementedError):
             results = Hardware.enumerate(connection)
@@ -42,6 +44,7 @@ def test_hardware_classmethod_enumerate_by_connection_type(
 
 
 def test_hardware_classmethod_from_portinfo(hardware_serial_device) -> None:
+    """Test Hardware.from_portinfo() creates correct Hardware object."""
     assert isinstance(hardware_serial_device, Hardware)
     assert hardware_serial_device.vendor_id == 0x9999
     assert hardware_serial_device.product_id == 0x9999
@@ -57,6 +60,7 @@ def test_hardware_classmethod_from_portinfo(hardware_serial_device) -> None:
 
 
 def test_hardware_classmethod_from_hid(hardware_hid_device) -> None:
+    """Test Hardware.from_hid() creates correct Hardware object."""
     assert isinstance(hardware_hid_device, Hardware)
     assert hardware_hid_device.vendor_id == 0x9999
     assert hardware_hid_device.product_id == 0x9999
@@ -75,16 +79,16 @@ def test_hardware_classmethod_from_hid(hardware_hid_device) -> None:
 @pytest.mark.skip(reason="Not implemented")
 @pytest.mark.parametrize("hardware", [None])
 def test_hardware_property_handle(hardware: Hardware) -> None:
-    pass
+    """Test Hardware.handle property (not implemented)."""
 
 
 @pytest.mark.skip(reason="Not implemented")
 @pytest.mark.parametrize("hardware", [None])
 def test_hardware_method_acquire(hardware: Hardware) -> None:
-    pass
+    """Test Hardware.acquire() method (not implemented)."""
 
 
 @pytest.mark.skip(reason="Not implemented")
 @pytest.mark.parametrize("hardware", [None])
 def test_hardware_method_release(hardware: Hardware) -> None:
-    pass
+    """Test Hardware.release() method (not implemented)."""

@@ -1,27 +1,31 @@
-""" """
+"""Tests for the Light abstract base class and its methods."""
 
 import pytest
 
-from busylight_core import Light, NoLightsFound
+from busylight_core import Light, NoLightsFoundError
 from busylight_core.hardware import Hardware
 
 
 def test_light_init_fails(hardware_devices: list[Hardware]) -> None:
+    """Test that Light abstract class cannot be instantiated directly."""
     for device in hardware_devices:
         with pytest.raises(TypeError):
-            result = Light(device)
+            Light(device)
 
 
 def test_light_abstractclassmethod_supported_device_ids() -> None:
-    assert Light.supported_device_ids == None
+    """Test that Light.supported_device_ids returns None for abstract class."""
+    assert Light.supported_device_ids is None
 
 
 def test_light_classmethod_vendor() -> None:
+    """Test that Light.vendor() returns a string."""
     result = Light.vendor()
     assert isinstance(result, str)
 
 
 def test_light_classmethod_unique_device_names() -> None:
+    """Test that Light.unique_device_names() returns a list of strings."""
     results = Light.unique_device_names()
 
     for result in results:
@@ -31,12 +35,14 @@ def test_light_classmethod_unique_device_names() -> None:
 def test_light_classmethod_claims_bogus_device(
     hardware_devices: list[Hardware],
 ) -> None:
+    """Test that Light abstract class doesn't claim any devices."""
     for device in hardware_devices:
         result = Light.claims(device)
         assert not result
 
 
 def test_light_classmethod_subclasses() -> None:
+    """Test that Light.subclasses() returns a list of Light subclasses."""
     results = Light.subclasses()
 
     assert isinstance(results, list)
@@ -46,6 +52,7 @@ def test_light_classmethod_subclasses() -> None:
 
 
 def test_light_classmethod_supported_lights() -> None:
+    """Test that Light.supported_lights() returns a dict of vendor to product names."""
     results = Light.supported_lights()
 
     assert isinstance(results, dict)
@@ -59,6 +66,7 @@ def test_light_classmethod_supported_lights() -> None:
 
 
 def test_light_classmethod_available_lights() -> None:
+    """Test that Light.available_lights() returns a dict of subclass to devices."""
     results = Light.available_lights()
 
     assert isinstance(results, dict)
@@ -72,6 +80,7 @@ def test_light_classmethod_available_lights() -> None:
 
 
 def test_light_classmethod_all_lights() -> None:
+    """Test that Light.all_lights() returns a list of Light instances."""
     results = Light.all_lights(reset=False, exclusive=False)
 
     assert isinstance(results, list)
@@ -81,8 +90,9 @@ def test_light_classmethod_all_lights() -> None:
 
 
 def test_light_classmethod_first_light() -> None:
+    """Test Light.first_light() returns a Light instance or raises NoLightsFoundError."""
     try:
         result = Light.first_light(reset=False, exclusive=False)
         assert isinstance(result, Light)
-    except NoLightsFound:
+    except NoLightsFoundError:
         pass

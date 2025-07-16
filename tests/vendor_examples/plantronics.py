@@ -1,4 +1,8 @@
-""" """
+"""Hardware examples for Plantronics busylight devices.
+
+This module provides mock hardware definitions for testing Plantronics
+busylight devices, including the Status Indicator product line.
+"""
 
 from busylight_core.vendors.plantronics import Status_Indicator
 

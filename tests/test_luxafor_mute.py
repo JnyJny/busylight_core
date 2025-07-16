@@ -23,13 +23,13 @@ def create_mock_mute_hardware():
 class TestLuxaforMute:
     """Test cases for Luxafor Mute device implementation."""
 
-    def test_supported_device_ids(self):
+    def test_supported_device_ids(self) -> None:
         """Test that supported_device_ids contains correct device mapping."""
         assert isinstance(Mute.supported_device_ids, dict)
         assert (0x4D8, 0xF372) in Mute.supported_device_ids
         assert Mute.supported_device_ids[(0x4D8, 0xF372)] == "Mute"
 
-    def test_is_button_property(self):
+    def test_is_button_property(self) -> None:
         """Test that is_button property returns True for Mute device."""
         mock_hardware = create_mock_mute_hardware()
 
@@ -37,7 +37,7 @@ class TestLuxaforMute:
             mute = Mute(mock_hardware)
             assert mute.is_button is True
 
-    def test_button_on_response_66_sets_button_false(self):
+    def test_button_on_response_66_sets_button_false(self) -> None:
         """Test button_on when device response[0] == 66 sets _button to False."""
         mock_hardware = create_mock_mute_hardware()
 
@@ -56,7 +56,7 @@ class TestLuxaforMute:
             assert mute._button is False
             assert result is False  # Returns False after processing
 
-    def test_button_on_response_131_true(self):
+    def test_button_on_response_131_true(self) -> None:
         """Test button_on when device response[0] == 131 and results[1] is truthy."""
         mock_hardware = create_mock_mute_hardware()
 
@@ -73,7 +73,7 @@ class TestLuxaforMute:
             mock_read.assert_called_once_with(8, 200)
             assert result is True
 
-    def test_button_on_response_131_false(self):
+    def test_button_on_response_131_false(self) -> None:
         """Test button_on when device response[0] == 131 and results[1] is falsy."""
         mock_hardware = create_mock_mute_hardware()
 
@@ -90,8 +90,8 @@ class TestLuxaforMute:
             mock_read.assert_called_once_with(8, 200)
             assert result is False
 
-    def test_button_on_response_131_with_nonzero_value(self):
-        """Test button_on when device response[0] == 131 and results[1] has non-zero value."""
+    def test_button_on_response_131_with_nonzero_value(self) -> None:
+        """Test button_on when device response[0] == 131 and results[1] != 0."""
         mock_hardware = create_mock_mute_hardware()
 
         with (
@@ -107,7 +107,7 @@ class TestLuxaforMute:
             mock_read.assert_called_once_with(8, 200)
             assert result is True
 
-    def test_button_on_index_error_handling(self):
+    def test_button_on_index_error_handling(self) -> None:
         """Test button_on handles IndexError gracefully and returns False."""
         mock_hardware = create_mock_mute_hardware()
 
@@ -122,7 +122,7 @@ class TestLuxaforMute:
             mock_read.assert_called_once_with(8, 200)
             assert result is False
 
-    def test_button_on_index_error_with_short_response(self):
+    def test_button_on_index_error_with_short_response(self) -> None:
         """Test button_on handles IndexError when response is too short."""
         mock_hardware = create_mock_mute_hardware()
 
@@ -137,7 +137,7 @@ class TestLuxaforMute:
             mock_read.assert_called_once_with(8, 200)
             assert result is False
 
-    def test_button_on_unknown_response_code(self):
+    def test_button_on_unknown_response_code(self) -> None:
         """Test button_on with unknown response code returns False."""
         mock_hardware = create_mock_mute_hardware()
 
@@ -158,7 +158,7 @@ class TestLuxaforMute:
 class TestLuxaforMuteInheritance:
     """Test inheritance and integration aspects of Luxafor Mute."""
 
-    def test_inherits_from_flag(self):
+    def test_inherits_from_flag(self) -> None:
         """Test that Mute properly inherits from Flag class."""
         from busylight_core.vendors.luxafor.flag import Flag
 
@@ -166,21 +166,21 @@ class TestLuxaforMuteInheritance:
 
         # Test that Mute has all the Flag methods
         mute_methods = dir(Mute)
-        flag_methods = dir(Flag)
+        dir(Flag)
 
         # Key Flag methods should be available in Mute
         expected_methods = ["claims", "state", "__bytes__", "supported_device_ids"]
         for method in expected_methods:
             assert method in mute_methods
 
-    def test_device_claiming_logic(self):
+    def test_device_claiming_logic(self) -> None:
         """Test that Mute can properly claim devices using inherited logic."""
         mock_hardware = create_mock_mute_hardware()
 
         result = Mute.claims(mock_hardware)
         assert result is True
 
-    def test_device_claiming_wrong_device(self):
+    def test_device_claiming_wrong_device(self) -> None:
         """Test that Mute rejects devices it doesn't support."""
         # Create a mock hardware that should NOT be claimed by Mute
         mock_hardware = Mock(spec=Hardware)
@@ -192,7 +192,7 @@ class TestLuxaforMuteInheritance:
         result = Mute.claims(mock_hardware)
         assert result is False
 
-    def test_bytes_conversion_inheritance(self):
+    def test_bytes_conversion_inheritance(self) -> None:
         """Test that __bytes__ method works through inheritance."""
         mock_hardware = create_mock_mute_hardware()
 
@@ -207,7 +207,7 @@ class TestLuxaforMuteInheritance:
             result = bytes(mute)
             assert isinstance(result, bytes)
 
-    def test_mute_specific_properties_override(self):
+    def test_mute_specific_properties_override(self) -> None:
         """Test that Mute-specific properties properly override Flag properties."""
         mock_hardware = create_mock_mute_hardware()
 
@@ -218,7 +218,7 @@ class TestLuxaforMuteInheritance:
             assert mute.is_button is True
 
             # Mute should have button_on property (not in base Flag)
-            # Check that the property exists in the class, not the instance to avoid calling it
+            # Check that the property exists in the class, not the instance
             assert "button_on" in dir(Mute)
             assert isinstance(Mute.button_on, property)
 
@@ -226,7 +226,7 @@ class TestLuxaforMuteInheritance:
 class TestLuxaforMuteEdgeCases:
     """Test edge cases and error conditions for Luxafor Mute."""
 
-    def test_button_on_read_strategy_exception(self):
+    def test_button_on_read_strategy_exception(self) -> None:
         """Test button_on when read_strategy raises an exception."""
         mock_hardware = create_mock_mute_hardware()
 
@@ -246,7 +246,7 @@ class TestLuxaforMuteEdgeCases:
             with pytest.raises(Exception, match="Device communication error"):
                 mute.button_on
 
-    def test_button_on_none_response(self):
+    def test_button_on_none_response(self) -> None:
         """Test button_on when read_strategy returns None."""
         mock_hardware = create_mock_mute_hardware()
 
@@ -261,7 +261,7 @@ class TestLuxaforMuteEdgeCases:
             with pytest.raises(TypeError):
                 mute.button_on
 
-    def test_multiple_button_reads(self):
+    def test_multiple_button_reads(self) -> None:
         """Test multiple sequential button reads behave consistently."""
         mock_hardware = create_mock_mute_hardware()
 

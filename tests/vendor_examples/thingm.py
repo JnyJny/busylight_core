@@ -1,4 +1,8 @@
-""" """
+"""Hardware examples for ThingM busylight devices.
+
+This module provides mock hardware definitions for testing ThingM
+busylight devices, including the Blink1 product line.
+"""
 
 from busylight_core.vendors.thingm import Blink1
 

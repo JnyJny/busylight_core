@@ -1,10 +1,10 @@
-""" """
+"""Test implementation compliance across all vendor Light subclasses."""
 
 from collections.abc import Callable
 
 import pytest
 
-from busylight_core import LightUnsupported, NoLightsFound
+from busylight_core import HardwareUnsupportedError, NoLightsFoundError
 from busylight_core.hardware import Hardware
 
 from .vendor_examples import HardwareCatalog as VENDOR_HARDWARE
@@ -14,6 +14,7 @@ VENDOR_SUBCLASSES = VENDOR_HARDWARE.keys()
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_supported_device_ids(subclass) -> None:
+    """Test that supported_device_ids returns a dict mapping device IDs to names."""
     result = subclass.supported_device_ids
     assert isinstance(result, dict)
 
@@ -26,12 +27,14 @@ def test_implementation_classmethod_supported_device_ids(subclass) -> None:
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_vendor(subclass) -> None:
+    """Test that vendor() returns a string identifying the vendor name."""
     result = subclass.vendor()
     assert isinstance(result, str)
 
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_unique_device_names(subclass) -> None:
+    """Test that unique_device_names() returns a list of unique device name strings."""
     result = subclass.unique_device_names()
     assert isinstance(result, list)
 
@@ -39,8 +42,9 @@ def test_implementation_classmethod_unique_device_names(subclass) -> None:
         assert isinstance(item, str)
 
 
-@pytest.mark.parametrize("subclass,devices", list(VENDOR_HARDWARE.items()))
+@pytest.mark.parametrize(("subclass", "devices"), list(VENDOR_HARDWARE.items()))
 def test_implementation_classmethod_claims(subclass, devices) -> None:
+    """Test that claims() returns True for devices that the subclass should support."""
     for device in devices:
         result = subclass.claims(device)
         assert isinstance(result, bool)
@@ -52,6 +56,7 @@ def test_implementation_classmethod_does_not_claim_bogus(
     subclass,
     hardware_devices,
 ) -> None:
+    """Test that claims() returns False for unsupported devices."""
     for device in hardware_devices:
         result = subclass.claims(device)
         assert isinstance(result, bool)
@@ -60,6 +65,7 @@ def test_implementation_classmethod_does_not_claim_bogus(
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_subclasses(subclass) -> None:
+    """Test that subclasses() returns a list of subclasses that inherit from the subclass."""
     results = subclass.subclasses()
     assert isinstance(results, list)
     for item in results:
@@ -68,6 +74,7 @@ def test_implementation_classmethod_subclasses(subclass) -> None:
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_supported_lights(subclass) -> None:
+    """Test that supported_lights() returns a dict mapping vendor names to devices."""
     results = subclass.supported_lights()
     assert isinstance(results, dict)
     for key, value in results.items():
@@ -78,6 +85,7 @@ def test_implementation_classmethod_supported_lights(subclass) -> None:
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_available_lights(subclass) -> None:
+    """Test that available_lights() returns a dict mapping subclasses to Hardware devices."""
     results = subclass.available_lights()
     assert isinstance(results, dict)
     for subclasses, devices in results.items():
@@ -89,6 +97,7 @@ def test_implementation_classmethod_available_lights(subclass) -> None:
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_all_lights(subclass) -> None:
+    """Test that all_lights() returns a list of all available light instances."""
     results = subclass.all_lights()
     assert isinstance(results, list)
     for item in results:
@@ -97,22 +106,25 @@ def test_implementation_classmethod_all_lights(subclass) -> None:
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_classmethod_first_light(subclass) -> None:
+    """Test that first_light() returns first available light or raises NoLightsFoundError."""
     try:
         result = subclass.first_light()
         assert isinstance(result, subclass)
-    except NoLightsFound:
+    except NoLightsFoundError:
         pass
 
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
 def test_implementation_init_with_bogus_hardware(subclass, hardware_devices) -> None:
+    """Test that initializing with unsupported hardware raises HardwareUnsupportedError."""
     for device in hardware_devices:
-        with pytest.raises(LightUnsupported):
-            result = subclass(device, reset=False, exclusive=False)
+        with pytest.raises(HardwareUnsupportedError):
+            subclass(device, reset=False, exclusive=False)
 
 
-@pytest.mark.parametrize("subclass,devices", list(VENDOR_HARDWARE.items()))
+@pytest.mark.parametrize(("subclass", "devices"), list(VENDOR_HARDWARE.items()))
 def test_implementation_init(subclass, devices) -> None:
+    """Test that light instances can be initialized with supported hardware and work."""
     for device in devices:
         ## EJO The aquire and release methods are monkey patched here to
         ##     to avoid really trying to acquire/release potentially bogus

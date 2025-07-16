@@ -1,4 +1,8 @@
-""" """
+"""Hardware examples for Agile Innovative busylight devices.
+
+This module provides mock hardware definitions for testing Agile Innovative
+busylight devices, including the BlinkStick product line.
+"""
 
 from busylight_core.vendors.agile_innovative import BlinkStick
 

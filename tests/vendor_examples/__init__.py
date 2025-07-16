@@ -1,4 +1,8 @@
-""" """
+"""Hardware examples for all supported busylight vendors.
+
+This module provides mock hardware definitions for testing purposes across
+all supported busylight vendors and their devices.
+"""
 
 from .agile_innovative import AGILE_INNOVATIVE_HARDWARE
 from .compulab import COMPULAB_HARDWARE

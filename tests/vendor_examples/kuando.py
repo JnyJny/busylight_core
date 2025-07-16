@@ -1,4 +1,8 @@
-""" """
+"""Hardware examples for Kuando busylight devices.
+
+This module provides mock hardware definitions for testing Kuando
+busylight devices, including the Busylight Alpha and Omega product lines.
+"""
 
 from busylight_core.vendors.kuando import Busylight_Alpha, Busylight_Omega
 

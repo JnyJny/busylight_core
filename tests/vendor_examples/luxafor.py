@@ -1,4 +1,8 @@
-""" """
+"""Hardware examples for Luxafor busylight devices.
+
+This module provides mock hardware definitions for testing Luxafor
+busylight devices, including the Flag, Mute, Orb, BusyTag, and Bluetooth product lines.
+"""
 
 from busylight_core.vendors.luxafor import Bluetooth, BusyTag, Flag, Mute, Orb
 

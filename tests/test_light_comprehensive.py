@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from busylight_core.exceptions import LightUnavailable, LightUnsupported
+from busylight_core.exceptions import LightUnavailableError, HardwareUnsupportedError
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.light import Light
 
@@ -13,7 +13,9 @@ from busylight_core.light import Light
 class MockLightSubclass(Light):
     """Mock Light subclass for testing."""
 
-    supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {(0x1234, 0x5678): "MockLight"}
+    supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
+        (0x1234, 0x5678): "MockLight"
+    }
 
     def __bytes__(self) -> bytes:
         return b"\x01\x02\x03\x04"
@@ -41,8 +43,8 @@ def create_mock_hardware(vendor_id=0x1234, product_id=0x5678, path=b"/dev/hidraw
 class TestLightFirstLight:
     """Test first_light method coverage."""
 
-    def test_first_light_with_exception_handling(self):
-        """Test first_light when subclass init raises exception - covers lines 115-117."""
+    def test_first_light_with_exception_handling(self) -> None:
+        """Test first_light when subclass init raises exception."""
         mock_hardware = create_mock_hardware()
 
         with (
@@ -62,7 +64,7 @@ class TestLightFirstLight:
 class TestLightRepr:
     """Test __repr__ method coverage."""
 
-    def test_repr_method(self):
+    def test_repr_method(self) -> None:
         """Test __repr__ method - covers line 142."""
         mock_hardware = create_mock_hardware()
 
@@ -82,7 +84,7 @@ class TestLightRepr:
 class TestLightPath:
     """Test path property coverage."""
 
-    def test_path_property_cached(self):
+    def test_path_property_cached(self) -> None:
         """Test path property decode - covers line 153."""
         mock_hardware = create_mock_hardware(path=b"/dev/hidraw1")
 
@@ -104,7 +106,7 @@ class TestLightPath:
 class TestLightPlatform:
     """Test platform property coverage."""
 
-    def test_platform_property_windows(self):
+    def test_platform_property_windows(self) -> None:
         """Test platform property for Windows - covers line 160."""
         mock_hardware = create_mock_hardware()
 
@@ -123,7 +125,7 @@ class TestLightPlatform:
 class TestLightSortKey:
     """Test _sort_key property coverage."""
 
-    def test_sort_key_property(self):
+    def test_sort_key_property(self) -> None:
         """Test _sort_key property - covers line 166."""
         mock_hardware = create_mock_hardware()
 
@@ -145,8 +147,8 @@ class TestLightSortKey:
 class TestLightEquality:
     """Test __eq__ method coverage."""
 
-    def test_eq_method_attribute_error(self):
-        """Test __eq__ method when other object lacks _sort_key - covers lines 169-172."""
+    def test_eq_method_attribute_error(self) -> None:
+        """Test __eq__ method when other object lacks _sort_key."""
         mock_hardware = create_mock_hardware()
 
         with (
@@ -161,7 +163,7 @@ class TestLightEquality:
 
             other = NoSortKeyObject()
 
-            # This should raise TypeError because NotImplemented is being raised incorrectly
+            # This should raise TypeError because NotImplemented is being raised
             with pytest.raises(TypeError):
                 light == other
 
@@ -169,7 +171,7 @@ class TestLightEquality:
 class TestLightComparison:
     """Test __lt__ method coverage."""
 
-    def test_lt_method_not_light_instance(self):
+    def test_lt_method_not_light_instance(self) -> None:
         """Test __lt__ method with non-Light instance - covers lines 176-177."""
         mock_hardware = create_mock_hardware()
 
@@ -183,7 +185,7 @@ class TestLightComparison:
             result = light.__lt__("not a light")
             assert result is NotImplemented
 
-    def test_lt_method_comparison_logic(self):
+    def test_lt_method_comparison_logic(self) -> None:
         """Test __lt__ method comparison logic - covers lines 179-183."""
         mock_hardware1 = create_mock_hardware(path=b"/dev/hidraw0")
         mock_hardware2 = create_mock_hardware(path=b"/dev/hidraw1")
@@ -200,7 +202,7 @@ class TestLightComparison:
             result = light1 < light2
             assert isinstance(result, bool)
 
-    def test_lt_method_equal_sort_keys(self):
+    def test_lt_method_equal_sort_keys(self) -> None:
         """Test __lt__ method when sort keys are equal - covers line 183."""
         mock_hardware = create_mock_hardware()
 
@@ -223,7 +225,7 @@ class TestLightComparison:
 class TestLightHash:
     """Test __hash__ method coverage."""
 
-    def test_hash_method_caching(self):
+    def test_hash_method_caching(self) -> None:
         """Test __hash__ method caching - covers lines 186-191."""
         mock_hardware = create_mock_hardware()
 
@@ -249,7 +251,7 @@ class TestLightHash:
 class TestLightHex:
     """Test hex property coverage."""
 
-    def test_hex_property(self):
+    def test_hex_property(self) -> None:
         """Test hex property - covers line 201."""
         mock_hardware = create_mock_hardware()
 
@@ -267,7 +269,7 @@ class TestLightHex:
 class TestLightReadStrategy:
     """Test read_strategy property coverage."""
 
-    def test_read_strategy_property(self):
+    def test_read_strategy_property(self) -> None:
         """Test read_strategy property - covers line 206."""
         mock_hardware = create_mock_hardware()
 
@@ -284,7 +286,7 @@ class TestLightReadStrategy:
 class TestLightExclusiveAccess:
     """Test exclusive_access context manager coverage."""
 
-    def test_exclusive_access_non_exclusive_mode(self):
+    def test_exclusive_access_non_exclusive_mode(self) -> None:
         """Test exclusive_access when not in exclusive mode - covers lines 222, 227."""
         mock_hardware = create_mock_hardware()
 
@@ -307,7 +309,7 @@ class TestLightExclusiveAccess:
 class TestLightUpdate:
     """Test update method coverage."""
 
-    def test_update_windows_10_platform(self):
+    def test_update_windows_10_platform(self) -> None:
         """Test update method with Windows 10 platform - covers line 236."""
         mock_hardware = create_mock_hardware()
 
@@ -327,7 +329,7 @@ class TestLightUpdate:
                 expected_data = bytes([0]) + b"\x01\x02\x03\x04"
                 mock_hardware.handle.write.assert_called_once_with(expected_data)
 
-    def test_update_unsupported_platform(self):
+    def test_update_unsupported_platform(self) -> None:
         """Test update method with unsupported platform - covers lines 239-240."""
         mock_hardware = create_mock_hardware()
 
@@ -351,8 +353,8 @@ class TestLightUpdate:
                     "Unsupported OS UnsupportedOS_1.0, hoping for the best."
                 )
 
-    def test_update_write_strategy_exception(self):
-        """Test update method when write_strategy raises exception - covers lines 248-250."""
+    def test_update_write_strategy_exception(self) -> None:
+        """Test update method when write_strategy raises exception."""
         mock_hardware = create_mock_hardware()
 
         with (
@@ -368,7 +370,7 @@ class TestLightUpdate:
                 patch.object(light, "exclusive_access"),
                 patch("busylight_core.light.logger.error") as mock_logger,
             ):
-                with pytest.raises(LightUnavailable):
+                with pytest.raises(LightUnavailableError):
                     light.update()
 
                 # Should log error
@@ -378,7 +380,7 @@ class TestLightUpdate:
 class TestLightIntegration:
     """Integration tests for Light class."""
 
-    def test_complete_light_workflow(self):
+    def test_complete_light_workflow(self) -> None:
         """Test a complete workflow with Light class."""
         mock_hardware = create_mock_hardware()
 
@@ -421,15 +423,15 @@ class TestLightIntegration:
 class TestLightEdgeCases:
     """Test edge cases and error conditions."""
 
-    def test_unsupported_hardware_initialization(self):
+    def test_unsupported_hardware_initialization(self) -> None:
         """Test Light initialization with unsupported hardware."""
         # Create hardware that won't be claimed by MockLightSubclass
         mock_hardware = create_mock_hardware(vendor_id=0x9999, product_id=0x9999)
 
-        with pytest.raises(LightUnsupported):
+        with pytest.raises(HardwareUnsupportedError):
             MockLightSubclass(mock_hardware)
 
-    def test_light_comparison_edge_cases(self):
+    def test_light_comparison_edge_cases(self) -> None:
         """Test light comparison edge cases."""
         mock_hardware1 = create_mock_hardware()
         mock_hardware2 = create_mock_hardware()

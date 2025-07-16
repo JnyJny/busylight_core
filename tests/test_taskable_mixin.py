@@ -11,7 +11,7 @@ from busylight_core.mixins.taskable import TaskableMixin
 class TestTaskableMixin:
     """Test cases for TaskableMixin functionality."""
 
-    def test_event_loop_property(self):
+    def test_event_loop_property(self) -> None:
         """Test that event_loop property returns an event loop."""
         mixin = TaskableMixin()
 
@@ -30,7 +30,7 @@ class TestTaskableMixin:
             mock_new_loop.assert_called_once()
             assert result is mock_loop
 
-    def test_event_loop_cached_property(self):
+    def test_event_loop_cached_property(self) -> None:
         """Test that event_loop is cached and only calls event loop functions once."""
         mixin = TaskableMixin()
 
@@ -53,14 +53,14 @@ class TestTaskableMixin:
             assert result2 is mock_loop
             assert result1 is result2
 
-    def test_tasks_property_initial_state(self):
+    def test_tasks_property_initial_state(self) -> None:
         """Test that tasks property returns empty dict initially."""
         mixin = TaskableMixin()
 
         assert isinstance(mixin.tasks, dict)
         assert len(mixin.tasks) == 0
 
-    def test_tasks_cached_property(self):
+    def test_tasks_cached_property(self) -> None:
         """Test that tasks property is cached and returns same dict."""
         mixin = TaskableMixin()
 
@@ -70,7 +70,7 @@ class TestTaskableMixin:
         assert tasks1 is tasks2
         assert isinstance(tasks1, dict)
 
-    def test_add_task_new_task(self):
+    def test_add_task_new_task(self) -> None:
         """Test adding a new task creates and stores it."""
         mixin = TaskableMixin()
         mock_task = Mock()
@@ -78,7 +78,7 @@ class TestTaskableMixin:
         mock_loop.create_task.return_value = mock_task
 
         # Mock coroutine function
-        async def mock_coroutine(self):
+        async def mock_coroutine(self) -> str:
             return "test_result"
 
         with patch.object(mixin, "event_loop", mock_loop):
@@ -89,14 +89,14 @@ class TestTaskableMixin:
         assert result is mock_task
         assert mixin.tasks["test_task"] is mock_task
 
-    def test_add_task_existing_task_returns_existing(self):
+    def test_add_task_existing_task_returns_existing(self) -> None:
         """Test adding task with existing name returns existing task."""
         mixin = TaskableMixin()
         existing_task = Mock()
         mixin.tasks["existing_task"] = existing_task
 
         # Mock coroutine function
-        async def mock_coroutine(self):
+        async def mock_coroutine(self) -> str:
             return "test_result"
 
         mock_loop = Mock()
@@ -107,7 +107,7 @@ class TestTaskableMixin:
         assert result is existing_task
         mock_loop.create_task.assert_not_called()
 
-    def test_add_task_coroutine_called_with_self(self):
+    def test_add_task_coroutine_called_with_self(self) -> None:
         """Test that coroutine is called with self when creating task."""
         mixin = TaskableMixin()
         mock_task = Mock()
@@ -117,7 +117,7 @@ class TestTaskableMixin:
         # Mock coroutine function that records its argument
         coroutine_args = []
 
-        async def mock_coroutine(arg):
+        async def mock_coroutine(arg) -> str:
             coroutine_args.append(arg)
             return "test_result"
 
@@ -126,11 +126,11 @@ class TestTaskableMixin:
 
         # Verify the coroutine was called with self
         mock_loop.create_task.assert_called_once()
-        call_args = mock_loop.create_task.call_args[0][0]
+        mock_loop.create_task.call_args[0][0]
         # The argument should be a coroutine, we can't easily verify the mixin
         # was passed but we can verify create_task was called
 
-    def test_cancel_task_existing_task(self):
+    def test_cancel_task_existing_task(self) -> None:
         """Test canceling an existing task."""
         mixin = TaskableMixin()
         mock_task = Mock()
@@ -143,7 +143,7 @@ class TestTaskableMixin:
         assert result is mock_task
         assert "test_task" not in mixin.tasks
 
-    def test_cancel_task_nonexistent_task(self):
+    def test_cancel_task_nonexistent_task(self) -> None:
         """Test canceling a non-existent task returns None."""
         mixin = TaskableMixin()
 
@@ -152,7 +152,7 @@ class TestTaskableMixin:
         assert result is None
         assert len(mixin.tasks) == 0
 
-    def test_cancel_task_keyerror_handling(self):
+    def test_cancel_task_keyerror_handling(self) -> None:
         """Test cancel_task handles KeyError gracefully."""
         mixin = TaskableMixin()
 
@@ -161,7 +161,7 @@ class TestTaskableMixin:
 
         assert result is None
 
-    def test_cancel_task_attributeerror_handling(self):
+    def test_cancel_task_attributeerror_handling(self) -> None:
         """Test cancel_task handles AttributeError gracefully."""
         mixin = TaskableMixin()
 
@@ -177,7 +177,7 @@ class TestTaskableMixin:
         # Task should still be removed from tasks dict
         assert "problematic_task" not in mixin.tasks
 
-    def test_cancel_tasks_empty_tasks(self):
+    def test_cancel_tasks_empty_tasks(self) -> None:
         """Test cancel_tasks with no tasks does nothing."""
         mixin = TaskableMixin()
 
@@ -186,7 +186,7 @@ class TestTaskableMixin:
 
         assert len(mixin.tasks) == 0
 
-    def test_cancel_tasks_with_multiple_tasks(self):
+    def test_cancel_tasks_with_multiple_tasks(self) -> None:
         """Test cancel_tasks cancels all tasks and clears dict."""
         mixin = TaskableMixin()
 
@@ -209,7 +209,7 @@ class TestTaskableMixin:
         # Verify tasks dict is cleared
         assert len(mixin.tasks) == 0
 
-    def test_cancel_tasks_with_task_cancel_error(self):
+    def test_cancel_tasks_with_task_cancel_error(self) -> None:
         """Test cancel_tasks raises exception when task.cancel() fails."""
         mixin = TaskableMixin()
 
@@ -238,12 +238,12 @@ class TestTaskableMixinIntegration:
     """Integration tests for TaskableMixin with real asyncio."""
 
     @pytest.mark.asyncio
-    async def test_real_asyncio_integration(self):
+    async def test_real_asyncio_integration(self) -> None:
         """Test TaskableMixin with actual asyncio tasks."""
         mixin = TaskableMixin()
 
         # Create a real coroutine
-        async def test_coroutine(self):
+        async def test_coroutine(self) -> str:
             await asyncio.sleep(0.1)
             return "completed"
 
@@ -265,16 +265,16 @@ class TestTaskableMixinIntegration:
         assert task.cancelled()
 
     @pytest.mark.asyncio
-    async def test_multiple_real_tasks(self):
+    async def test_multiple_real_tasks(self) -> None:
         """Test managing multiple real asyncio tasks."""
         mixin = TaskableMixin()
 
         # Create multiple coroutines
-        async def slow_task(self):
+        async def slow_task(self) -> str:
             await asyncio.sleep(0.2)
             return "slow_completed"
 
-        async def fast_task(self):
+        async def fast_task(self) -> str:
             await asyncio.sleep(0.05)
             return "fast_completed"
 
@@ -294,7 +294,7 @@ class TestTaskableMixinIntegration:
         assert slow.cancelled()
         assert fast.cancelled()
 
-    def test_event_loop_property_with_real_loop(self):
+    def test_event_loop_property_with_real_loop(self) -> None:
         """Test event_loop property returns actual event loop."""
         mixin = TaskableMixin()
 
@@ -312,7 +312,7 @@ class TestTaskableMixinIntegration:
 class TestTaskableMixinEdgeCases:
     """Test edge cases and error conditions."""
 
-    def test_tasks_property_modification(self):
+    def test_tasks_property_modification(self) -> None:
         """Test that tasks dict can be modified and persists."""
         mixin = TaskableMixin()
 
@@ -328,7 +328,7 @@ class TestTaskableMixinEdgeCases:
         tasks_ref["another_task"] = Mock()
         assert "another_task" in mixin.tasks
 
-    def test_add_task_with_none_coroutine(self):
+    def test_add_task_with_none_coroutine(self) -> None:
         """Test add_task behavior with None coroutine."""
         mixin = TaskableMixin()
 
@@ -336,7 +336,7 @@ class TestTaskableMixinEdgeCases:
         with pytest.raises(TypeError):
             mixin.add_task("bad_task", None)
 
-    def test_cancel_task_with_none_in_tasks(self):
+    def test_cancel_task_with_none_in_tasks(self) -> None:
         """Test cancel_task when tasks dict contains None."""
         mixin = TaskableMixin()
 
@@ -349,7 +349,7 @@ class TestTaskableMixinEdgeCases:
         assert result is None
         assert "none_task" not in mixin.tasks
 
-    def test_concurrent_task_operations(self):
+    def test_concurrent_task_operations(self) -> None:
         """Test that concurrent operations on tasks work correctly."""
         mixin = TaskableMixin()
 
