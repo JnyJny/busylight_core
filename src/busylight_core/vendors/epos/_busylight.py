@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from ...word import BitField, Word
+from busylight_core.word import BitField, Word
 
 
 class Action(int, Enum):
@@ -30,7 +30,7 @@ class OnField(BitField):
 
 
 class State(Word):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(0, 80)
 
     report = ReportField(72, 8)
@@ -51,7 +51,7 @@ class State(Word):
         color: tuple[int, int, int],
         led: int = 0,
     ) -> None:
-        """ """
+        """Set color for the specified LED."""
         self.report = Report.ONE
         self.action = Action.SetColor
         match led:

@@ -1,6 +1,8 @@
-""" """
+"""Luxafor Flag device implementation details."""
 
 from enum import Enum
+
+from loguru import logger
 
 
 class Command(int, Enum):
@@ -66,4 +68,5 @@ class State:
                 pass
 
         logger.debug(f"Unsupported command: {self.command}")
-        raise ValueError(f"Unsupported command: {self.command}")
+        msg = f"Unsupported command: {self.command}"
+        raise ValueError(msg)

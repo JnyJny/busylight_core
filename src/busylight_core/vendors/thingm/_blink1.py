@@ -1,8 +1,8 @@
-""" """
+"""ThingM Blink(1) device implementation details."""
 
 from enum import Enum
 
-from ...word import BitField, Word
+from busylight_core.word import BitField, Word
 
 
 class Action(int, Enum):
@@ -44,89 +44,89 @@ class Report(int, Enum):
 class ReportField(BitField):
     """8-bit report field."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(56, 8)
 
 
 class ActionField(BitField):
     """8-bit action field."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(48, 8)
 
 
 class RedField(BitField):
     """8-bit red field."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(40, 8)
 
 
 class GreenField(BitField):
     """8-bit green field."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(32, 8)
 
 
 class BlueField(BitField):
     """8-bit blue field."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(24, 8)
 
 
 class PlayField(BitField):
     """8-bit play field."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(40, 8)
 
 
 class StartField(BitField):
     """8-bit start field."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(32, 8)
 
 
 class StopField(BitField):
     """8-bit stop field."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(24, 8)
 
 
 class CountField(BitField):
     """8-bit count field."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(16, 8)
 
 
 class FadeField(BitField):
     """16-bit fade field."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(8, 16)
 
 
 class LedsField(BitField):
     """8-bit led field."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(0, 8)
 
 
 class LinesField(BitField):
     """8-bit line field."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(0, 8)
 
 
 class State(Word):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(0, 64)
 
     report = ReportField()

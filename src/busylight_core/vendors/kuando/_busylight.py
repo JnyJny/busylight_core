@@ -1,9 +1,9 @@
-""" """
+"""Kuando Busylight device implementation details."""
 
 import struct
 from enum import Enum
 
-from ...word import BitField, Word
+from busylight_core.word import BitField, Word
 
 
 class Ring(int, Enum):
@@ -55,7 +55,7 @@ class RepeatField(BitField):
 
 
 class ColorField(BitField):
-    def __set__(self, instance, value):
+    def __set__(self, instance, value) -> None:
         super().__set__(instance, int((value / 255) * 100))
 
     def __get__(self, instance, owner):
@@ -226,12 +226,12 @@ class Footer(Step):
 
 
 class State:
-    def __init__(self):
+    def __init__(self) -> None:
         self.steps = [Step() for _ in range(7)]
         self.footer = Footer()
         self.struct = struct.Struct("!8Q")
 
-    def __bytes__(self):
+    def __bytes__(self) -> bytes:
         self.footer.checksum = sum(bytes(self.footer)[:-2])
         for step in self.steps:
             self.footer.checksum += sum(bytes(step))

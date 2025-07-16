@@ -1,4 +1,4 @@
-""" """
+"""Mixin classes for extending Light functionality."""
 
 from .colorable import ColorableMixin
 from .taskable import TaskableMixin

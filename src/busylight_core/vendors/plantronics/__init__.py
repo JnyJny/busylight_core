@@ -1,4 +1,4 @@
-""" """
+"""Plantronics status light devices."""
 
 from .status_indicator import Status_Indicator
 

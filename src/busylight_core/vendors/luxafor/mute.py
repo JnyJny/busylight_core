@@ -1,19 +1,39 @@
 """Luxafor Mute"""
 
+from typing import ClassVar
+
 from .flag import Flag
 
 
 class Mute(Flag):
-    supported_device_ids: dict[tuple[int, int], str] = {
+    """Luxafor Mute status light controller.
+
+    A mute button device with status light functionality, combining
+    the Luxafor Flag features with button input capabilities.
+    """
+
+    supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
         (0x4D8, 0xF372): "Mute",
     }
 
     @property
     def is_button(self) -> bool:
+        """Check if this device has button functionality.
+
+        Returns:
+            True, as the Mute device has a button
+
+        """
         return True
 
     @property
     def button_on(self) -> bool:
+        """Check if the mute button is currently pressed.
+
+        Returns:
+            True if the button is pressed, False otherwise
+
+        """
         results = self.read_strategy(8, 200)
 
         try:

@@ -6,13 +6,13 @@ from functools import cached_property
 
 
 class TaskableMixin:
-    """This mixin class is designed to associate and manage
-    asynchronous tasks. Tasks can be added and cancelled.
+    """Associate and manage asynchronous tasks.
 
+    Tasks can be added and cancelled.
     """
 
     @cached_property
-    def event_loop(self):
+    def event_loop(self) -> asyncio.AbstractEventLoop:
         """The default event loop."""
         try:
             return asyncio.get_running_loop()
@@ -25,8 +25,9 @@ class TaskableMixin:
         return {}
 
     def add_task(self, name: str, coroutine: Awaitable) -> asyncio.Task:
-        """Create a new task using coroutine as the body and stash it in
-        the tasks dictionary property using name as a key.
+        """Create a new task using coroutine as the body and stash it in the tasks dict.
+
+        Using name as a key for the tasks dictionary.
 
         :name: str
         :coroutine: Awaitable
@@ -43,8 +44,9 @@ class TaskableMixin:
         return self.tasks[name]
 
     def cancel_task(self, name: str) -> asyncio.Task | None:
-        """Cancels a task associated with name if it exists.  If the
-        task exists the cancelled task is returned, otherwise None.
+        """Cancel a task associated with name if it exists.
+
+        If the task exists the cancelled task is returned, otherwise None.
 
         :name: str
         :return: None | asyncio.Task
@@ -53,14 +55,15 @@ class TaskableMixin:
             task = self.tasks[name]
             del self.tasks[name]
             task.cancel()
-            return task
         except (KeyError, AttributeError):
             pass
+        else:
+            return task
 
         return None
 
     def cancel_tasks(self) -> None:
-        """Cancels all tasks and returns nothing."""
+        """Cancel all tasks and return nothing."""
         for task in self.tasks.values():
             task.cancel()
         self.tasks.clear()

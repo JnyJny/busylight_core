@@ -170,7 +170,8 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         :param: exclusive - bool - acquire exclusive access to the hardware
 
         Raises:
-        - HardwareUnsupportedError: if the given Hardware is not supported by this class.
+        - HardwareUnsupportedError: if the given Hardware is not supported by this
+          class.
 
         """
         if not self.__class__.claims(hardware):

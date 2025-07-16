@@ -1,5 +1,6 @@
 """Comprehensive tests for the Light base class to improve coverage."""
 
+from typing import ClassVar
 from unittest.mock import Mock, patch
 
 import pytest
@@ -12,7 +13,7 @@ from busylight_core.light import Light
 class MockLightSubclass(Light):
     """Mock Light subclass for testing."""
 
-    supported_device_ids: dict[tuple[int, int], str] = {(0x1234, 0x5678): "MockLight"}
+    supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {(0x1234, 0x5678): "MockLight"}
 
     def __bytes__(self) -> bytes:
         return b"\x01\x02\x03\x04"

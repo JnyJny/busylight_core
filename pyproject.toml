@@ -164,6 +164,8 @@ lint.select = [
   "ALL"
 ]
 lint.ignore = [
+  # ARG002 Unused method argument
+  "ARG002",
   # Missing docstring in magic method
   "D105",
   # missing-trailing-comma (COM812)
@@ -185,7 +187,21 @@ lint.ignore = [
   # first-line-ends-in-period (D415)
   "D415",
   # blank-except (BLE001)
-  "BLE001"
+  "BLE001",
+  # invalid-class-name (N801)
+  "N801",
+  # boolean-default-value-positional-argument (FBT002)
+  "FBT002",
+  # magic-value-comparison (PLR2004)
+  "PLR2004",
+  # too-many-arguments (PLR0913)
+  "PLR0913",
+  # non-unique-enums (PIE796)
+  "PIE796",
+  # missing-type-function-argument (ANN001)
+  "ANN001",
+  # missing-return-type-special-method (ANN204)
+  "ANN204"
  ]
 
 [tool.ruff.lint.per-file-ignores]

@@ -1,6 +1,6 @@
 """MuteMe Implementation Details"""
 
-from ...word import BitField, Word
+from busylight_core.word import BitField, Word
 
 
 class OneBitField(BitField):
@@ -68,5 +68,5 @@ class State(Word):
         return self.red, self.green, self.blue
 
     @color.setter
-    def color(self, values: tuple[int, int, int]):
+    def color(self, values: tuple[int, int, int]) -> None:
         self.red, self.green, self.blue = values

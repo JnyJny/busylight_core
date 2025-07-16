@@ -6,8 +6,8 @@ from dataclasses import dataclass
 
 from loguru import logger
 
-from ...exceptions import HardwareUnsupportedError
-from ...hardware import Hardware
+from busylight_core.exceptions import HardwareUnsupportedError
+from busylight_core.hardware import Hardware
 
 
 @dataclass

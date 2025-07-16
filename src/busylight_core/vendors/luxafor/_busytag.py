@@ -22,9 +22,6 @@ class Command(str, Enum):
     @classmethod
     def solid_color(cls, color: tuple[int, int, int], led: int = 0) -> None:
         red, green, blue = color
-        if led == 0:
-            led = 127
-        else:
-            led = 1 << led
+        led = 127 if led == 0 else 1 << led
 
         return cls.SolidColor.format(leds=led, red=red, green=green, blue=blue)

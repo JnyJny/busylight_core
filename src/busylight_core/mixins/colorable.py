@@ -1,14 +1,16 @@
-""" """
+"""Color manipulation mixin for Light classes."""
 
 
 class ColorableMixin:
+    """Mixin providing color manipulation properties for Light classes."""
+
     @property
     def red(self) -> int:
         """Red color value."""
         return getattr(self, "_red", 0)
 
     @red.setter
-    def red(self, value: int):
+    def red(self, value: int) -> None:
         self._red = value
 
     @property
@@ -17,7 +19,7 @@ class ColorableMixin:
         return getattr(self, "_green", 0)
 
     @green.setter
-    def green(self, value: int):
+    def green(self, value: int) -> None:
         self._green = value
 
     @property
@@ -26,7 +28,7 @@ class ColorableMixin:
         return getattr(self, "_blue", 0)
 
     @blue.setter
-    def blue(self, value: int):
+    def blue(self, value: int) -> None:
         self._blue = value
 
     @property
@@ -35,7 +37,7 @@ class ColorableMixin:
         return self.red, self.green, self.blue
 
     @color.setter
-    def color(self, value: tuple[int, int, int]):
+    def color(self, value: tuple[int, int, int]) -> None:
         self.red, self.green, self.blue = value
 
     @property

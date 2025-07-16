@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from ...word import BitField, Word
+from busylight_core.word import BitField, Word
 
 
 class FlashSpeed(int, Enum):
