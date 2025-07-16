@@ -21,9 +21,9 @@ new lights will not be recognized.
 from loguru import logger
 
 from .exceptions import (
+    HardwareUnsupportedError,
     InvalidHardwareError,
     LightUnavailableError,
-    LightUnsupportedError,
     NoLightsFoundError,
 )
 from .hardware import Hardware
@@ -52,10 +52,10 @@ __all__ = [
     "Fit_StatUSB",
     "Flag",
     "Hardware",
+    "HardwareUnsupportedError",
     "InvalidHardwareError",
     "Light",
     "LightUnavailableError",
-    "LightUnsupportedError",
     "Mute",
     "MuteMe",
     "MuteMe_Mini",

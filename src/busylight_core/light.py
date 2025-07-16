@@ -32,7 +32,11 @@ from functools import cache, cached_property, lru_cache
 
 from loguru import logger
 
-from .exceptions import LightUnavailable, LightUnsupported, NoLightsFound
+from .exceptions import (
+    HardwareUnsupportedError,
+    LightUnavailableError,
+    NoLightsFoundError,
+)
 from .hardware import Hardware
 from .mixins import ColorableMixin, TaskableMixin
 
@@ -140,7 +144,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         """Return the first unused light ready for use.
 
         Raises:
-        - NoLightsFound: if no lights are available.
+        - NoLightsFoundError: if no lights are available.
 
         """
         for subclass, devices in cls.available_lights().items():
@@ -151,7 +155,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
                     logger.info(f"Failed to acquire {device}: {error}")
                     raise
 
-        raise NoLightsFound
+        raise NoLightsFoundError
 
     def __init__(
         self,
@@ -166,11 +170,11 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         :param: exclusive - bool - acquire exclusive access to the hardware
 
         Raises:
-        - LightUnsupported: if the given Hardware is not supported by this class.
+        - HardwareUnsupportedError: if the given Hardware is not supported by this class.
 
         """
         if not self.__class__.claims(hardware):
-            raise LightUnsupported(hardware)
+            raise HardwareUnsupportedError(hardware)
 
         self.hardware = hardware
         self._reset = reset
@@ -274,7 +278,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         """Obtain the current state of the light and writes it to the device.
 
         Raises:
-        - LightUnavailable
+        - LightUnavailableError
 
         """
         state = bytes(self)
@@ -294,7 +298,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
                 self.write_strategy(state)
             except Exception as error:
                 logger.error(f"{self}: {error}")
-                raise LightUnavailable(self) from None
+                raise LightUnavailableError(self) from None
 
     @contextlib.contextmanager
     def batch_update(self) -> Generator[None, None, None]:

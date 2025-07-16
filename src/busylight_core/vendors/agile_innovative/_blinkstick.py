@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 from loguru import logger
 
-from ...exceptions import LightUnsupported
+from ...exceptions import HardwareUnsupportedError
 from ...hardware import Hardware
 
 
@@ -56,4 +56,4 @@ class BlinkStickVariant:
             case _:
                 logger.error(f"unknown major {major}")
 
-        raise LightUnsupported(Hardware)
+        raise HardwareUnsupportedError(Hardware)
