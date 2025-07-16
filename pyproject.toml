@@ -164,6 +164,8 @@ lint.select = [
   "ALL"
 ]
 lint.ignore = [
+  # Missing docstring in magic method
+  "D105",
   # missing-trailing-comma (COM812)
   "COM812",
   # incorrect-blank-line-before-class (D203)
