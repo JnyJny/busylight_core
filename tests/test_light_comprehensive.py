@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from busylight_core.exceptions import LightUnavailableError, HardwareUnsupportedError
+from busylight_core.exceptions import HardwareUnsupportedError, LightUnavailableError
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.light import Light
 
@@ -20,10 +20,13 @@ class MockLightSubclass(Light):
     def __bytes__(self) -> bytes:
         return b"\x01\x02\x03\x04"
 
-    def on(self, color: tuple[int, int, int], led: int = 0) -> None: ...
+    def on(self, color: tuple[int, int, int], led: int = 0) -> None:
+        """Turn the light on with the specified color (mock)."""
 
 
-def create_mock_hardware(vendor_id=0x1234, product_id=0x5678, path=b"/dev/hidraw0"):
+def create_mock_hardware(
+    vendor_id=0x1234, product_id=0x5678, path=b"/dev/hidraw0"
+) -> Hardware:
     """Create a mock hardware device."""
     mock_hardware = Mock(spec=Hardware)
     mock_hardware.device_id = (vendor_id, product_id)
@@ -123,10 +126,10 @@ class TestLightPlatform:
 
 
 class TestLightSortKey:
-    """Test _sort_key property coverage."""
+    """Test sort_key property coverage."""
 
     def test_sort_key_property(self) -> None:
-        """Test _sort_key property - covers line 166."""
+        """Test sort_key property - covers line 166."""
         mock_hardware = create_mock_hardware()
 
         with (
@@ -135,20 +138,19 @@ class TestLightSortKey:
             patch.object(MockLightSubclass, "vendor", return_value="TestVendor"),
         ):
             light = MockLightSubclass(mock_hardware)
-            sort_key = light._sort_key
 
-            assert isinstance(sort_key, tuple)
-            assert len(sort_key) == 3
-            assert sort_key[0] == "testvendor"  # vendor().lower()
-            assert sort_key[1] == "mocklight"  # name.lower()
-            assert sort_key[2] == "/dev/hidraw0"  # path
+            assert isinstance(light.sort_key, tuple)
+            assert len(light.sort_key) == 3
+            assert light.sort_key[0] == "testvendor"
+            assert light.sort_key[1] == "mocklight"
+            assert light.sort_key[2] == "/dev/hidraw0"
 
 
 class TestLightEquality:
     """Test __eq__ method coverage."""
 
     def test_eq_method_attribute_error(self) -> None:
-        """Test __eq__ method when other object lacks _sort_key."""
+        """Test __eq__ method when other object lacks sort_key."""
         mock_hardware = create_mock_hardware()
 
         with (
@@ -157,15 +159,14 @@ class TestLightEquality:
         ):
             light = MockLightSubclass(mock_hardware)
 
-            # Test with object that doesn't have _sort_key
+            # Test with object that doesn't have sort_key
             class NoSortKeyObject:
                 pass
 
             other = NoSortKeyObject()
 
-            # This should raise TypeError because NotImplemented is being raised
             with pytest.raises(TypeError):
-                light == other
+                assert light == other
 
 
 class TestLightComparison:
@@ -198,7 +199,7 @@ class TestLightComparison:
             light1 = MockLightSubclass(mock_hardware1)
             light2 = MockLightSubclass(mock_hardware2)
 
-            # Test comparison - should compare based on _sort_key
+            # Test comparison - should compare based on sort_key
             result = light1 < light2
             assert isinstance(result, bool)
 
@@ -215,8 +216,8 @@ class TestLightComparison:
 
             # Mock same sort keys
             sort_key = ("vendor", "name", "/dev/hidraw0")
-            light1._sort_key = sort_key
-            light2._sort_key = sort_key
+            light1.sort_key = sort_key
+            light2.sort_key = sort_key
 
             result = light1 < light2
             assert result is False
@@ -242,10 +243,6 @@ class TestLightHash:
             # Second call should use cached value
             hash2 = hash(light)
             assert hash1 == hash2
-
-            # Verify _hash attribute is set
-            assert hasattr(light, "_hash")
-            assert light._hash == hash1
 
 
 class TestLightHex:
@@ -296,7 +293,6 @@ class TestLightExclusiveAccess:
         ):
             # Create light in non-exclusive mode
             light = MockLightSubclass(mock_hardware, exclusive=False)
-            light._exclusive = False
 
             with light.exclusive_access():
                 # Should acquire inside context
@@ -444,8 +440,7 @@ class TestLightEdgeCases:
             light1 = MockLightSubclass(mock_hardware1)
             light2 = MockLightSubclass(mock_hardware2)
 
-            # Test equality
-            assert light1 == light1  # Same object
+            assert light1 == light2
 
             # Test hash consistency
             hash1 = hash(light1)
@@ -456,3 +451,4 @@ class TestLightEdgeCases:
             lights = [light1, light2]
             sorted_lights = sorted(lights)
             assert len(sorted_lights) == 2
+            assert sorted_lights == lights

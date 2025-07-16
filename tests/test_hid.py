@@ -4,8 +4,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from busylight_core.hid import Device, enumerate
 from busylight_core.exceptions import HardwareAlreadyOpenError, HardwareNotOpenError
+from busylight_core.hid import Device
+from busylight_core.hid import enumerate as hid_enumerate
 
 
 class TestEnumerate:
@@ -19,7 +20,7 @@ class TestEnumerate:
         ]
 
         with patch("busylight_core.hid.hid.enumerate", return_value=mock_device_info):
-            result = enumerate()
+            result = hid_enumerate()
 
         assert isinstance(result, list)
         assert len(result) == 2
@@ -32,7 +33,7 @@ class TestEnumerate:
     def test_enumerate_empty_list(self) -> None:
         """Test enumerate with no devices."""
         with patch("busylight_core.hid.hid.enumerate", return_value=[]):
-            result = enumerate()
+            result = hid_enumerate()
 
         assert result == []
 
@@ -47,16 +48,16 @@ class TestDeviceInitialization:
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
 
-        assert device._handle is mock_device
-        assert device._is_open is False
+        assert device.handle is mock_device
+        assert device.is_open is False
 
     def test_device_init_with_pyhidapi_fallback(self) -> None:
         """Test Device initialization with pyhidapi fallback."""
         with patch("busylight_core.hid.hid.device", side_effect=AttributeError):
             device = Device()
 
-        assert device._handle is None
-        assert device._is_open is False
+        assert device.handle is None
+        assert device.is_open is False
 
     def test_is_open_property(self) -> None:
         """Test the is_open property."""
@@ -64,8 +65,8 @@ class TestDeviceInitialization:
             device = Device()
 
         assert device.is_open is False
-        device._is_open = True
-        assert device.is_open is True
+        with pytest.raises(AttributeError):
+            device.is_open = True
 
 
 class TestDeviceErrorHandling:
@@ -105,7 +106,7 @@ class TestDeviceOpen:
             device.open(0x1234, 0x5678)
 
         mock_device.open.assert_called_once_with(0x1234, 0x5678, None)
-        assert device._is_open is True
+        assert device.is_open
 
     def test_open_with_cython_hidapi_and_serial(self) -> None:
         """Test opening device with cython-hidapi and serial number."""
@@ -116,7 +117,7 @@ class TestDeviceOpen:
             device.open(0x1234, 0x5678, "SERIAL123")
 
         mock_device.open.assert_called_once_with(0x1234, 0x5678, "SERIAL123")
-        assert device._is_open is True
+        assert device.is_open
 
     def test_open_with_pyhidapi_fallback(self) -> None:
         """Test opening device with pyhidapi fallback."""
@@ -135,8 +136,8 @@ class TestDeviceOpen:
 
         # Check that hid.Device was called with correct parameters
         mock_device_class.assert_called_once_with(vid=0x1234, pid=0x5678, serial=None)
-        assert device._handle is mock_hid_device
-        assert device._is_open is True
+        assert device.handle is mock_hid_device
+        assert device.is_open
 
     def test_open_with_pyhidapi_fallback_and_serial(self) -> None:
         """Test opening device with pyhidapi fallback and serial number."""
@@ -156,8 +157,8 @@ class TestDeviceOpen:
         mock_device_class.assert_called_once_with(
             vid=0x1234, pid=0x5678, serial="SERIAL123"
         )
-        assert device._handle is mock_hid_device
-        assert device._is_open is True
+        assert device.handle is mock_hid_device
+        assert device.is_open
 
     def test_open_already_open_device(self) -> None:
         """Test opening an already open device raises HardwareAlreadyOpenError."""
@@ -165,7 +166,7 @@ class TestDeviceOpen:
 
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
-            device._is_open = True
+            device._is_open = True  # noqa: SLF001
 
             with pytest.raises(HardwareAlreadyOpenError):
                 device.open(0x1234, 0x5678)
@@ -184,7 +185,7 @@ class TestDeviceOpenPath:
             device.open_path(test_path)
 
         mock_device.open_path.assert_called_once_with(test_path)
-        assert device._is_open is True
+        assert device.is_open
 
     def test_open_path_with_string(self) -> None:
         """Test opening device by path with string (converted to bytes)."""
@@ -196,7 +197,7 @@ class TestDeviceOpenPath:
             device.open_path(test_path)
 
         mock_device.open_path.assert_called_once_with(test_path.encode("utf-8"))
-        assert device._is_open is True
+        assert device.is_open
 
     def test_open_path_with_pyhidapi_fallback(self) -> None:
         """Test opening device by path with pyhidapi fallback."""
@@ -215,8 +216,8 @@ class TestDeviceOpenPath:
             device.open_path(test_path)
 
         mock_device_class.assert_called_once_with(path=test_path)
-        assert device._handle is mock_hid_device
-        assert device._is_open is True
+        assert device.handle is mock_hid_device
+        assert device.is_open
 
     def test_open_path_already_open_device(self) -> None:
         """Test opening path on already open device raises HardwareAlreadyOpenError."""
@@ -224,7 +225,7 @@ class TestDeviceOpenPath:
 
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
-            device._is_open = True
+            device._is_open = True  # noqa: SLF001
 
             with pytest.raises(HardwareAlreadyOpenError):
                 device.open_path(b"/dev/hidraw0")
@@ -239,11 +240,11 @@ class TestDeviceClose:
 
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
-            device._is_open = True
+            device._is_open = True  # noqa: SLF001
             device.close()
 
         mock_device.close.assert_called_once()
-        assert device._is_open is False
+        assert device.is_open is False
 
     def test_close_not_open_device(self) -> None:
         """Test closing a device that's not open raises IOError."""
@@ -252,7 +253,7 @@ class TestDeviceClose:
 
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
-            device._is_open = True
+            device._is_open = True  # noqa: SLF001
 
             with pytest.raises(HardwareNotOpenError):
                 device.close()
@@ -268,7 +269,7 @@ class TestDeviceOperations:
 
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
-            device._is_open = True
+            device._is_open = True  # noqa: SLF001
 
             result = device.read(3)
 
@@ -282,7 +283,7 @@ class TestDeviceOperations:
 
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
-            device._is_open = True
+            device._is_open = True  # noqa: SLF001
 
             result = device.read(3, 1000)
 
@@ -295,7 +296,7 @@ class TestDeviceOperations:
 
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
-            device._is_open = False
+            device._is_open = False  # noqa: SLF001
 
             with pytest.raises(HardwareNotOpenError):
                 device.read(3)
@@ -308,7 +309,7 @@ class TestDeviceOperations:
 
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
-            device._is_open = True
+            device._is_open = True  # noqa: SLF001
 
             result = device.write(test_data)
 
@@ -321,7 +322,7 @@ class TestDeviceOperations:
 
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
-            device._is_open = False
+            device._is_open = False  # noqa: SLF001
 
             with pytest.raises(HardwareNotOpenError):
                 device.write(b"\x01\x02\x03")
@@ -333,7 +334,7 @@ class TestDeviceOperations:
 
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
-            device._is_open = True
+            device._is_open = True  # noqa: SLF001
 
             result = device.get_feature_report(1, 3)
 
@@ -346,7 +347,7 @@ class TestDeviceOperations:
 
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
-            device._is_open = False
+            device._is_open = False  # noqa: SLF001
 
             with pytest.raises(HardwareNotOpenError):
                 device.get_feature_report(1, 3)
@@ -359,7 +360,7 @@ class TestDeviceOperations:
 
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
-            device._is_open = True
+            device._is_open = True  # noqa: SLF001
 
             result = device.send_feature_report(test_data)
 
@@ -372,7 +373,7 @@ class TestDeviceOperations:
 
         with patch("busylight_core.hid.hid.device", return_value=mock_device):
             device = Device()
-            device._is_open = False
+            device._is_open = False  # noqa: SLF001
 
             with pytest.raises(HardwareNotOpenError):
                 device.send_feature_report(b"\x01\x02\x03")

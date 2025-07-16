@@ -211,13 +211,30 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
             case _:
                 return system
 
+    @property
+    def exclusive(self) -> bool:
+        """Return True if the light has exclusive access to the hardware."""
+        return self._exclusive
+
+    @property
+    def reset(self) -> bool:
+        """Return True if the light resets the hardware to a known state."""
+        return self._reset
+
     @cached_property
-    def _sort_key(self) -> tuple[str, str, str]:
+    def sort_key(self) -> tuple[str, str, str]:
+        """Return a tuple used for sorting lights.
+
+        The tuple consists of:
+        - vendor name in lowercase
+        - device name in lowercase
+        - hardware path
+        """
         return (self.vendor().lower(), self.name.lower(), self.path)
 
     def __eq__(self, other: object) -> bool:
         try:
-            return self._sort_key == other._sort_key
+            return self.sort_key == other.sort_key
         except AttributeError:
             raise TypeError from None
 
@@ -225,9 +242,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         if not isinstance(other, Light):
             return NotImplemented
 
-        for self_value, other_value in zip(
-            self._sort_key, other._sort_key, strict=False
-        ):
+        for self_value, other_value in zip(self.sort_key, other.sort_key, strict=False):
             if self_value != other_value:
                 return self_value < other_value
 
@@ -237,7 +252,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         try:
             return self._hash
         except AttributeError:
-            self._hash = hash(self._sort_key)
+            self._hash = hash(self.sort_key)
             return self._hash
 
     @cached_property

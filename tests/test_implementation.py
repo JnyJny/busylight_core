@@ -7,9 +7,9 @@ import pytest
 from busylight_core import HardwareUnsupportedError, NoLightsFoundError
 from busylight_core.hardware import Hardware
 
-from .vendor_examples import HardwareCatalog as VENDOR_HARDWARE
+from .vendor_examples import HardwareCatalog
 
-VENDOR_SUBCLASSES = VENDOR_HARDWARE.keys()
+VENDOR_SUBCLASSES = HardwareCatalog.keys()
 
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
@@ -42,7 +42,7 @@ def test_implementation_classmethod_unique_device_names(subclass) -> None:
         assert isinstance(item, str)
 
 
-@pytest.mark.parametrize(("subclass", "devices"), list(VENDOR_HARDWARE.items()))
+@pytest.mark.parametrize(("subclass", "devices"), list(HardwareCatalog.items()))
 def test_implementation_classmethod_claims(subclass, devices) -> None:
     """Test that claims() returns True for devices that the subclass should support."""
     for device in devices:
@@ -122,7 +122,7 @@ def test_implementation_init_with_bogus_hardware(subclass, hardware_devices) -> 
             subclass(device, reset=False, exclusive=False)
 
 
-@pytest.mark.parametrize(("subclass", "devices"), list(VENDOR_HARDWARE.items()))
+@pytest.mark.parametrize(("subclass", "devices"), list(HardwareCatalog.items()))
 def test_implementation_init(subclass, devices) -> None:
     """Test that light instances can be initialized with supported hardware and work."""
     for device in devices:
@@ -135,13 +135,19 @@ def test_implementation_init(subclass, devices) -> None:
         device.release = lambda: None
 
         class TestSubclass(subclass):
+            def _write(self, buf: bytes) -> int:
+                return len(buf)
+
+            def _read(self, nbytes: int, timeout: int | None = None) -> bytes:
+                return bytes(nbytes)
+
             @property
             def write_strategy(self) -> Callable[[bytes], int]:
-                return lambda buf: None
+                return self._write
 
             @property
             def read_strategy(self) -> Callable[[int, int | None], bytes]:
-                return lambda nbytes: b""
+                return self._read
 
         result = TestSubclass(device, reset=False, exclusive=False)
 
@@ -149,11 +155,11 @@ def test_implementation_init(subclass, devices) -> None:
 
         assert isinstance(result.hardware, Hardware)
         assert result.hardware == device
-        assert result._reset is False
-        assert result._exclusive is False
+        assert result.reset is False
+        assert result.exclusive is False
 
-        assert isinstance(result._sort_key, tuple)
-        for item in result._sort_key:
+        assert isinstance(result.sort_key, tuple)
+        for item in result.sort_key:
             assert isinstance(item, str)
 
         assert isinstance(result.name, str)

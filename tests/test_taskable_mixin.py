@@ -78,7 +78,7 @@ class TestTaskableMixin:
         mock_loop.create_task.return_value = mock_task
 
         # Mock coroutine function
-        async def mock_coroutine(self) -> str:
+        async def mock_coroutine(self) -> str:  # noqa: ARG001
             return "test_result"
 
         with patch.object(mixin, "event_loop", mock_loop):
@@ -96,7 +96,7 @@ class TestTaskableMixin:
         mixin.tasks["existing_task"] = existing_task
 
         # Mock coroutine function
-        async def mock_coroutine(self) -> str:
+        async def mock_coroutine(self) -> str:  # noqa: ARG001
             return "test_result"
 
         mock_loop = Mock()
@@ -243,7 +243,7 @@ class TestTaskableMixinIntegration:
         mixin = TaskableMixin()
 
         # Create a real coroutine
-        async def test_coroutine(self) -> str:
+        async def test_coroutine(self) -> str:  # noqa: ARG001
             await asyncio.sleep(0.1)
             return "completed"
 
@@ -270,11 +270,11 @@ class TestTaskableMixinIntegration:
         mixin = TaskableMixin()
 
         # Create multiple coroutines
-        async def slow_task(self) -> str:
+        async def slow_task(self) -> str:  # noqa: ARG001
             await asyncio.sleep(0.2)
             return "slow_completed"
 
-        async def fast_task(self) -> str:
+        async def fast_task(self) -> str:  # noqa: ARG001
             await asyncio.sleep(0.05)
             return "fast_completed"
 

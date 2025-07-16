@@ -60,6 +60,11 @@ class Device:
         return self._is_open
 
     @property
+    def handle(self) -> hid.device | None:
+        """Return the underlying hidapi device handle."""
+        return self._handle
+
+    @property
     def error(self) -> str:
         """Return the last error message."""
         try:

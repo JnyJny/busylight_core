@@ -5,10 +5,11 @@ from unittest.mock import Mock, patch
 import pytest
 
 from busylight_core.hardware import ConnectionType, Hardware
+from busylight_core.vendors.luxafor.flag import Flag
 from busylight_core.vendors.luxafor.mute import Mute
 
 
-def create_mock_mute_hardware():
+def create_mock_mute_hardware() -> Hardware:
     """Create a properly configured mock hardware for Mute device."""
     mock_hardware = Mock(spec=Hardware)
     mock_hardware.device_id = (0x4D8, 0xF372)
@@ -50,10 +51,7 @@ class TestLuxaforMute:
         ):
             mute = Mute(mock_hardware)
             result = mute.button_on
-
             mock_read.assert_called_once_with(8, 200)
-            assert hasattr(mute, "_button")
-            assert mute._button is False
             assert result is False  # Returns False after processing
 
     def test_button_on_response_131_true(self) -> None:
@@ -160,8 +158,6 @@ class TestLuxaforMuteInheritance:
 
     def test_inherits_from_flag(self) -> None:
         """Test that Mute properly inherits from Flag class."""
-        from busylight_core.vendors.luxafor.flag import Flag
-
         assert issubclass(Mute, Flag)
 
         # Test that Mute has all the Flag methods
@@ -244,7 +240,7 @@ class TestLuxaforMuteEdgeCases:
             # Should not crash, but may raise the exception or return a default value
             # The current implementation doesn't handle this case, so it will raise
             with pytest.raises(Exception, match="Device communication error"):
-                mute.button_on
+                assert mute.button_on
 
     def test_button_on_none_response(self) -> None:
         """Test button_on when read_strategy returns None."""
@@ -259,7 +255,7 @@ class TestLuxaforMuteEdgeCases:
 
             # This will likely cause a TypeError when trying to access None[0]
             with pytest.raises(TypeError):
-                mute.button_on
+                assert mute.button_on
 
     def test_multiple_button_reads(self) -> None:
         """Test multiple sequential button reads behave consistently."""
@@ -287,7 +283,6 @@ class TestLuxaforMuteEdgeCases:
             # Third read - status response, sets _button = False
             result = mute.button_on
             assert result is False
-            assert mute._button is False
 
             # Verify all calls were made with correct parameters
             assert mock_read.call_count == 3
