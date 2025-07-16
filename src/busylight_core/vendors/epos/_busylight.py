@@ -1,7 +1,6 @@
 """EPOS Busylight Implementation Details"""
 
 from enum import Enum
-from typing import Tuple
 
 from ...word import BitField, Word
 
@@ -69,16 +68,16 @@ class State(Word):
         return (self.red0, self.green0, self.blue0)
 
     @color0.setter
-    def color0(self, color: Tuple[int, int, int]) -> None:
+    def color0(self, color: tuple[int, int, int]) -> None:
         self.red0, self.green0, self.blue0 = color
 
     @property
-    def color1(self) -> Tuple[int, int, int]:
+    def color1(self) -> tuple[int, int, int]:
         """Return the second color as a tuple of RGB values."""
         return (self.red1, self.green1, self.blue1)
 
     @color1.setter
-    def color1(self, color: Tuple[int, int, int]) -> None:
+    def color1(self, color: tuple[int, int, int]) -> None:
         self.red1, self.green1, self.blue1 = color
 
     @property

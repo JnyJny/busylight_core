@@ -6,7 +6,7 @@ from loguru import logger
 
 from ...hardware import Hardware
 from ...light import Light
-from ._flag import LEDS, Command, Pattern, State, Wave
+from ._flag import LEDS, State
 
 
 class Flag(Light):

@@ -1,7 +1,5 @@
 """Luxafor Mute"""
 
-from loguru import logger
-
 from .flag import Flag
 
 

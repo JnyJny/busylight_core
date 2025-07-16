@@ -1,9 +1,7 @@
-"""
-"""
+""" """
 
 
 class ColorableMixin:
-
     @property
     def red(self) -> int:
         """Red color value."""

@@ -1,8 +1,9 @@
 """ """
 
-from typing import Callable
+from collections.abc import Callable
 
 import pytest
+
 from busylight_core import LightUnsupported, NoLightsFound
 from busylight_core.hardware import Hardware
 

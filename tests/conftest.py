@@ -1,8 +1,9 @@
 """ """
 
 import pytest
-from busylight_core.hardware import ConnectionType, Hardware
 from serial.tools.list_ports_common import ListPortInfo
+
+from busylight_core.hardware import Hardware
 
 
 @pytest.fixture

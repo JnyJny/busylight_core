@@ -1,7 +1,5 @@
 """ """
 
-from loguru import logger
-
 from ...hardware import Hardware
 from ...light import Light
 
@@ -18,7 +16,6 @@ class MuteSync(Light):
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
         """Returns True if the hardware describes a MuteSync Button."""
-
         # Addresses issue #356 where MuteSync claims another hardware with
         # a SiliconLabs CP2102 USB to Serial controller that is not a MuteSync
         # hardware.

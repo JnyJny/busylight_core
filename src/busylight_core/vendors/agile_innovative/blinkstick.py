@@ -2,8 +2,6 @@
 
 from functools import cached_property
 
-from loguru import logger
-
 from ...light import Light
 from ._blinkstick import BlinkStickVariant
 

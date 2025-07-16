@@ -1,6 +1,5 @@
 """BusyTag Light Support"""
 
-from functools import cached_property
 from ...light import Light
 from ._busytag import Command
 

@@ -1,7 +1,4 @@
-""" MuteMe Implementation Details
-"""
-
-from loguru import logger
+"""MuteMe Implementation Details"""
 
 from ...word import BitField, Word
 

@@ -1,14 +1,16 @@
-""" """
+"""Bitwise operations on a word of bits."""
 
 import array
-import struct
 
 
 class Word:
-    def __init__(self, value: int = 0, length: int = 8) -> None:
+    """A class representing a word of bits, with methods for bit manipulation."""
 
+    def __init__(self, value: int = 0, length: int = 8) -> None:
+        """Initialize a Word of length bits with the given value."""
         if length <= 0 or length % 8 != 0:
-            raise ValueError("length must be a multiple of 8")
+            msg = "length must be a multiple of 8"
+            raise ValueError(msg)
 
         self.initial_value = value
         self.length = length
@@ -28,14 +30,16 @@ class Word:
     @property
     def range(self) -> range:
         """Return the range of bit offsets for this word."""
-        return range(0, self.length)
+        return range(self.length)
 
     @property
     def hex(self) -> str:
+        """Return a string hexadecimal representation of the word."""
         return f"{self.value:#0{self.length // 4}x}"
 
     @property
     def bin(self) -> str:
+        """Return a string binary representation of the word."""
         return "0b" + bin(self.value)[2:].zfill(self.length)
 
     def clear(self) -> None:
@@ -55,7 +59,8 @@ class Word:
     def __setitem__(self, key: int | slice, value: bool | int) -> None:
         if isinstance(key, int):
             if key not in self.range:
-                raise IndexError(f"Index out of range: {key}")
+                msg = f"Index out of range: {key}"
+                raise IndexError(msg)
             self.bits[key] = value & 1
             return
         length = len(self.bits[key])
@@ -64,7 +69,10 @@ class Word:
 
 
 class ReadOnlyBitField:
+    """A class representing a read-only bit field within a word."""
+
     def __init__(self, offset: int, width: int = 1) -> None:
+        """Initialize a bitfield with the given offset and width."""
         self.field = slice(offset, offset + width)
 
     def __get__(self, obj, type=None) -> int:
@@ -74,9 +82,12 @@ class ReadOnlyBitField:
         self.name = name
 
     def __set__(self, obj, value: int) -> None:
-        raise AttributeError(f"{self.name} attribute is read only")
+        msg = f"{self.name} attribute is read only"
+        raise AttributeError(msg)
 
 
 class BitField(ReadOnlyBitField):
+    """A class representing a mutable bit field within a word."""
+
     def __set__(self, obj, value: int) -> None:
         obj[self.field] = value

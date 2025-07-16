@@ -1,9 +1,7 @@
 """ThingM blink(1) Support"""
 
+from collections.abc import Callable
 from functools import cached_property
-from typing import Callable
-
-from loguru import logger
 
 from ...light import Light
 from ._blink1 import LEDS, State

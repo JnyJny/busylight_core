@@ -1,6 +1,7 @@
 """ """
 
 import pytest
+
 from busylight_core import Light, NoLightsFound
 from busylight_core.hardware import Hardware
 
@@ -12,7 +13,7 @@ def test_light_init_fails(hardware_devices: list[Hardware]) -> None:
 
 
 def test_light_abstractclassmethod_supported_device_ids() -> None:
-    assert Light.supported_device_ids == {}
+    assert Light.supported_device_ids == None
 
 
 def test_light_classmethod_vendor() -> None:

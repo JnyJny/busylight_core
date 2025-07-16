@@ -1,10 +1,8 @@
-""" Agile Innovative BlinkStick implementation details.
-"""
+"""Agile Innovative BlinkStick implementation details."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
 
 from loguru import logger
 
@@ -32,7 +30,6 @@ class BlinkStickVariant:
 
     @classmethod
     def from_hardware(cls, hardware: Hardware) -> BlinkStickVariant:
-
         bs_serial, version = hardware.serial_number.split("-")
         bs_serial = bs_serial[2:]
         major, minor = version.split(".")

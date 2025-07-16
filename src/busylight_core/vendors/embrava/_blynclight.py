@@ -1,6 +1,5 @@
 """Embrava Blynclight Implementation Details"""
 
-import struct
 from enum import Enum
 
 from ...word import BitField, Word

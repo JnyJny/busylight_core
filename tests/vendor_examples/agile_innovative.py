@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from busylight_core.vendors.agile_innovative import BlinkStick
 

@@ -3,9 +3,6 @@
 import asyncio
 from functools import cached_property
 
-from loguru import logger
-
-from ...hardware import Hardware
 from ...light import Light
 from ._busylight import State
 
@@ -45,8 +42,7 @@ async def _keepalive(light: Busylight_Alpha, interval: int = 15) -> None:
     `interval` seconds, and an asyncio sleep for half that time will
     be used to schedule the next keep alive packet update.
     """
-
-    if interval not in range(0, 16):
+    if interval not in range(16):
         raise ValueError("Keepalive interval must be between 0 and 15 seconds.")
 
     sleep_interval = round(interval / 2)

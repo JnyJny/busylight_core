@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from busylight_core.vendors.kuando import Busylight_Alpha, Busylight_Omega
 

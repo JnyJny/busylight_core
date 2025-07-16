@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from busylight_core.hardware import ConnectionType
 from busylight_core.vendors.compulab import Fit_StatUSB

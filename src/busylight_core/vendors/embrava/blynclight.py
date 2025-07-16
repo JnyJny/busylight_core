@@ -1,13 +1,10 @@
 """ """
 
 import struct
-
-from functools import cached_property, lru_cache
-
-from loguru import logger
+from functools import cached_property
 
 from ...light import Light
-from ._blynclight import State, FlashSpeed
+from ._blynclight import FlashSpeed, State
 
 
 class Blynclight(Light):

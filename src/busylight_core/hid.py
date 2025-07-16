@@ -32,16 +32,12 @@ agreement and remove the namespace collision.
 
 """
 
-from functools import cached_property
-
-from loguru import logger
-
 import hid
+from loguru import logger
 
 
 def enumerate() -> list[dict]:
     """Return a list of dictionaries, each describing a USB device."""
-
     return [dict(**d) for d in hid.enumerate()]
 
 
@@ -63,7 +59,7 @@ class Device:
         """Return the last error message."""
         try:
             return self._handle.error()
-        except IOError as error:
+        except OSError as error:
             return str(error)
 
     def open(
@@ -77,9 +73,8 @@ class Device:
 
         If the device is already open, raises IOError.
         """
-
         if self.is_open:
-            raise IOError("device already open")
+            raise OSError("device already open")
 
         if self._handle:
             self._handle.open(vendor_id, product_id, serial_number)
@@ -96,9 +91,8 @@ class Device:
 
         If the device is already open, raises IOError.
         """
-
         if self.is_open:
-            raise IOError("device already open")
+            raise OSError("device already open")
 
         if isinstance(path, str):
             path = path.encode("utf-8")
@@ -119,36 +113,32 @@ class Device:
             self._handle.close()
             self._is_open = False
         except AttributeError:
-            raise IOError("device not open") from None
+            raise OSError("device not open") from None
 
     def read(self, nbytes: int, timeout_ms: int | None = None) -> list[int]:
         """Read nbytes from the device, returns a list of ints."""
-
         if not self.is_open:
-            raise IOError("device not open")
+            raise OSError("device not open")
 
         return self._handle.read(nbytes, timeout_ms)
 
     def write(self, buf: bytes) -> int:
         """Write bytes in buf to the device."""
-
         if not self.is_open:
-            raise IOError("device not open")
+            raise OSError("device not open")
 
         return self._handle.write(buf)
 
     def get_feature_report(self, report: int, nbytes: int) -> list[int]:
         """Read a nbytes feature report from the device."""
-
         if not self.is_open:
-            raise IOError("device not open")
+            raise OSError("device not open")
 
         return self._handle.get_feature_report(report, nbytes)
 
     def send_feature_report(self, buf: bytes) -> int:
         """Write bytes in buf using device feature report."""
-
         if not self.is_open:
-            raise IOError("device not open")
+            raise OSError("device not open")
 
         return self._handle.send_feature_report(buf)

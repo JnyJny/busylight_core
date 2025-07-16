@@ -3,8 +3,6 @@
 import struct
 from functools import cached_property
 
-from loguru import logger
-
 from ...light import Light
 from ._muteme import State
 
@@ -47,7 +45,7 @@ class MuteMe(Light):
 
     @property
     def button_on(self) -> bool:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def on(self, color: tuple[int, int, int], led: int = 0) -> None:
         with self.batch_update():

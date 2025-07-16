@@ -1,7 +1,5 @@
 """ """
 
-from loguru import logger
-
 from ...light import Light
 
 

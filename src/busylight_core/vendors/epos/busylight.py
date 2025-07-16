@@ -1,8 +1,8 @@
 """EPOS Busylight Support"""
 
 from functools import cached_property
-from ...light import Light
 
+from ...light import Light
 from ._busylight import State
 
 

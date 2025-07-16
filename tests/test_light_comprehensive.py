@@ -1,12 +1,12 @@
 """Comprehensive tests for the Light base class to improve coverage."""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from contextlib import contextmanager
+from unittest.mock import Mock, patch
 
+import pytest
+
+from busylight_core.exceptions import LightUnavailable, LightUnsupported
+from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.light import Light
-from busylight_core.hardware import Hardware, ConnectionType
-from busylight_core.exceptions import LightUnavailable, LightUnsupported, NoLightsFound
 
 
 class MockLightSubclass(Light):

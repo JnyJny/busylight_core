@@ -21,7 +21,6 @@ HardwareCatalog = (
 )
 
 __all__ = [
-    "HardwareCatalog",
     "AGILE_INNOVATIVE_HARDWARE",
     "COMPULAB_HARDWARE",
     "EMBRAVA_HARDWARE",
@@ -30,4 +29,5 @@ __all__ = [
     "MUTEME_HARDWARE",
     "PLANTRONICS_HARDWARE",
     "THINGM_HARDWARE",
+    "HardwareCatalog",
 ]

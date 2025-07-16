@@ -1,6 +1,6 @@
 """ """
 
-from busylight_core.vendors.luxafor import Bluetooth, Flag, Mute, Orb, BusyTag
+from busylight_core.vendors.luxafor import Bluetooth, BusyTag, Flag, Mute, Orb
 
 from .utils import make_hardware
 

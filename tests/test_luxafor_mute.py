@@ -1,10 +1,11 @@
 """Tests for the Luxafor Mute device."""
 
-import pytest
 from unittest.mock import Mock, patch
 
+import pytest
+
+from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.vendors.luxafor.mute import Mute
-from busylight_core.hardware import Hardware, ConnectionType
 
 
 def create_mock_mute_hardware():
@@ -24,7 +25,6 @@ class TestLuxaforMute:
 
     def test_supported_device_ids(self):
         """Test that supported_device_ids contains correct device mapping."""
-
         assert isinstance(Mute.supported_device_ids, dict)
         assert (0x4D8, 0xF372) in Mute.supported_device_ids
         assert Mute.supported_device_ids[(0x4D8, 0xF372)] == "Mute"
@@ -220,7 +220,7 @@ class TestLuxaforMuteInheritance:
             # Mute should have button_on property (not in base Flag)
             # Check that the property exists in the class, not the instance to avoid calling it
             assert "button_on" in dir(Mute)
-            assert isinstance(getattr(Mute, "button_on"), property)
+            assert isinstance(Mute.button_on, property)
 
 
 class TestLuxaforMuteEdgeCases:

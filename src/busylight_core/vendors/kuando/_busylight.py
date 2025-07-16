@@ -1,10 +1,9 @@
-"""
-"""
+""" """
 
 import struct
 from enum import Enum
 
-from ...word import BitField, ReadOnlyBitField, Word
+from ...word import BitField, Word
 
 
 class Ring(int, Enum):
@@ -60,7 +59,7 @@ class ColorField(BitField):
         super().__set__(instance, int((value / 255) * 100))
 
     def __get__(self, instance, owner):
-        return int((super().__get__(instance, owner) / 100 * 0xFF))
+        return int(super().__get__(instance, owner) / 100 * 0xFF)
 
 
 class RedField(ColorField):
@@ -233,7 +232,6 @@ class State:
         self.struct = struct.Struct("!8Q")
 
     def __bytes__(self):
-
         self.footer.checksum = sum(bytes(self.footer)[:-2])
         for step in self.steps:
             self.footer.checksum += sum(bytes(step))

@@ -5,11 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from functools import cached_property
-from typing import Optional
 
 import serial
 from loguru import logger
-from serial.serialutil import SerialException
 from serial.tools import list_ports
 from serial.tools.list_ports_common import ListPortInfo
 
@@ -35,18 +33,17 @@ class Hardware:
     product_id: int
     serial_number: str
     manufacturer_string: str
-    product_string: Optional[str] = None
-    release_number: Optional[str] = None
-    usage: Optional[int] = None
-    usage_page: Optional[int] = None
-    interface_number: Optional[int] = None
-    bus_type: Optional[int] = None
+    product_string: str | None = None
+    release_number: str | None = None
+    usage: int | None = None
+    usage_page: int | None = None
+    interface_number: int | None = None
+    bus_type: int | None = None
     is_acquired: bool = False
 
     @classmethod
     def enumerate(cls, by_type: ConnectionType = ConnectionType.ANY) -> list[Hardware]:
         """List of all connected hardware devices."""
-
         hardware_info = []
 
         match by_type:
@@ -105,7 +102,6 @@ class Hardware:
     @cached_property
     def handle(self) -> HardwareHandle:
         """An I/O handle for this hardware device."""
-
         handle: HardwareHandle
 
         match self.device_type:
@@ -122,7 +118,6 @@ class Hardware:
 
     def acquire(self) -> None:
         """Open the hardware device."""
-
         if self.is_acquired:
             logger.debug(f"{self} already acquired")
             return
@@ -141,7 +136,6 @@ class Hardware:
 
     def release(self) -> None:
         """Close the hardware device."""
-
         if not self.is_acquired:
             logger.debug(f"{self} already released")
             return

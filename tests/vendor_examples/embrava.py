@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from busylight_core.vendors.embrava import Blynclight, Blynclight_Mini, Blynclight_Plus
 

@@ -1,15 +1,13 @@
-"""
-"""
+""" """
 
 import pytest
+
 from busylight_core.hardware import ConnectionType, Hardware
-from serial.tools import list_ports_common
 
 # test enumerate classmethod
 
 
 def test_hardware_classmethod_enumerate_without_args() -> None:
-
     results = Hardware.enumerate()
 
     assert isinstance(results, list)
@@ -31,7 +29,6 @@ def test_hardware_classmethod_enumerate_by_connection_type(
     connection,
     implemented,
 ) -> None:
-
     if not implemented:
         with pytest.raises(NotImplementedError):
             results = Hardware.enumerate(connection)
@@ -45,7 +42,6 @@ def test_hardware_classmethod_enumerate_by_connection_type(
 
 
 def test_hardware_classmethod_from_portinfo(hardware_serial_device) -> None:
-
     assert isinstance(hardware_serial_device, Hardware)
     assert hardware_serial_device.vendor_id == 0x9999
     assert hardware_serial_device.product_id == 0x9999
@@ -61,7 +57,6 @@ def test_hardware_classmethod_from_portinfo(hardware_serial_device) -> None:
 
 
 def test_hardware_classmethod_from_hid(hardware_hid_device) -> None:
-
     assert isinstance(hardware_hid_device, Hardware)
     assert hardware_hid_device.vendor_id == 0x9999
     assert hardware_hid_device.product_id == 0x9999

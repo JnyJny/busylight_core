@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from busylight_core.vendors.plantronics import Status_Indicator
 

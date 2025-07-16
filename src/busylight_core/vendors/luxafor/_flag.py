@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from enum import Enum
 
@@ -56,7 +55,6 @@ class State:
         self.color = (0, 0, 0)
 
     def __bytes__(self) -> bytes:
-
         match self.command:
             case Command.Color:
                 return bytes([self.command, self.leds, *self.color])

@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from busylight_core.vendors.thingm import Blink1
 

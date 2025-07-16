@@ -1,11 +1,10 @@
 """Tests for the Embrava Blynclight device."""
 
-import pytest
 from unittest.mock import Mock, patch
 
-from busylight_core.vendors.embrava.blynclight import Blynclight, FlashSpeed
+from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.vendors.embrava._blynclight import State
-from busylight_core.hardware import Hardware, ConnectionType
+from busylight_core.vendors.embrava.blynclight import Blynclight, FlashSpeed
 
 
 def create_mock_blynclight_hardware():
@@ -25,7 +24,6 @@ class TestBlynclightDeviceSupport:
 
     def test_supported_device_ids(self):
         """Test that supported_device_ids contains correct device mapping."""
-
         assert isinstance(Blynclight.supported_device_ids, dict)
         assert (0x2C0D, 0x0001) in Blynclight.supported_device_ids
         assert (0x2C0D, 0x000C) in Blynclight.supported_device_ids

@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from .colorable import ColorableMixin
 from .taskable import TaskableMixin
