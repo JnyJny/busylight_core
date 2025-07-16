@@ -72,5 +72,5 @@ async def _keepalive(light: Busylight_Alpha, interval: int = 15) -> None:
 
     while True:
         with light.batch_update():
-            light.state.steps[0].keepalive(interval)
+            light.state.steps[0].keep_alive(interval)
         await asyncio.sleep(sleep_interval)
