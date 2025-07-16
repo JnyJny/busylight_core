@@ -52,7 +52,8 @@ class Word:
     def __getitem__(self, key: int | slice) -> int:
         if isinstance(key, int):
             if key not in self.range:
-                raise IndexError(f"Index out of range: {key}")
+                msg = f"Index out of range: {key}"
+                raise IndexError(msg)
             return self.bits[key]
         return sum([b << n for n, b in enumerate(self.bits[key])])
 
@@ -75,13 +76,13 @@ class ReadOnlyBitField:
         """Initialize a bitfield with the given offset and width."""
         self.field = slice(offset, offset + width)
 
-    def __get__(self, obj, type=None) -> int:
-        return obj[self.field]
+    def __get__(self, instance: Word, owner: type | None = None) -> int:
+        return instance[self.field]
 
-    def __set_name__(self, owner, name: str) -> None:
+    def __set_name__(self, owner: type, name: str) -> None:
         self.name = name
 
-    def __set__(self, obj, value: int) -> None:
+    def __set__(self, instance: Word, value: int) -> None:
         msg = f"{self.name} attribute is read only"
         raise AttributeError(msg)
 
@@ -89,5 +90,5 @@ class ReadOnlyBitField:
 class BitField(ReadOnlyBitField):
     """A class representing a mutable bit field within a word."""
 
-    def __set__(self, obj, value: int) -> None:
-        obj[self.field] = value
+    def __set__(self, instance: Word, value: int) -> None:
+        instance[self.field] = value

@@ -1,20 +1,26 @@
-""" """
+"""USB Hardware Description"""
 
 from __future__ import annotations
 
+import contextlib
 from dataclasses import dataclass
 from enum import Enum
 from functools import cached_property
+from typing import TYPE_CHECKING
 
 import serial
 from loguru import logger
 from serial.tools import list_ports
-from serial.tools.list_ports_common import ListPortInfo
+
+if TYPE_CHECKING:
+    from serial.tools.list_ports_common import ListPortInfo
 
 from . import hid
 
 
 class ConnectionType(int, Enum):
+    """USB Harddware connection types."""
+
     ANY: int = -1
     UNKNOWN: int = 0
     HID: int = 1
@@ -27,6 +33,8 @@ HardwareHandle = hid.Device | serial.Serial
 
 @dataclass
 class Hardware:
+    """USB Hardware description."""
+
     device_type: ConnectionType
     path: bytes
     vendor_id: int
@@ -49,24 +57,27 @@ class Hardware:
         match by_type:
             case ConnectionType.ANY:
                 for connection_type in ConnectionType:
-                    if connection_type > 0:
-                        try:
-                            hardware_info.extend(cls.enumerate(connection_type))
-                        except NotImplementedError:
-                            pass
+                    if connection_type <= 0:
+                        continue
+                    with contextlib.suppress(NotImplementedError):
+                        hardware_info.extend(cls.enumerate(connection_type))
             case ConnectionType.HID:
-                for device_dict in hid.enumerate():
-                    hardware_info.append(cls.from_hid(device_dict))
+                hardware_info.extend(
+                    cls.from_hid(device_dict) for device_dict in hid.enumerate()
+                )
             case ConnectionType.SERIAL:
-                for port_info in list_ports.comports():
-                    hardware_info.append(cls.from_PortInfo(port_info))
+                hardware_info.extend(
+                    cls.from_portinfo(port_info) for port_info in list_ports.comports()
+                )
+
             case _:
-                raise NotImplementedError(f"Device type {by_type} not implemented")
+                msg = f"Device type {by_type} not implemented"
+                raise NotImplementedError(msg)
 
         return hardware_info
 
     @classmethod
-    def from_PortInfo(cls, port_info: ListPortInfo) -> Hardware:
+    def from_portinfo(cls, port_info: ListPortInfo) -> Hardware:
         """Create a Hardware object from a serial port info object."""
         return cls(
             device_type=ConnectionType.SERIAL,
@@ -111,9 +122,8 @@ class Hardware:
                 handle = serial.Serial(timeout=1)
                 handle.port = self.path.decode("utf-8")
             case _:
-                raise NotImplementedError(
-                    f"Device type {self.device_type} not implemented"
-                )
+                msg = f"Device type {self.device_type} not implemented"
+                raise NotImplementedError(msg)
         return handle
 
     def acquire(self) -> None:
@@ -130,9 +140,8 @@ class Hardware:
                 self.handle.open()
                 self.is_acquired = True
             case _:
-                raise NotImplementedError(
-                    f"{self.device_type.value.title()} hardware not implemented"
-                )
+                msg = f"{self.device_type.value.title()} hardware not implemented"
+                raise NotImplementedError(msg)
 
     def release(self) -> None:
         """Close the hardware device."""
@@ -145,6 +154,5 @@ class Hardware:
                 self.handle.close()
                 self.is_acquired = False
             case _:
-                raise NotImplementedError(
-                    f"{self.device_type.value.title()} hardware not implemented"
-                )
+                msg = f"{self.device_type.value.title()} hardware not implemented"
+                raise NotImplementedError(msg)
