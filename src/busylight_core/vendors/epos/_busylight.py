@@ -20,7 +20,6 @@ class ReportField(BitField):
 
 class ActionField(BitField):
     """An 8-bit action."""
-        super().__init__(56, 16)
 
 
 class ColorField(BitField):
@@ -29,9 +28,6 @@ class ColorField(BitField):
 
 class OnField(BitField):
     """A 1-bit field that toggles the light on."""
-
-    def __init__(self) -> None:
-        super().__init__(0, 8)
 
 
 class State(Word):
@@ -105,5 +101,3 @@ class State(Word):
         self.green1 = 0
         self.blue1 = 0
         self.on = 0
-        
-        

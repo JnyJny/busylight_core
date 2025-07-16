@@ -31,6 +31,7 @@ from .light import Light
 from .vendors.agile_innovative import BlinkStick
 from .vendors.compulab import Fit_StatUSB
 from .vendors.embrava import Blynclight, Blynclight_Mini, Blynclight_Plus
+from .vendors.epos import Busylight
 from .vendors.kuando import Busylight_Alpha, Busylight_Omega
 from .vendors.luxafor import Bluetooth, BusyTag, Flag, Mute, Orb
 from .vendors.muteme import MuteMe, MuteMe_Mini, MuteSync
@@ -45,6 +46,7 @@ __all__ = [
     "Blynclight_Mini",
     "Blynclight_Plus",
     "BusyTag",
+    "Busylight",
     "Busylight_Alpha",
     "Busylight_Omega",
     "Fit_StatUSB",
