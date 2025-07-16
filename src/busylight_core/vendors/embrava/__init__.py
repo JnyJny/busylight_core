@@ -1,5 +1,4 @@
-"""Embrava Blynclight Support
-"""
+"""Embrava Blynclight Support"""
 
 from .blynclight import Blynclight
 from .blynclight_mini import Blynclight_Mini
