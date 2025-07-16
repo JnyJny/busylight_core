@@ -1,13 +1,34 @@
-""" """
+"""Base class for USB connected lights.
+
+While not intended to be instantiated directly, this class provides a common
+interface for all USB connected lights and a mechanism for discovering
+available lights on the system.
+
+```python
+from busylight_core import Light
+
+all_lights = Light.all_lights()
+
+for light in all_lights:
+    light.on((255, 0, 0))  # Turn on the light with red color
+
+for light in all_lights:
+    light.off()  # Turn off all lights
+````
+
+"""
 
 from __future__ import annotations
 
 import abc
 import contextlib
-
 import platform
-from functools import cached_property, lru_cache
-from typing import Callable, Generator, Optional
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Generator
+
+from functools import cache, cached_property, lru_cache
 
 from loguru import logger
 
@@ -17,29 +38,40 @@ from .mixins import ColorableMixin, TaskableMixin
 
 
 class Light(abc.ABC, ColorableMixin, TaskableMixin):
-    supported_device_ids: dict[tuple[int, int], str] = {}
+    """Base class for USB connected lights.
+
+    This base class provides a common interface for all USB connected lights.
+    """
+
+    supported_device_ids: dict[tuple[int, int], str] | None = None
 
     @classmethod
     @lru_cache(maxsize=1)
     def vendor(cls) -> str:
-        """The vendor name in title case."""
+        """Return the vendor name in title case."""
         return cls.__module__.split(".")[-2].title()
 
     @classmethod
     @lru_cache(maxsize=1)
     def unique_device_names(cls) -> list[str]:
-        """Returns a list of unique device names."""
-        return sorted(set(cls.supported_device_ids.values()))
+        """Return a list of unique device names."""
+        try:
+            return sorted(set(cls.supported_device_ids.values()))
+        except AttributeError:
+            return []
 
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
-        """Returns True if the hardware is claimed by this class."""
-        return hardware.device_id in cls.supported_device_ids
+        """Return True if the hardware is claimed by this class."""
+        try:
+            return hardware.device_id in cls.supported_device_ids
+        except TypeError:
+            return False
 
     @classmethod
-    @lru_cache(maxsize=None)
+    @cache
     def subclasses(cls) -> list[type[Light]]:
-        """Returns a list of all subclasses of this class."""
+        """Return a list of all subclasses of this class."""
         subclasses = []
 
         if cls != Light:
@@ -53,7 +85,10 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
     @classmethod
     @lru_cache(maxsize=1)
     def supported_lights(cls) -> dict[str, list[str]]:
-        """A dictionary of supported lights by vendor."""
+        """Return a dictionary of supported lights by vendor.
+
+        Keys are vendor names, values are a list of product names.
+        """
         supported_lights: dict[str, list[str]] = {}
 
         for subclass in cls.subclasses():
@@ -64,8 +99,10 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
 
     @classmethod
     def available_lights(cls) -> dict[type[Light], list[Hardware]]:
-        """Returns a dictionary of available hardware by type."""
+        """Return a dictionary of available hardware by type.
 
+        Keys are Light subclasses, values are a list of Hardware instances.
+        """
         available_lights: dict[type[Light], list[Hardware]] = {}
 
         for hardware in Hardware.enumerate():
@@ -84,41 +121,54 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         return available_lights
 
     @classmethod
-    def all_lights(cls, reset: bool = True, exclusive: bool = True) -> list[Light]:
-        """Returns a list of all lights ready for use."""
-
+    def all_lights(cls, *, reset: bool = True, exclusive: bool = True) -> list[Light]:
+        """Return a list of all lights ready for use."""
         lights: list[Light] = []
 
         for subclass, devices in cls.available_lights().items():
-            for device in devices:
-                lights.append(subclass(device, reset, exclusive))
+            lights.extend(
+                [
+                    subclass(device, reset=reset, exclusive=exclusive)
+                    for device in devices
+                ]
+            )
 
         return lights
 
     @classmethod
-    def first_light(cls, reset: bool = True, exclusive: bool = True) -> Light:
-        """Returns the first unused light ready for use.
+    def first_light(cls, *, reset: bool = True, exclusive: bool = True) -> Light:
+        """Return the first unused light ready for use.
 
         Raises:
         - NoLightsFound: if no lights are available.
-        """
 
+        """
         for subclass, devices in cls.available_lights().items():
             for device in devices:
                 try:
-                    return subclass(device, reset, exclusive)
+                    return subclass(device, reset=reset, exclusive=exclusive)
                 except Exception as error:
                     logger.info(f"Failed to acquire {device}: {error}")
                     raise
 
-        raise NoLightsFound()
+        raise NoLightsFound
 
     def __init__(
         self,
         hardware: Hardware,
+        *,
         reset: bool = False,
         exclusive: bool = True,
-    ):
+    ) -> None:
+        """Initialize a Light with the given hardware information.
+
+        :param: reset - bool - reset the hardware to a known state
+        :param: exclusive - bool - acquire exclusive access to the hardware
+
+        Raises:
+        - LightUnsupported: if the given Hardware is not supported by this class.
+
+        """
         if not self.__class__.claims(hardware):
             raise LightUnsupported(hardware)
 
@@ -148,6 +198,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
 
     @cached_property
     def platform(self) -> str:
+        """The discovered operating system platform name."""
         system = platform.system()
         match system:
             case "Windows":
@@ -163,13 +214,15 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         try:
             return self._sort_key == other._sort_key
         except AttributeError:
-            raise NotImplemented from None
+            raise TypeError from None
 
     def __lt__(self, other: Light) -> bool:
         if not isinstance(other, Light):
             return NotImplemented
 
-        for self_value, other_value in zip(self._sort_key, other._sort_key):
+        for self_value, other_value in zip(
+            self._sort_key, other._sort_key, strict=False
+        ):
             if self_value != other_value:
                 return self_value < other_value
 
@@ -184,22 +237,22 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
 
     @cached_property
     def name(self) -> str:
-        """The marketing name of this light."""
+        """Return the marketing name of this light."""
         return self.supported_device_ids[self.hardware.device_id]
 
     @property
     def hex(self) -> str:
-        """The hexadecimal representation of the light's state."""
+        """Return the hexadecimal representation of the light's state."""
         return bytes(self).hex(":")
 
     @property
     def read_strategy(self) -> Callable[[int, int | None], bytes]:
-        """Returns the read method used by this light."""
+        """Return the read method used by this light."""
         return self.hardware.handle.read
 
     @property
     def write_strategy(self) -> Callable[[bytes], None]:
-        """Returns the write method used by this light."""
+        """Return the write method used by this light."""
         return self.hardware.handle.write
 
     @contextlib.contextmanager
@@ -209,7 +262,6 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         If the device is not acquired in exclusive mode, it will be
         acquired and released automatically.
         """
-
         if not self._exclusive:
             self.hardware.acquire()
 
@@ -219,12 +271,12 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
             self.hardware.release()
 
     def update(self) -> None:
-        """Obtains the current state of the light and writes it to the device.
+        """Obtain the current state of the light and writes it to the device.
 
         Raises:
         - LightUnavailable
-        """
 
+        """
         state = bytes(self)
 
         match self.platform:
@@ -246,10 +298,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
 
     @contextlib.contextmanager
     def batch_update(self) -> Generator[None, None, None]:
-        """A context manager for updating the software state of the
-        light and updating the hardware automatically on exit.
-        """
-
+        """Update the software state of the light on exit."""
         yield
         self.update()
 
@@ -260,9 +309,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         led: int = 0,
     ) -> None:
         """Activate the light with the given red, green, blue color tuple."""
-        raise NotImplemented
-        # with self.batch_update():
-        #     self.color = color
+        raise NotImplementedError
 
     def off(self, led: int = 0) -> None:
         """Deactivate the light."""
@@ -275,4 +322,4 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
 
     @abc.abstractmethod
     def __bytes__(self) -> bytes:
-        """The byte representation of the light's state."""
+        """Return the byte representation of the light's state."""
