@@ -9,8 +9,6 @@ repository = "https://github.com/JnyJny/busylight_core"
 requires-python = ">=3.11,<4.0"
 dependencies = [
     "loguru",
-    "typer",
-    "pydantic_settings",
     "pyserial>=3.5",
     "hidapi>=0.14.0.post4",
 ]
