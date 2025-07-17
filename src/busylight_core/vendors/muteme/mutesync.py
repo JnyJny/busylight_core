@@ -34,12 +34,12 @@ class MuteSync(Light):
         vendor = cls.vendor().lower()
 
         try:
-            manufacturer = vendor in hardware.manufacturer_string.lower()
+            manufacturer = "mutesync" in hardware.manufacturer_string.lower()
         except AttributeError:
             manufacturer = False
 
         try:
-            product = vendor in hardware.product_string.lower()
+            product = "mutesync" in hardware.product_string.lower()
         except AttributeError:
             product = False
 
