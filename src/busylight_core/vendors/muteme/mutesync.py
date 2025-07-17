@@ -31,8 +31,6 @@ class MuteSync(Light):
 
         claim = super().claims(hardware)
 
-        vendor = cls.vendor().lower()
-
         try:
             manufacturer = "mutesync" in hardware.manufacturer_string.lower()
         except AttributeError:
