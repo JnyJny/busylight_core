@@ -27,17 +27,17 @@ availability, meeting status, or system notifications.
 
 ## Supported Hardware
 
-| Vendor | Device Models | Special Features |
-|--------|---------------|------------------|
-| **Embrava** | Blynclight, Blynclight Mini, Blynclight Plus | Audio playback, flash control, dim/bright |
-| **Kuando** | Busylight Alpha, Busylight Omega | Keepalive functionality |
-| **Luxafor** | Flag, Mute, Orb, Bluetooth | Button input (Mute model) |
-| **ThingM** | Blink(1) | Fade effects, feature reports |
-| **Agile Innovative** | BlinkStick (multiple variants) | 1-192 LEDs, channel control |
-| **MuteMe** | MuteMe, MuteMe Mini | Button input detection |
-| **MuteSync** | Button | Button input detection |
-| **Plantronics** | Status Indicator | Basic light control |
-| **CompuLab** | fit-statUSB | Basic light control |
+| Vendor | Device Models |
+|--------|---------------|
+| **Agile Innovative** | BlinkStick Square |
+| **CompuLab** | fit-statUSB |
+| **EPOS** | Busylight |
+| **Embrava** | Blynclight, Blynclight Mini, Blynclight Plus |
+| **Kuando** | Busylight Alpha, Busylight Omega, Mute |
+| **Luxafor** | Flag, Mute, Orb, Bluetooth |
+| **MuteMe** | MuteMe, MuteMe Mini, MuteSync |
+| **Plantronics** | Status Indicator |
+| **ThingM** | Blink(1) |
 
 
 ## Installation
