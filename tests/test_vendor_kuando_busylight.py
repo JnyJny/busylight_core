@@ -14,7 +14,7 @@ from busylight_core.vendors.kuando.busylight_alpha import _keepalive
 class TestKuandoBusylightStep:
     """Test the Step class for Kuando Busylight."""
 
-    def test_step_initialization(self):
+    def test_step_initialization(self) -> None:
         """Test that Step initializes with correct default values."""
         step = Step()
         assert step.opcode == 0
@@ -28,7 +28,7 @@ class TestKuandoBusylightStep:
         assert step.ringtone == 0
         assert step.volume == 0
 
-    def test_step_keep_alive(self):
+    def test_step_keep_alive(self) -> None:
         """Test keep_alive method configuration."""
         step = Step()
         timeout = 10
@@ -37,7 +37,7 @@ class TestKuandoBusylightStep:
         assert step.operand == timeout
         assert step.body == 0
 
-    def test_step_keep_alive_timeout_mask(self):
+    def test_step_keep_alive_timeout_mask(self) -> None:
         """Test keep_alive method with timeout masking."""
         step = Step()
         timeout = 0x1F  # 31, should be masked to 0xF (15)
@@ -46,7 +46,7 @@ class TestKuandoBusylightStep:
         assert step.operand == 0xF  # Masked to 4 bits
         assert step.body == 0
 
-    def test_step_boot(self):
+    def test_step_boot(self) -> None:
         """Test boot method configuration."""
         step = Step()
         step.boot()
@@ -54,7 +54,7 @@ class TestKuandoBusylightStep:
         assert step.operand == 0
         assert step.body == 0
 
-    def test_step_reset(self):
+    def test_step_reset(self) -> None:
         """Test reset method configuration."""
         step = Step()
         step.reset()
@@ -62,7 +62,7 @@ class TestKuandoBusylightStep:
         assert step.operand == 0
         assert step.body == 0
 
-    def test_step_jump_basic(self):
+    def test_step_jump_basic(self) -> None:
         """Test jump method with basic color."""
         step = Step()
         color = (255, 128, 64)
@@ -79,7 +79,7 @@ class TestKuandoBusylightStep:
         assert step.ringtone == Ring.Off
         assert step.volume == 0
 
-    def test_step_jump_full_parameters(self):
+    def test_step_jump_full_parameters(self) -> None:
         """Test jump method with all parameters."""
         step = Step()
         color = (200, 150, 100)
@@ -107,7 +107,7 @@ class TestKuandoBusylightStep:
         assert step.ringtone == ringtone & 0xF  # Ringtone is masked to 4 bits
         assert step.volume == volume & 0x3  # Volume is masked to 3 bits
 
-    def test_step_jump_parameter_masking(self):
+    def test_step_jump_parameter_masking(self) -> None:
         """Test jump method with parameter masking."""
         step = Step()
         color = (255, 255, 255)
@@ -129,7 +129,7 @@ class TestKuandoBusylightStep:
         assert step.ringtone == 0xF
         assert step.volume == 0x3
 
-    def test_step_color_property(self):
+    def test_step_color_property(self) -> None:
         """Test color property getter and setter."""
         step = Step()
         color = (128, 64, 32)
@@ -138,7 +138,7 @@ class TestKuandoBusylightStep:
         retrieved_color = step.color
         assert all(abs(retrieved_color[i] - color[i]) <= 2 for i in range(3))
 
-    def test_step_color_conversion(self):
+    def test_step_color_conversion(self) -> None:
         """Test color conversion from 0-255 to 0-100 range."""
         step = Step()
         # Test full range colors
@@ -162,7 +162,7 @@ class TestKuandoBusylightStep:
 class TestKuandoBusylightState:
     """Test the State class for Kuando Busylight."""
 
-    def test_state_initialization(self):
+    def test_state_initialization(self) -> None:
         """Test that State initializes with steps."""
         state = State()
         assert hasattr(state, "steps")
@@ -177,7 +177,7 @@ class TestKuandoBusylightAlpha:
     """Test the main Busylight_Alpha class."""
 
     @pytest.fixture
-    def mock_hardware(self):
+    def mock_hardware(self) -> Hardware:
         """Create mock hardware for testing."""
         hardware = Mock(spec=Hardware)
         hardware.vendor_id = 0x04D8
@@ -189,7 +189,7 @@ class TestKuandoBusylightAlpha:
         return hardware
 
     @pytest.fixture
-    def busylight(self, mock_hardware):
+    def busylight(self, mock_hardware) -> Busylight_Alpha:
         """Create a Busylight_Alpha instance for testing."""
         # Mock the hardware handle methods
         mock_hardware.handle = Mock()
@@ -198,7 +198,7 @@ class TestKuandoBusylightAlpha:
 
         return Busylight_Alpha(mock_hardware, reset=False, exclusive=False)
 
-    def test_supported_device_ids(self):
+    def test_supported_device_ids(self) -> None:
         """Test supported_device_ids contains expected devices."""
         device_ids = Busylight_Alpha.supported_device_ids
         assert (0x04D8, 0xF848) in device_ids
@@ -207,13 +207,13 @@ class TestKuandoBusylightAlpha:
         assert (0x27BB, 0x3BCE) in device_ids
         assert all("Busylight Alpha" in name for name in device_ids.values())
 
-    def test_state_property(self, busylight):
+    def test_state_property(self, busylight) -> None:
         """Test state property returns State instance."""
         assert isinstance(busylight.state, State)
         # Should be cached
         assert busylight.state is busylight.state
 
-    def test_bytes_method(self, busylight):
+    def test_bytes_method(self, busylight) -> None:
         """Test __bytes__ method returns state bytes."""
         state_bytes = bytes(busylight)
         expected_bytes = bytes(busylight.state)
@@ -222,7 +222,7 @@ class TestKuandoBusylightAlpha:
             len(state_bytes) == 64
         )  # State should be 7 steps + 1 footer * 8 bytes each
 
-    def test_on_method(self, busylight):
+    def test_on_method(self, busylight) -> None:
         """Test on() method with color."""
         color = (255, 128, 64)
         with (
@@ -242,7 +242,7 @@ class TestKuandoBusylightAlpha:
             mock_batch.assert_called_once()
             mock_add_task.assert_called_once_with("keepalive", _keepalive)
 
-    def test_off_method(self, busylight):
+    def test_off_method(self, busylight) -> None:
         """Test off() method."""
         # First turn on
         busylight.on((255, 0, 0))
@@ -262,7 +262,7 @@ class TestKuandoBusylightAlpha:
             mock_batch.assert_called_once()
             mock_cancel_task.assert_called_once_with("keepalive")
 
-    def test_on_method_with_led_parameter(self, busylight):
+    def test_on_method_with_led_parameter(self, busylight) -> None:
         """Test on() method with led parameter (should be ignored)."""
         color = (128, 255, 32)
         with (
@@ -281,7 +281,7 @@ class TestKuandoBusylightAlpha:
             mock_batch.assert_called_once()
             mock_add_task.assert_called_once_with("keepalive", _keepalive)
 
-    def test_off_method_with_led_parameter(self, busylight):
+    def test_off_method_with_led_parameter(self, busylight) -> None:
         """Test off() method with led parameter (should be ignored)."""
         with (
             patch.object(busylight, "batch_update") as mock_batch,
@@ -301,7 +301,7 @@ class TestKuandoBusylightKeepAlive:
     """Test the keepalive functionality."""
 
     @pytest.fixture
-    def mock_light(self):
+    def mock_light(self) -> Busylight_Alpha:
         """Create mock light for testing."""
         light = Mock(spec=Busylight_Alpha)
         light.state = Mock()
@@ -312,7 +312,7 @@ class TestKuandoBusylightKeepAlive:
         return light
 
     @pytest.mark.asyncio
-    async def test_keepalive_default_interval(self, mock_light):
+    async def test_keepalive_default_interval(self, mock_light) -> None:
         """Test keepalive with default interval."""
         with patch("asyncio.sleep") as mock_sleep:
             mock_sleep.side_effect = [
@@ -330,7 +330,7 @@ class TestKuandoBusylightKeepAlive:
             )  # Should sleep for interval/2 rounded: round(15/2) = 8
 
     @pytest.mark.asyncio
-    async def test_keepalive_custom_interval(self, mock_light):
+    async def test_keepalive_custom_interval(self, mock_light) -> None:
         """Test keepalive with custom interval."""
         interval = 10
         with patch("asyncio.sleep") as mock_sleep:
@@ -346,7 +346,7 @@ class TestKuandoBusylightKeepAlive:
             mock_sleep.assert_called_with(5)  # Should sleep for interval/2
 
     @pytest.mark.asyncio
-    async def test_keepalive_interval_validation(self, mock_light):
+    async def test_keepalive_interval_validation(self, mock_light) -> None:
         """Test keepalive interval validation."""
         # Test invalid intervals
         with pytest.raises(
@@ -379,7 +379,7 @@ class TestKuandoBusylightKeepAlive:
             mock_light.state.steps[0].keep_alive.assert_called_with(15)
 
     @pytest.mark.asyncio
-    async def test_keepalive_sleep_calculation(self, mock_light):
+    async def test_keepalive_sleep_calculation(self, mock_light) -> None:
         """Test keepalive sleep interval calculation."""
         test_cases = [
             (1, 0),  # round(1/2) = 0
@@ -400,7 +400,7 @@ class TestKuandoBusylightKeepAlive:
                 mock_sleep.assert_called_with(expected_sleep)
 
     @pytest.mark.asyncio
-    async def test_keepalive_continuous_operation(self, mock_light):
+    async def test_keepalive_continuous_operation(self, mock_light) -> None:
         """Test keepalive continuous operation."""
         with patch("asyncio.sleep") as mock_sleep:
             # Allow 3 iterations then cancel
@@ -418,7 +418,7 @@ class TestKuandoBusylightKeepAlive:
                 assert call[0][0] == 4  # round(8/2) = 4
 
     @pytest.mark.asyncio
-    async def test_keepalive_batch_update_usage(self, mock_light):
+    async def test_keepalive_batch_update_usage(self, mock_light) -> None:
         """Test keepalive uses batch_update correctly."""
         with patch("asyncio.sleep") as mock_sleep:
             mock_sleep.side_effect = [

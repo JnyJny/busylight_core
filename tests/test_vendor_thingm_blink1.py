@@ -29,7 +29,7 @@ from busylight_core.vendors.thingm._blink1 import (
 class TestThingMBlink1Fields:
     """Test the bit field classes."""
 
-    def test_field_positions(self):
+    def test_field_positions(self) -> None:
         """Test bit field positions and widths."""
         # Test bit field positions
         assert ReportField().field == slice(56, 64)
@@ -49,7 +49,7 @@ class TestThingMBlink1Fields:
 class TestThingMBlink1Enums:
     """Test the enum classes."""
 
-    def test_action_enum_values(self):
+    def test_action_enum_values(self) -> None:
         """Test Action enum has correct character values."""
         assert Action.FadeColor == ord("c")
         assert Action.SetColor == ord("n")
@@ -74,13 +74,13 @@ class TestThingMBlink1Enums:
         assert Action.ServerModeTickle == ord("D")
         assert Action.GetChipID == ord("U")
 
-    def test_leds_enum_values(self):
+    def test_leds_enum_values(self) -> None:
         """Test LEDS enum values."""
         assert LEDS.All == 0
         assert LEDS.Top == 1
         assert LEDS.Bottom == 2
 
-    def test_report_enum_values(self):
+    def test_report_enum_values(self) -> None:
         """Test Report enum values."""
         assert Report.One == 1
         assert Report.Two == 2
@@ -89,7 +89,7 @@ class TestThingMBlink1Enums:
 class TestThingMBlink1State:
     """Test the State class."""
 
-    def test_state_initialization(self):
+    def test_state_initialization(self) -> None:
         """Test State initializes with correct default values."""
         state = State()
         assert state.report == 0
@@ -106,7 +106,7 @@ class TestThingMBlink1State:
         assert state.line == 0
         assert state.color == (0, 0, 0)
 
-    def test_state_color_property(self):
+    def test_state_color_property(self) -> None:
         """Test color property getter and setter."""
         state = State()
         color = (255, 128, 64)
@@ -116,7 +116,7 @@ class TestThingMBlink1State:
         assert state.green == 128
         assert state.blue == 64
 
-    def test_state_alias_fields(self):
+    def test_state_alias_fields(self) -> None:
         """Test that alias fields work correctly."""
         state = State()
 
@@ -148,7 +148,7 @@ class TestThingMBlink1State:
         state.leds = 7
         assert state.line == 7
 
-    def test_state_fade_to_color_default(self):
+    def test_state_fade_to_color_default(self) -> None:
         """Test fade_to_color with default parameters."""
         state = State()
         color = (255, 128, 64)
@@ -160,7 +160,7 @@ class TestThingMBlink1State:
         assert state.fade == 10  # default fade_ms
         assert state.leds == LEDS.All  # default leds
 
-    def test_state_fade_to_color_custom(self):
+    def test_state_fade_to_color_custom(self) -> None:
         """Test fade_to_color with custom parameters."""
         state = State()
         color = (200, 100, 50)
@@ -175,7 +175,7 @@ class TestThingMBlink1State:
         assert state.fade == fade_ms
         assert state.leds == leds
 
-    def test_state_fade_to_color_clears_previous(self):
+    def test_state_fade_to_color_clears_previous(self) -> None:
         """Test fade_to_color clears previous state."""
         state = State()
         # Set some initial values
@@ -192,7 +192,7 @@ class TestThingMBlink1State:
         assert state.start == 0  # green should be 0
         assert state.stop == 0  # blue should be 0
 
-    def test_state_write_pattern_line(self):
+    def test_state_write_pattern_line(self) -> None:
         """Test write_pattern_line method."""
         state = State()
         color = (128, 64, 32)
@@ -207,7 +207,7 @@ class TestThingMBlink1State:
         assert state.fade == fade_ms
         assert state.line == index
 
-    def test_state_save_patterns(self):
+    def test_state_save_patterns(self) -> None:
         """Test save_patterns method."""
         state = State()
         state.save_patterns()
@@ -217,7 +217,7 @@ class TestThingMBlink1State:
         assert state.color == (0xBE, 0xEF, 0xCA)
         assert state.count == 0xFE
 
-    def test_state_play_loop_default(self):
+    def test_state_play_loop_default(self) -> None:
         """Test play_loop with default parameters."""
         state = State()
         play = 1
@@ -233,7 +233,7 @@ class TestThingMBlink1State:
         assert state.stop == stop
         assert state.count == 0  # default count
 
-    def test_state_play_loop_custom(self):
+    def test_state_play_loop_custom(self) -> None:
         """Test play_loop with custom parameters."""
         state = State()
         play = 2
@@ -250,7 +250,7 @@ class TestThingMBlink1State:
         assert state.stop == stop
         assert state.count == count
 
-    def test_state_clear_patterns_default(self):
+    def test_state_clear_patterns_default(self) -> None:
         """Test clear_patterns with default parameters."""
         state = State()
 
@@ -262,7 +262,7 @@ class TestThingMBlink1State:
             for i in range(16):
                 mock_write.assert_any_call((0, 0, 0), 0, i)
 
-    def test_state_clear_patterns_custom(self):
+    def test_state_clear_patterns_custom(self) -> None:
         """Test clear_patterns with custom parameters."""
         state = State()
         start = 5
@@ -276,7 +276,7 @@ class TestThingMBlink1State:
             for i in range(start, start + count):
                 mock_write.assert_any_call((0, 0, 0), 0, i)
 
-    def test_state_methods_clear_previous(self):
+    def test_state_methods_clear_previous(self) -> None:
         """Test that all state methods clear previous state."""
         state = State()
 
@@ -318,7 +318,7 @@ class TestThingMBlink1:
     """Test the main Blink1 class."""
 
     @pytest.fixture
-    def mock_hardware(self):
+    def mock_hardware(self) -> Hardware:
         """Create mock hardware for testing."""
         hardware = Mock(spec=Hardware)
         hardware.vendor_id = 0x27B8
@@ -330,7 +330,7 @@ class TestThingMBlink1:
         return hardware
 
     @pytest.fixture
-    def blink1(self, mock_hardware):
+    def blink1(self, mock_hardware) -> Blink1:
         """Create a Blink1 instance for testing."""
         mock_hardware.handle = Mock()
         mock_hardware.handle.write = Mock(return_value=8)
@@ -338,35 +338,35 @@ class TestThingMBlink1:
         mock_hardware.handle.send_feature_report = Mock(return_value=8)
         return Blink1(mock_hardware, reset=False, exclusive=False)
 
-    def test_vendor_method(self):
+    def test_vendor_method(self) -> None:
         """Test vendor() method returns correct vendor name."""
         assert Blink1.vendor() == "ThingM"
 
-    def test_supported_device_ids(self):
+    def test_supported_device_ids(self) -> None:
         """Test supported_device_ids contains expected devices."""
         device_ids = Blink1.supported_device_ids
         assert (0x27B8, 0x01ED) in device_ids
         assert device_ids[(0x27B8, 0x01ED)] == "Blink(1)"
 
-    def test_state_property(self, blink1):
+    def test_state_property(self, blink1) -> None:
         """Test state property returns State instance."""
         assert isinstance(blink1.state, State)
         # Should be cached
         assert blink1.state is blink1.state
 
-    def test_bytes_method(self, blink1):
+    def test_bytes_method(self, blink1) -> None:
         """Test __bytes__ method returns state bytes."""
         state_bytes = bytes(blink1)
         expected_bytes = bytes(blink1.state)
         assert state_bytes == expected_bytes
         assert len(state_bytes) == 8  # State should be 64 bits / 8 = 8 bytes
 
-    def test_write_strategy_property(self, blink1):
+    def test_write_strategy_property(self, blink1) -> None:
         """Test write_strategy property returns send_feature_report."""
         strategy = blink1.write_strategy
         assert strategy == blink1.hardware.handle.send_feature_report
 
-    def test_on_method_default_led(self, blink1):
+    def test_on_method_default_led(self, blink1) -> None:
         """Test on() method with default LED."""
         color = (255, 128, 64)
         with patch.object(blink1, "batch_update") as mock_batch:
@@ -381,7 +381,7 @@ class TestThingMBlink1:
             assert blink1.state.leds == LEDS.All  # Default LED
             mock_batch.assert_called_once()
 
-    def test_on_method_specific_led(self, blink1):
+    def test_on_method_specific_led(self, blink1) -> None:
         """Test on() method with specific LED."""
         color = (200, 100, 50)
         led = 1
@@ -397,7 +397,7 @@ class TestThingMBlink1:
             assert blink1.state.leds == LEDS.Top  # LED 1
             mock_batch.assert_called_once()
 
-    def test_on_method_led_mapping(self, blink1):
+    def test_on_method_led_mapping(self, blink1) -> None:
         """Test on() method LED mapping."""
         color = (100, 100, 100)
         test_cases = [
@@ -415,7 +415,7 @@ class TestThingMBlink1:
 
                 assert blink1.state.leds == expected_leds
 
-    def test_on_method_batch_update_usage(self, blink1):
+    def test_on_method_batch_update_usage(self, blink1) -> None:
         """Test on() method uses batch_update correctly."""
         color = (150, 75, 25)
         with patch.object(blink1, "batch_update") as mock_batch:
@@ -428,7 +428,7 @@ class TestThingMBlink1:
             mock_batch.return_value.__enter__.assert_called_once()
             mock_batch.return_value.__exit__.assert_called_once()
 
-    def test_on_method_state_configuration(self, blink1):
+    def test_on_method_state_configuration(self, blink1) -> None:
         """Test on() method configures state correctly."""
         color = (255, 0, 255)
         with patch.object(blink1, "batch_update") as mock_batch:
@@ -444,7 +444,7 @@ class TestThingMBlink1:
             assert blink1.state.fade == 10  # Default fade
             assert blink1.state.leds == LEDS.Bottom
 
-    def test_bytes_integration(self, blink1):
+    def test_bytes_integration(self, blink1) -> None:
         """Test integration between on() method and bytes() output."""
         color = (128, 64, 32)
         blink1.on(color, led=1)
@@ -457,7 +457,7 @@ class TestThingMBlink1:
         assert blink1.state.leds == LEDS.Top
         assert len(result) == 8
 
-    def test_state_persistence(self, blink1):
+    def test_state_persistence(self, blink1) -> None:
         """Test that state persists across operations."""
         color = (200, 150, 100)
         blink1.on(color)
@@ -471,7 +471,7 @@ class TestThingMBlink1:
         result2 = bytes(blink1)
         assert result1 == result2
 
-    def test_write_strategy_integration(self, blink1):
+    def test_write_strategy_integration(self, blink1) -> None:
         """Test write_strategy integration with hardware."""
         strategy = blink1.write_strategy
         assert callable(strategy)
@@ -482,7 +482,7 @@ class TestThingMBlink1:
         strategy(test_data)
         blink1.hardware.handle.send_feature_report.assert_called_once_with(test_data)
 
-    def test_leds_enum_usage(self, blink1):
+    def test_leds_enum_usage(self, blink1) -> None:
         """Test that LEDS enum is properly used."""
         color = (255, 255, 255)
 
@@ -498,7 +498,7 @@ class TestThingMBlink1:
                 assert isinstance(blink1.state.leds, int)
                 assert blink1.state.leds == LEDS(led_value)
 
-    def test_color_and_led_independence(self, blink1):
+    def test_color_and_led_independence(self, blink1) -> None:
         """Test that color and LED settings are independent."""
         color1 = (255, 0, 0)
         color2 = (0, 255, 0)
@@ -517,7 +517,7 @@ class TestThingMBlink1:
             assert blink1.state.color == color2
             assert blink1.state.leds == LEDS.Bottom
 
-    def test_state_word_size(self, blink1):
+    def test_state_word_size(self, blink1) -> None:
         """Test that state word is correct size."""
         # State should be 64 bits
         assert len(bytes(blink1.state)) == 8

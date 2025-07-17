@@ -12,7 +12,7 @@ from busylight_core.vendors.luxafor._busytag import Command
 class TestLuxaforBusyTagCommand:
     """Test the Command enum for BusyTag."""
 
-    def test_command_enum_values(self):
+    def test_command_enum_values(self) -> None:
         """Test that Command enum has all expected AT commands."""
         assert Command.GetDeviceName == "AT+GDN"
         assert Command.GetManufacturerName == "AT+GMN"
@@ -27,21 +27,21 @@ class TestLuxaforBusyTagCommand:
         assert Command.GetLastResetReasonCore1 == "AT+GLRR1"
         assert Command.SolidColor == "AT+SC={leds},{red:02x}{green:02x}{blue:02x}"
 
-    def test_solid_color_method_all_leds(self):
+    def test_solid_color_method_all_leds(self) -> None:
         """Test solid_color method with all LEDs (led=0)."""
         color = (255, 128, 64)
         result = Command.solid_color(color, led=0)
         expected = "AT+SC=127,ff8040"
         assert result == expected
 
-    def test_solid_color_method_specific_led(self):
+    def test_solid_color_method_specific_led(self) -> None:
         """Test solid_color method with specific LED."""
         color = (200, 100, 50)
         result = Command.solid_color(color, led=3)
         expected = "AT+SC=8,c86432"  # 1 << 3 = 8
         assert result == expected
 
-    def test_solid_color_method_led_bit_shifting(self):
+    def test_solid_color_method_led_bit_shifting(self) -> None:
         """Test solid_color method LED bit shifting."""
         color = (255, 255, 255)
 
@@ -61,7 +61,7 @@ class TestLuxaforBusyTagCommand:
             expected = f"AT+SC={expected_leds},ffffff"
             assert result == expected
 
-    def test_solid_color_method_color_formatting(self):
+    def test_solid_color_method_color_formatting(self) -> None:
         """Test solid_color method color formatting."""
         # Test various colors to ensure proper hex formatting
         test_cases = [
@@ -79,7 +79,7 @@ class TestLuxaforBusyTagCommand:
             expected = f"AT+SC=127,{expected_hex}"
             assert result == expected
 
-    def test_solid_color_method_edge_cases(self):
+    def test_solid_color_method_edge_cases(self) -> None:
         """Test solid_color method edge cases."""
         # Test with LED 0 (should use 127)
         result = Command.solid_color((100, 100, 100), led=0)
@@ -89,7 +89,7 @@ class TestLuxaforBusyTagCommand:
         result = Command.solid_color((50, 50, 50), led=7)
         assert result == "AT+SC=128,323232"  # 1 << 7 = 128
 
-    def test_solid_color_method_return_type(self):
+    def test_solid_color_method_return_type(self) -> None:
         """Test that solid_color method returns a string."""
         result = Command.solid_color((255, 128, 64), led=0)
         assert isinstance(result, str)
@@ -100,7 +100,7 @@ class TestLuxaforBusyTag:
     """Test the main BusyTag class."""
 
     @pytest.fixture
-    def mock_hardware(self):
+    def mock_hardware(self) -> Hardware:
         """Create mock hardware for testing."""
         hardware = Mock(spec=Hardware)
         hardware.vendor_id = 0x303A
@@ -112,56 +112,55 @@ class TestLuxaforBusyTag:
         return hardware
 
     @pytest.fixture
-    def busytag(self, mock_hardware):
+    def busytag(self, mock_hardware) -> BusyTag:
         """Create a BusyTag instance for testing."""
         mock_hardware.handle = Mock()
         mock_hardware.handle.write = Mock(return_value=32)
         mock_hardware.handle.read = Mock(return_value=b"\x00" * 32)
         return BusyTag(mock_hardware, reset=False, exclusive=False)
 
-    def test_vendor_method(self):
+    def test_vendor_method(self) -> None:
         """Test vendor() method returns correct vendor name."""
         assert BusyTag.vendor() == "Busy Tag"
 
-    def test_supported_device_ids(self):
+    def test_supported_device_ids(self) -> None:
         """Test supported_device_ids contains expected devices."""
         device_ids = BusyTag.supported_device_ids
         assert (0x303A, 0x81DF) in device_ids
         assert device_ids[(0x303A, 0x81DF)] == "Busy Tag"
 
-    def test_command_property_default(self, busytag):
+    def test_command_property_default(self, busytag) -> None:
         """Test command property default value."""
         assert busytag.command == ""
 
-    def test_command_property_setter(self, busytag):
+    def test_command_property_setter(self, busytag) -> None:
         """Test command property setter."""
         test_command = "AT+SC=127,ff0000"
         busytag.command = test_command
         assert busytag.command == test_command
-        assert busytag._command == test_command
 
-    def test_command_property_getter(self, busytag):
+    def test_command_property_getter(self, busytag) -> None:
         """Test command property getter."""
         # Test with no command set
         assert busytag.command == ""
 
         # Test with command set
-        busytag._command = "AT+GDN"
-        assert busytag.command == "AT+GDN"
+        busytag._command = Command.GetDeviceName  # noqa: SLF001
+        assert busytag.command == Command.GetDeviceName
 
-    def test_bytes_method_empty_command(self, busytag):
+    def test_bytes_method_empty_command(self, busytag) -> None:
         """Test __bytes__ method with empty command."""
         result = bytes(busytag)
         assert result == b""
 
-    def test_bytes_method_with_command(self, busytag):
+    def test_bytes_method_with_command(self, busytag) -> None:
         """Test __bytes__ method with command."""
         busytag.command = "AT+SC=127,ff8040"
         result = bytes(busytag)
         expected = b"AT+SC=127,ff8040"
         assert result == expected
 
-    def test_bytes_method_various_commands(self, busytag):
+    def test_bytes_method_various_commands(self, busytag) -> None:
         """Test __bytes__ method with various commands."""
         test_commands = [
             "AT+GDN",
@@ -177,7 +176,7 @@ class TestLuxaforBusyTag:
             expected = command.encode()
             assert result == expected
 
-    def test_on_method_all_leds(self, busytag):
+    def test_on_method_all_leds(self, busytag) -> None:
         """Test on() method with all LEDs."""
         color = (255, 128, 64)
         with patch.object(busytag, "batch_update") as mock_batch:
@@ -190,7 +189,7 @@ class TestLuxaforBusyTag:
             assert busytag.command == "AT+SC=127,ff8040"
             mock_batch.assert_called_once()
 
-    def test_on_method_specific_led(self, busytag):
+    def test_on_method_specific_led(self, busytag) -> None:
         """Test on() method with specific LED."""
         color = (200, 100, 50)
         led = 3
@@ -204,7 +203,7 @@ class TestLuxaforBusyTag:
             assert busytag.command == "AT+SC=8,c86432"
             mock_batch.assert_called_once()
 
-    def test_on_method_various_colors(self, busytag):
+    def test_on_method_various_colors(self, busytag) -> None:
         """Test on() method with various colors."""
         test_cases = [
             ((255, 0, 0), "AT+SC=127,ff0000"),
@@ -224,7 +223,7 @@ class TestLuxaforBusyTag:
                 assert busytag.color == color
                 assert busytag.command == expected_command
 
-    def test_on_method_various_leds(self, busytag):
+    def test_on_method_various_leds(self, busytag) -> None:
         """Test on() method with various LED positions."""
         color = (255, 255, 255)
         test_cases = [
@@ -248,7 +247,7 @@ class TestLuxaforBusyTag:
                 assert busytag.color == color
                 assert busytag.command == expected_command
 
-    def test_on_method_batch_update_usage(self, busytag):
+    def test_on_method_batch_update_usage(self, busytag) -> None:
         """Test on() method uses batch_update correctly."""
         color = (100, 100, 100)
         with patch.object(busytag, "batch_update") as mock_batch:
@@ -261,7 +260,7 @@ class TestLuxaforBusyTag:
             mock_batch.return_value.__enter__.assert_called_once()
             mock_batch.return_value.__exit__.assert_called_once()
 
-    def test_command_persistence(self, busytag):
+    def test_command_persistence(self, busytag) -> None:
         """Test that command persists across operations."""
         busytag.command = "AT+GDN"
         assert busytag.command == "AT+GDN"
@@ -274,7 +273,7 @@ class TestLuxaforBusyTag:
         busytag.command = "AT+SC=127,ffffff"
         assert busytag.command == "AT+SC=127,ffffff"
 
-    def test_on_method_updates_both_color_and_command(self, busytag):
+    def test_on_method_updates_both_color_and_command(self, busytag) -> None:
         """Test that on() method updates both color and command."""
         color = (150, 75, 25)
         with patch.object(busytag, "batch_update") as mock_batch:
@@ -290,7 +289,7 @@ class TestLuxaforBusyTag:
             # bytes() should return the encoded command
             assert bytes(busytag) == b"AT+SC=4,964b19"
 
-    def test_encoding_consistency(self, busytag):
+    def test_encoding_consistency(self, busytag) -> None:
         """Test that command encoding is consistent."""
         commands = [
             "AT+GDN",
@@ -309,7 +308,7 @@ class TestLuxaforBusyTag:
             decoded = encoded.decode()
             assert decoded == command
 
-    def test_command_integration_with_on_method(self, busytag):
+    def test_command_integration_with_on_method(self, busytag) -> None:
         """Test integration between command property and on() method."""
         # Start with empty command
         assert busytag.command == ""

@@ -505,8 +505,6 @@ class TestBlynclightStateRepr:
 
     def test_state_repr(self) -> None:
         """Test State.__repr__() method."""
-        from busylight_core.vendors.embrava._blynclight import State
-
         state = State()
         # Set state values to see in representation
         state.off = 1
@@ -523,8 +521,6 @@ class TestBlynclightStateRepr:
 
     def test_state_str(self) -> None:
         """Test State.__str__() method."""
-        from busylight_core.vendors.embrava._blynclight import State
-
         state = State()
         # Set some state values
         state.off = 1

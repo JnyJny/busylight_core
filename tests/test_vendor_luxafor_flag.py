@@ -13,7 +13,7 @@ class TestLuxaforFlag:
     """Test the Flag class."""
 
     @pytest.fixture
-    def mock_hardware(self):
+    def mock_hardware(self) -> Hardware:
         """Create mock hardware for testing."""
         hardware = Mock(spec=Hardware)
         hardware.vendor_id = 0x04D8
@@ -26,24 +26,24 @@ class TestLuxaforFlag:
         return hardware
 
     @pytest.fixture
-    def flag(self, mock_hardware):
+    def flag(self, mock_hardware) -> Flag:
         """Create a Flag instance for testing."""
         mock_hardware.handle = Mock()
         mock_hardware.handle.write = Mock(return_value=8)
         mock_hardware.handle.read = Mock(return_value=b"\x00" * 8)
         return Flag(mock_hardware, reset=False, exclusive=False)
 
-    def test_vendor_method(self):
+    def test_vendor_method(self) -> None:
         """Test vendor() method returns correct vendor name."""
         assert Flag.vendor() == "Luxafor"
 
-    def test_supported_device_ids(self):
+    def test_supported_device_ids(self) -> None:
         """Test supported_device_ids contains expected devices."""
         device_ids = Flag.supported_device_ids
         assert (0x04D8, 0xF372) in device_ids
         assert device_ids[(0x04D8, 0xF372)] == "Flag"
 
-    def test_claims_method_with_keyerror(self, mock_hardware):
+    def test_claims_method_with_keyerror(self, mock_hardware) -> None:
         """Test claims() method with KeyError in product_string processing."""
         # Create a mock that raises KeyError when split() is called
         mock_product_string = Mock()
@@ -51,31 +51,35 @@ class TestLuxaforFlag:
         mock_hardware.product_string = mock_product_string
 
         # Mock super().claims() to return True
-        with patch.object(Flag.__bases__[0], "claims", return_value=True):
-            with patch("busylight_core.vendors.luxafor.flag.logger") as mock_logger:
-                result = Flag.claims(mock_hardware)
+        with (
+            patch.object(Flag.__bases__[0], "claims", return_value=True),
+            patch("busylight_core.vendors.luxafor.flag.logger") as mock_logger,
+        ):
+            result = Flag.claims(mock_hardware)
 
-                assert result is False
-                mock_logger.debug.assert_called_once()
-                assert "problem" in str(mock_logger.debug.call_args)
-                assert "test error" in str(mock_logger.debug.call_args)
+            assert result is False
+            mock_logger.debug.assert_called_once()
+            assert "problem" in str(mock_logger.debug.call_args)
+            assert "test error" in str(mock_logger.debug.call_args)
 
-    def test_claims_method_with_indexerror(self, mock_hardware):
+    def test_claims_method_with_indexerror(self, mock_hardware) -> None:
         """Test claims() method with IndexError in product_string processing."""
         # Empty string will cause IndexError when split()[-1] is accessed
         mock_hardware.product_string = ""
 
         # Mock super().claims() to return True
-        with patch.object(Flag.__bases__[0], "claims", return_value=True):
-            with patch("busylight_core.vendors.luxafor.flag.logger") as mock_logger:
-                result = Flag.claims(mock_hardware)
+        with (
+            patch.object(Flag.__bases__[0], "claims", return_value=True),
+            patch("busylight_core.vendors.luxafor.flag.logger") as mock_logger,
+        ):
+            result = Flag.claims(mock_hardware)
 
-                assert result is False
-                mock_logger.debug.assert_called_once()
-                assert "problem" in str(mock_logger.debug.call_args)
-                assert "list index out of range" in str(mock_logger.debug.call_args)
+            assert result is False
+            mock_logger.debug.assert_called_once()
+            assert "problem" in str(mock_logger.debug.call_args)
+            assert "list index out of range" in str(mock_logger.debug.call_args)
 
-    def test_claims_method_with_no_super_claim(self, mock_hardware):
+    def test_claims_method_with_no_super_claim(self, mock_hardware) -> None:
         """Test claims() method when super().claims() returns False."""
         mock_hardware.product_string = "Luxafor Flag"
 
@@ -88,7 +92,7 @@ class TestLuxaforFlag:
 class TestLuxaforFlagState:
     """Test the Flag State class."""
 
-    def test_state_bytes_with_fade_command(self):
+    def test_state_bytes_with_fade_command(self) -> None:
         """Test State.__bytes__() with Fade command."""
         state = State()
         state.command = Command.Fade
@@ -101,7 +105,7 @@ class TestLuxaforFlagState:
         expected = bytes([Command.Fade, 1, 255, 128, 64, 10, 5])
         assert result == expected
 
-    def test_state_bytes_with_unsupported_command(self):
+    def test_state_bytes_with_unsupported_command(self) -> None:
         """Test State.__bytes__() with unsupported command raises ValueError."""
         state = State()
         # Use a command value that's not Color or Fade
@@ -116,7 +120,7 @@ class TestLuxaforFlagState:
             # Should log the error before raising
             mock_logger.debug.assert_called_once_with("Unsupported command: 99")
 
-    def test_state_bytes_with_unknown_command_enum(self):
+    def test_state_bytes_with_unknown_command_enum(self) -> None:
         """Test State.__bytes__() with unknown command enum."""
         state = State()
         # Create a mock command that's not in the match statement

@@ -1,5 +1,7 @@
 """Tests for the Hardware class and related functionality."""
 
+from unittest.mock import Mock, patch
+
 import pytest
 
 from busylight_core.hardware import ConnectionType, Hardware
@@ -115,8 +117,6 @@ def test_hardware_handle_unsupported_connection_type() -> None:
 
 def test_hardware_acquire_already_acquired() -> None:
     """Test Hardware.acquire() when device is already acquired."""
-    from unittest.mock import Mock, patch
-
     # Create a HID hardware instance
     hardware = Hardware(
         device_type=ConnectionType.HID,
@@ -128,7 +128,7 @@ def test_hardware_acquire_already_acquired() -> None:
     )
 
     # Mock the handle and set as already acquired
-    hardware._handle = Mock()
+    hardware._handle = Mock()  # noqa: SLF001
     hardware.is_acquired = True
 
     # Mock logger to capture debug message
@@ -139,8 +139,6 @@ def test_hardware_acquire_already_acquired() -> None:
 
 def test_hardware_acquire_unsupported_connection_type() -> None:
     """Test Hardware.acquire() raises NotImplementedError for unsupported connection types."""
-    from unittest.mock import Mock
-
     hardware = Hardware(
         device_type=ConnectionType.BLUETOOTH,  # Unsupported type
         path=b"/dev/test",
@@ -151,7 +149,7 @@ def test_hardware_acquire_unsupported_connection_type() -> None:
     )
 
     # Mock the handle so we can call acquire
-    hardware._handle = Mock()
+    hardware._handle = Mock()  # noqa: SLF001
     hardware.is_acquired = False
 
     with pytest.raises(AttributeError, match="'int' object has no attribute 'title'"):
@@ -160,8 +158,6 @@ def test_hardware_acquire_unsupported_connection_type() -> None:
 
 def test_hardware_release_already_released() -> None:
     """Test Hardware.release() when device is already released."""
-    from unittest.mock import Mock, patch
-
     hardware = Hardware(
         device_type=ConnectionType.HID,
         path=b"/dev/test",
@@ -172,7 +168,7 @@ def test_hardware_release_already_released() -> None:
     )
 
     # Mock the handle and set as not acquired
-    hardware._handle = Mock()
+    hardware._handle = Mock()  # noqa: SLF001
     hardware.is_acquired = False
 
     # Mock logger to capture debug message
@@ -183,8 +179,6 @@ def test_hardware_release_already_released() -> None:
 
 def test_hardware_release_hid_and_serial() -> None:
     """Test Hardware.release() for HID and SERIAL connection types."""
-    from unittest.mock import Mock, patch
-
     # Test HID
     hid_hardware = Hardware(
         device_type=ConnectionType.HID,
@@ -196,14 +190,14 @@ def test_hardware_release_hid_and_serial() -> None:
     )
 
     mock_handle = Mock()
-    hid_hardware._handle = mock_handle
+    hid_hardware._handle = mock_handle  # noqa: SLF001
     hid_hardware.is_acquired = True
 
     # Need to mock the handle property to return our mock
     with patch.object(
         type(hid_hardware),
         "handle",
-        new_callable=lambda: property(lambda self: mock_handle),
+        new_callable=lambda: property(lambda _: mock_handle),
     ):
         hid_hardware.release()
 
@@ -221,14 +215,14 @@ def test_hardware_release_hid_and_serial() -> None:
     )
 
     mock_handle = Mock()
-    serial_hardware._handle = mock_handle
+    serial_hardware._handle = mock_handle  # noqa: SLF001
     serial_hardware.is_acquired = True
 
     # Need to mock the handle property to return our mock
     with patch.object(
         type(serial_hardware),
         "handle",
-        new_callable=lambda: property(lambda self: mock_handle),
+        new_callable=lambda: property(lambda _: mock_handle),
     ):
         serial_hardware.release()
 
@@ -238,8 +232,6 @@ def test_hardware_release_hid_and_serial() -> None:
 
 def test_hardware_release_unsupported_connection_type() -> None:
     """Test Hardware.release() raises NotImplementedError for unsupported connection types."""
-    from unittest.mock import Mock
-
     hardware = Hardware(
         device_type=ConnectionType.BLUETOOTH,  # Unsupported type
         path=b"/dev/test",
@@ -250,7 +242,7 @@ def test_hardware_release_unsupported_connection_type() -> None:
     )
 
     # Mock the handle and set as acquired
-    hardware._handle = Mock()
+    hardware._handle = Mock()  # noqa: SLF001
     hardware.is_acquired = True
 
     with pytest.raises(AttributeError, match="'int' object has no attribute 'title'"):
