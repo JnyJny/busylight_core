@@ -70,6 +70,7 @@ def test_word_dunder_setitem() -> None:
 
 def test_word_with_readonly_bitfield() -> None:
     """Test Word with ReadOnlyBitField functionality."""
+
     class TestWord(Word):
         readonly = ReadOnlyBitField(0, 8)
 
@@ -84,6 +85,7 @@ def test_word_with_readonly_bitfield() -> None:
 @pytest.mark.parametrize(("value", "expected"), [(0, 0), (0xFF, 0xFF)])
 def test_word_with_bitfield(value, expected) -> None:
     """Test Word with BitField functionality."""
+
     class TestWord(Word):
         field = BitField(0, 8)
 
@@ -98,6 +100,7 @@ def test_word_with_bitfield(value, expected) -> None:
 
 def test_word_with_bitfield_and_readonly_bitfield() -> None:
     """Test Word with both BitField and ReadOnlyBitField."""
+
     class TestWord(Word):
         field = BitField(0, 4)
         readonly = ReadOnlyBitField(4, 4)
