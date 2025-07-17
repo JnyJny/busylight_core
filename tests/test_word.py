@@ -123,3 +123,55 @@ def test_word_with_invalid_length(length: int) -> None:
     """Test Word initialization with invalid bit lengths raises ValueError."""
     with pytest.raises(ValueError, match="length must be a multiple of 8"):
         Word(0, length)
+
+
+def test_word_repr() -> None:
+    """Test Word.__repr__() method returns correct string representation."""
+    word = Word(255, 8)
+    result = repr(word)
+    expected = f"Word(value={word.hex})"
+    assert result == expected
+    assert "Word" in result
+    assert word.hex in result
+
+
+def test_word_str() -> None:
+    """Test Word.__str__() method returns hex representation."""
+    word = Word(255, 8)
+    result = str(word)
+    assert result == word.hex
+    assert result == "0xff"
+
+
+def test_word_getitem_index_out_of_range() -> None:
+    """Test Word.__getitem__() raises IndexError for out of range index."""
+    word = Word(0, 8)  # 8-bit word has range 0-7
+    
+    # Test negative index out of range
+    with pytest.raises(IndexError, match="Index out of range: -1"):
+        word[-1]
+    
+    # Test positive index out of range
+    with pytest.raises(IndexError, match="Index out of range: 8"):
+        word[8]
+    
+    # Test way out of range
+    with pytest.raises(IndexError, match="Index out of range: 100"):
+        word[100]
+
+
+def test_word_setitem_index_out_of_range() -> None:
+    """Test Word.__setitem__() raises IndexError for out of range index."""
+    word = Word(0, 8)  # 8-bit word has range 0-7
+    
+    # Test negative index out of range
+    with pytest.raises(IndexError, match="Index out of range: -1"):
+        word[-1] = 1
+    
+    # Test positive index out of range
+    with pytest.raises(IndexError, match="Index out of range: 8"):
+        word[8] = 1
+    
+    # Test way out of range
+    with pytest.raises(IndexError, match="Index out of range: 100"):
+        word[100] = 1

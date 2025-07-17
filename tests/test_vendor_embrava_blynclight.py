@@ -498,3 +498,100 @@ class TestBlynclightEdgeCases:
             assert result is True, (
                 f"Failed to claim device {vendor_id:04X}:{product_id:04X}"
             )
+
+
+class TestBlynclightStateRepr:
+    """Test State class string representations."""
+    
+    def test_state_repr(self) -> None:
+        """Test State.__repr__() method."""
+        from busylight_core.vendors.embrava._blynclight import State
+        
+        state = State()
+        # Set state values to see in representation
+        state.off = 1
+        state.dim = 1
+        state.flash = 1
+        
+        result = repr(state)
+        
+        # Should contain class name and hex representation
+        assert "State" in result
+        assert "0x" in result
+        assert result.startswith("State(0x")
+        assert result.endswith(")")
+    
+    def test_state_str(self) -> None:
+        """Test State.__str__() method."""
+        from busylight_core.vendors.embrava._blynclight import State
+        
+        state = State()
+        # Set some state values
+        state.off = 1
+        state.dim = 1
+        state.flash = 0
+        state.speed = 2
+        state.repeat = 1
+        state.play = 0
+        state.music = 5
+        state.volume = 10
+        state.mute = 1
+        
+        result = str(state)
+        
+        # Should contain all field values
+        assert "off:    1" in result
+        assert "dim:    1" in result  
+        assert "flash:  0" in result
+        assert "speed:  2" in result
+        assert "repeat: 1" in result
+        assert "play:   0" in result
+        assert "music:  5" in result
+        assert "volume: 10" in result
+        assert "mute:   1" in result
+        
+        # Should be newline-separated
+        lines = result.split("\n")
+        assert len(lines) == 9  # 9 fields
+        
+        # Each line should contain a field name and value
+        for line in lines:
+            assert ":" in line
+
+
+class TestBlynclightOnMethod:
+    """Test the on() method coverage."""
+    
+    def test_on_method(self) -> None:
+        """Test on() method sets color correctly."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with (
+            patch.object(mock_hardware, "acquire"),
+            patch.object(Blynclight, "reset"),
+            patch.object(Blynclight, "update") as mock_update,
+        ):
+            blynclight = Blynclight(mock_hardware)
+            test_color = (200, 100, 50)
+            
+            blynclight.on(test_color)
+            
+            assert blynclight.color == test_color
+            mock_update.assert_called_once()
+    
+    def test_on_method_with_led_parameter(self) -> None:
+        """Test on() method with led parameter (ignored for Blynclight)."""
+        mock_hardware = create_mock_blynclight_hardware()
+        
+        with (
+            patch.object(mock_hardware, "acquire"),
+            patch.object(Blynclight, "reset"),
+            patch.object(Blynclight, "update") as mock_update,
+        ):
+            blynclight = Blynclight(mock_hardware)
+            test_color = (150, 75, 25)
+            
+            blynclight.on(test_color, led=5)  # LED parameter should be ignored
+            
+            assert blynclight.color == test_color
+            mock_update.assert_called_once()
