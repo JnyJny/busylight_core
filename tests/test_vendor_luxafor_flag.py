@@ -1,16 +1,17 @@
 """Tests for Luxafor Flag implementation."""
 
-import pytest
 from unittest.mock import Mock, patch
 
+import pytest
+
+from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.vendors.luxafor import Flag
-from busylight_core.vendors.luxafor._flag import State, Command
-from busylight_core.hardware import Hardware, ConnectionType
+from busylight_core.vendors.luxafor._flag import Command, State
 
 
 class TestLuxaforFlag:
     """Test the Flag class."""
-    
+
     @pytest.fixture
     def mock_hardware(self):
         """Create mock hardware for testing."""
@@ -23,70 +24,70 @@ class TestLuxaforFlag:
         hardware.acquire = Mock()
         hardware.release = Mock()
         return hardware
-    
+
     @pytest.fixture
     def flag(self, mock_hardware):
         """Create a Flag instance for testing."""
         mock_hardware.handle = Mock()
         mock_hardware.handle.write = Mock(return_value=8)
-        mock_hardware.handle.read = Mock(return_value=b'\x00' * 8)
+        mock_hardware.handle.read = Mock(return_value=b"\x00" * 8)
         return Flag(mock_hardware, reset=False, exclusive=False)
-    
+
     def test_vendor_method(self):
         """Test vendor() method returns correct vendor name."""
         assert Flag.vendor() == "Luxafor"
-    
+
     def test_supported_device_ids(self):
         """Test supported_device_ids contains expected devices."""
         device_ids = Flag.supported_device_ids
         assert (0x04D8, 0xF372) in device_ids
         assert device_ids[(0x04D8, 0xF372)] == "Flag"
-    
+
     def test_claims_method_with_keyerror(self, mock_hardware):
         """Test claims() method with KeyError in product_string processing."""
         # Create a mock that raises KeyError when split() is called
         mock_product_string = Mock()
         mock_product_string.split.side_effect = KeyError("test error")
         mock_hardware.product_string = mock_product_string
-        
+
         # Mock super().claims() to return True
-        with patch.object(Flag.__bases__[0], 'claims', return_value=True):
-            with patch('busylight_core.vendors.luxafor.flag.logger') as mock_logger:
+        with patch.object(Flag.__bases__[0], "claims", return_value=True):
+            with patch("busylight_core.vendors.luxafor.flag.logger") as mock_logger:
                 result = Flag.claims(mock_hardware)
-                
+
                 assert result is False
                 mock_logger.debug.assert_called_once()
                 assert "problem" in str(mock_logger.debug.call_args)
                 assert "test error" in str(mock_logger.debug.call_args)
-    
+
     def test_claims_method_with_indexerror(self, mock_hardware):
         """Test claims() method with IndexError in product_string processing."""
         # Empty string will cause IndexError when split()[-1] is accessed
         mock_hardware.product_string = ""
-        
+
         # Mock super().claims() to return True
-        with patch.object(Flag.__bases__[0], 'claims', return_value=True):
-            with patch('busylight_core.vendors.luxafor.flag.logger') as mock_logger:
+        with patch.object(Flag.__bases__[0], "claims", return_value=True):
+            with patch("busylight_core.vendors.luxafor.flag.logger") as mock_logger:
                 result = Flag.claims(mock_hardware)
-                
+
                 assert result is False
                 mock_logger.debug.assert_called_once()
                 assert "problem" in str(mock_logger.debug.call_args)
                 assert "list index out of range" in str(mock_logger.debug.call_args)
-    
+
     def test_claims_method_with_no_super_claim(self, mock_hardware):
         """Test claims() method when super().claims() returns False."""
         mock_hardware.product_string = "Luxafor Flag"
-        
+
         # Mock super().claims() to return False
-        with patch.object(Flag.__bases__[0], 'claims', return_value=False):
+        with patch.object(Flag.__bases__[0], "claims", return_value=False):
             result = Flag.claims(mock_hardware)
             assert result is False
 
 
 class TestLuxaforFlagState:
     """Test the Flag State class."""
-    
+
     def test_state_bytes_with_fade_command(self):
         """Test State.__bytes__() with Fade command."""
         state = State()
@@ -95,11 +96,11 @@ class TestLuxaforFlagState:
         state.color = (255, 128, 64)
         state.fade = 10
         state.repeat = 5
-        
+
         result = bytes(state)
         expected = bytes([Command.Fade, 1, 255, 128, 64, 10, 5])
         assert result == expected
-    
+
     def test_state_bytes_with_unsupported_command(self):
         """Test State.__bytes__() with unsupported command raises ValueError."""
         state = State()
@@ -107,14 +108,14 @@ class TestLuxaforFlagState:
         state.command = 99  # Invalid command
         state.leds = 1
         state.color = (255, 128, 64)
-        
-        with patch('busylight_core.vendors.luxafor._flag.logger') as mock_logger:
+
+        with patch("busylight_core.vendors.luxafor._flag.logger") as mock_logger:
             with pytest.raises(ValueError, match="Unsupported command: 99"):
                 bytes(state)
-            
+
             # Should log the error before raising
             mock_logger.debug.assert_called_once_with("Unsupported command: 99")
-    
+
     def test_state_bytes_with_unknown_command_enum(self):
         """Test State.__bytes__() with unknown command enum."""
         state = State()
@@ -124,10 +125,14 @@ class TestLuxaforFlagState:
         state.command = mock_command
         state.leds = 1
         state.color = (255, 128, 64)
-        
-        with patch('busylight_core.vendors.luxafor._flag.logger') as mock_logger:
-            with pytest.raises(ValueError, match=f"Unsupported command: {mock_command}"):
+
+        with patch("busylight_core.vendors.luxafor._flag.logger") as mock_logger:
+            with pytest.raises(
+                ValueError, match=f"Unsupported command: {mock_command}"
+            ):
                 bytes(state)
-            
+
             # Should log the error before raising
-            mock_logger.debug.assert_called_once_with(f"Unsupported command: {mock_command}")
+            mock_logger.debug.assert_called_once_with(
+                f"Unsupported command: {mock_command}"
+            )

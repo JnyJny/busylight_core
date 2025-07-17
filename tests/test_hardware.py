@@ -103,17 +103,20 @@ def test_hardware_handle_unsupported_connection_type() -> None:
         vendor_id=0x1234,
         product_id=0x5678,
         serial_number="TEST123",
-        manufacturer_string="Test Manufacturer"
+        manufacturer_string="Test Manufacturer",
     )
-    
-    with pytest.raises(NotImplementedError, match="Device type ConnectionType.BLUETOOTH not implemented"):
+
+    with pytest.raises(
+        NotImplementedError,
+        match="Device type ConnectionType.BLUETOOTH not implemented",
+    ):
         _ = hardware.handle
 
 
 def test_hardware_acquire_already_acquired() -> None:
     """Test Hardware.acquire() when device is already acquired."""
     from unittest.mock import Mock, patch
-    
+
     # Create a HID hardware instance
     hardware = Hardware(
         device_type=ConnectionType.HID,
@@ -121,15 +124,15 @@ def test_hardware_acquire_already_acquired() -> None:
         vendor_id=0x1234,
         product_id=0x5678,
         serial_number="TEST123",
-        manufacturer_string="Test Manufacturer"
+        manufacturer_string="Test Manufacturer",
     )
-    
+
     # Mock the handle and set as already acquired
     hardware._handle = Mock()
     hardware.is_acquired = True
-    
+
     # Mock logger to capture debug message
-    with patch('busylight_core.hardware.logger') as mock_logger:
+    with patch("busylight_core.hardware.logger") as mock_logger:
         hardware.acquire()
         mock_logger.debug.assert_called_once_with(f"{hardware} already acquired")
 
@@ -137,20 +140,20 @@ def test_hardware_acquire_already_acquired() -> None:
 def test_hardware_acquire_unsupported_connection_type() -> None:
     """Test Hardware.acquire() raises NotImplementedError for unsupported connection types."""
     from unittest.mock import Mock
-    
+
     hardware = Hardware(
         device_type=ConnectionType.BLUETOOTH,  # Unsupported type
         path=b"/dev/test",
         vendor_id=0x1234,
         product_id=0x5678,
         serial_number="TEST123",
-        manufacturer_string="Test Manufacturer"
+        manufacturer_string="Test Manufacturer",
     )
-    
+
     # Mock the handle so we can call acquire
     hardware._handle = Mock()
     hardware.is_acquired = False
-    
+
     with pytest.raises(AttributeError, match="'int' object has no attribute 'title'"):
         hardware.acquire()
 
@@ -158,22 +161,22 @@ def test_hardware_acquire_unsupported_connection_type() -> None:
 def test_hardware_release_already_released() -> None:
     """Test Hardware.release() when device is already released."""
     from unittest.mock import Mock, patch
-    
+
     hardware = Hardware(
         device_type=ConnectionType.HID,
         path=b"/dev/test",
         vendor_id=0x1234,
         product_id=0x5678,
         serial_number="TEST123",
-        manufacturer_string="Test Manufacturer"
+        manufacturer_string="Test Manufacturer",
     )
-    
+
     # Mock the handle and set as not acquired
     hardware._handle = Mock()
     hardware.is_acquired = False
-    
+
     # Mock logger to capture debug message
-    with patch('busylight_core.hardware.logger') as mock_logger:
+    with patch("busylight_core.hardware.logger") as mock_logger:
         hardware.release()
         mock_logger.debug.assert_called_once_with(f"{hardware} already released")
 
@@ -181,7 +184,7 @@ def test_hardware_release_already_released() -> None:
 def test_hardware_release_hid_and_serial() -> None:
     """Test Hardware.release() for HID and SERIAL connection types."""
     from unittest.mock import Mock, patch
-    
+
     # Test HID
     hid_hardware = Hardware(
         device_type=ConnectionType.HID,
@@ -189,20 +192,24 @@ def test_hardware_release_hid_and_serial() -> None:
         vendor_id=0x1234,
         product_id=0x5678,
         serial_number="TEST123",
-        manufacturer_string="Test Manufacturer"
+        manufacturer_string="Test Manufacturer",
     )
-    
+
     mock_handle = Mock()
     hid_hardware._handle = mock_handle
     hid_hardware.is_acquired = True
-    
+
     # Need to mock the handle property to return our mock
-    with patch.object(type(hid_hardware), 'handle', new_callable=lambda: property(lambda self: mock_handle)):
+    with patch.object(
+        type(hid_hardware),
+        "handle",
+        new_callable=lambda: property(lambda self: mock_handle),
+    ):
         hid_hardware.release()
-    
+
     mock_handle.close.assert_called_once()
     assert hid_hardware.is_acquired is False
-    
+
     # Test SERIAL
     serial_hardware = Hardware(
         device_type=ConnectionType.SERIAL,
@@ -210,17 +217,21 @@ def test_hardware_release_hid_and_serial() -> None:
         vendor_id=0x1234,
         product_id=0x5678,
         serial_number="TEST123",
-        manufacturer_string="Test Manufacturer"
+        manufacturer_string="Test Manufacturer",
     )
-    
+
     mock_handle = Mock()
     serial_hardware._handle = mock_handle
     serial_hardware.is_acquired = True
-    
+
     # Need to mock the handle property to return our mock
-    with patch.object(type(serial_hardware), 'handle', new_callable=lambda: property(lambda self: mock_handle)):
+    with patch.object(
+        type(serial_hardware),
+        "handle",
+        new_callable=lambda: property(lambda self: mock_handle),
+    ):
         serial_hardware.release()
-    
+
     mock_handle.close.assert_called_once()
     assert serial_hardware.is_acquired is False
 
@@ -228,19 +239,19 @@ def test_hardware_release_hid_and_serial() -> None:
 def test_hardware_release_unsupported_connection_type() -> None:
     """Test Hardware.release() raises NotImplementedError for unsupported connection types."""
     from unittest.mock import Mock
-    
+
     hardware = Hardware(
         device_type=ConnectionType.BLUETOOTH,  # Unsupported type
         path=b"/dev/test",
         vendor_id=0x1234,
         product_id=0x5678,
         serial_number="TEST123",
-        manufacturer_string="Test Manufacturer"
+        manufacturer_string="Test Manufacturer",
     )
-    
+
     # Mock the handle and set as acquired
     hardware._handle = Mock()
     hardware.is_acquired = True
-    
+
     with pytest.raises(AttributeError, match="'int' object has no attribute 'title'"):
         hardware.release()
