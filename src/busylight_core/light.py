@@ -217,8 +217,8 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         return self._exclusive
 
     @property
-    def reset(self) -> bool:
-        """Return True if the light resets the hardware to a known state."""
+    def was_reset(self) -> bool:
+        """Return True if the light was reset when the hardware was initialized."""
         return self._reset
 
     @cached_property
