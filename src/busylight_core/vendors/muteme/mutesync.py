@@ -20,14 +20,14 @@ class MuteSync(Light):
     @staticmethod
     def vendor() -> str:
         """Return the vendor name for this device."""
-        return "MuteSync"
+        return "MuteMe"
 
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
         """Return True if the hardware describes a MuteSync Button."""
-        # Addresses issue #356 where MuteSync claims another hardware with
-        # a SiliconLabs CP2102 USB to Serial controller that is not a MuteSync
-        # hardware.
+        # Addresses busylight-for-humans issue #356 where MuteSync
+        # claims another hardware with a SiliconLabs CP2102 USB to
+        # Serial controller that is not MuteSync hardware.
 
         claim = super().claims(hardware)
 
@@ -47,7 +47,6 @@ class MuteSync(Light):
 
     def __bytes__(self) -> bytes:
         buf = [65] + [*self.color] * 4
-
         return bytes(buf)
 
     @property
