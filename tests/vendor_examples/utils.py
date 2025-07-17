@@ -22,7 +22,7 @@ def make_hardware(
         Hardware instances for each supported device ID of the subclass
 
     """
-    for (v, p) in subclass.supported_device_ids:
+    for v, p in subclass.supported_device_ids:
         match template.get("device_type", ConnectionType.HID):
             case ConnectionType.HID:
                 yield Hardware.from_hid({**template, "vendor_id": v, "product_id": p})
