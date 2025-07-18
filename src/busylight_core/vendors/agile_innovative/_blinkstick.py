@@ -16,32 +16,32 @@ class State:
 
     @classmethod
     def blinkstick(cls) -> State:
-        """BlinkStick State"""
+        """Return the BlinkStick state variant."""
         return cls(1, 1)
 
     @classmethod
     def blinkstick_pro(cls) -> State:
-        """BlinkStick Pro State"""
+        """Return the BlinkStick Pro state variant."""
         return cls(2, 192)
 
     @classmethod
     def blinkstick_square(cls) -> State:
-        """Return the BlinkStick Square variant."""
+        """Return the BlinkStick Square state variant."""
         return cls(6, 8)
 
     @classmethod
     def blinkstick_strip(cls) -> State:
-        """BlinkStick Strip State"""
+        """Return the BlinkStick Strip state variant."""
         return cls(6, 8)
 
     @classmethod
     def blinkstick_nano(cls) -> State:
-        """BlinkStick Nano State"""
+        """Return the BlinkStick Nano state variant."""
         return cls(6, 2)
 
     @classmethod
     def blinkstick_flex(cls) -> State:
-        """BlinkStick Flex State"""
+        """Return BlinkStick Flex state variant."""
         return cls(6, 32)
 
     def __init__(self, report: int, nleds: int) -> None:
@@ -51,6 +51,11 @@ class State:
         self.colors: list[tuple[int, int, int]] = []
 
     def __bytes__(self) -> bytes:
+        # EJO there is a bug here WRT versions of BlinkStick that
+        #     don't require the channel in the command word. Also,
+        #     I don't have a solid understanding of what channel
+        #     controls. This works for BlinkStick Square which I
+        #     can test.
         buf = [self.report, self.channel]
         for color in self.colors:
             buf.extend(color)
@@ -65,23 +70,30 @@ class State:
                 return (r, g, b)
         return (0, 0, 0)
 
-    @color.setter
-    def color(self, value: tuple[int, int, int]) -> None:
-        r, g, b = value
-        value = (g, r, b)
-        self.colors = [value] * self.nleds
+    @staticmethod
+    def rgb_to_grb(color: tuple[int, int, int]) -> tuple[int, int, int]:
+        """Convert a RGB color tuple to an internal GRB representation."""
+        r, g, b = color
+        return (g, r, b)
 
-    def get_led(self, index: int) -> tuple[int, int, int]:
-        """Get the color of a specific LED."""
-        try:
-            r, g, b = self.colors[index]
-        except IndexError:
-            r, g, b = (0, 0, 0)
-
+    @staticmethod
+    def grb_to_rgb(color: tuple[int, int, int]) -> tuple[int, int, int]:
+        """Convert an internal GRB color tuple to RGB representation."""
+        g, r, b = color
         return (r, g, b)
 
+    @color.setter
+    def color(self, value: tuple[int, int, int]) -> None:
+        self.colors = [self.rgb_to_grb(value)] * self.nleds
+
+    def get_led(self, index: int) -> tuple[int, int, int]:
+        """Get the RGB color of a specific LED."""
+        try:
+            return self.grb_to_rgb(self.colors[index])
+        except IndexError:
+            return (0, 0, 0)
+
     def set_led(self, index: int, color: tuple[int, int, int]) -> None:
-        """Set the color of a specific LED."""
-        r, g, b = color
+        """Set the RGB color of a specific LED."""
         with contextlib.suppress(IndexError):
-            self.colors[index] = (g, r, b)
+            self.colors[index] = self.rgb_to_grb(color)
