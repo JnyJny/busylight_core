@@ -77,6 +77,8 @@ class ReadOnlyBitField:
         self.field = slice(offset, offset + width)
 
     def __get__(self, instance: Word, owner: type | None = None) -> int:
+        if instance is None:
+            return self
         return instance[self.field]
 
     def __set_name__(self, owner: type, name: str) -> None:

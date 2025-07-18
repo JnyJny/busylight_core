@@ -59,6 +59,8 @@ class ColorField(BitField):
         super().__set__(instance, int((value / 255) * 100))
 
     def __get__(self, instance, owner):
+        if instance is None:
+            return self
         return int(super().__get__(instance, owner) / 100 * 0xFF)
 
 
