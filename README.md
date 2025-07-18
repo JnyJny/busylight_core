@@ -11,7 +11,9 @@
 
 **busylight-core** provides a consistent interface to control various
 USB-connected status lights, commonly used for indicating
-availability, meeting status, or system notifications.
+availability, meeting status, or system notifications. Were you
+looking for a command-line interface to control your lights? Check out
+[Busylight for Humans™][busylight-for-humans]!
 
 ## Features
 
@@ -158,7 +160,7 @@ the previous step's success.
 [![gh:JnyJny/python-package-cookiecutter][python-package-cookiecutter-badge]][python-package-cookiecutter]
 
 <!-- End Links -->
-
+[busylight-for-humans]: https://github.com/JnyJny/busylight
 [python-package-cookiecutter-badge]: https://img.shields.io/badge/Made_With_Cookiecutter-python--package--cookiecutter-green?style=for-the-badge
 [python-package-cookiecutter]: https://github.com/JnyJny/python-package-cookiecutter
 [badge-release]: https://github.com/JnyJny/busylight_core/actions/workflows/release.yaml/badge.svg
