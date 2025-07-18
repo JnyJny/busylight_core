@@ -18,18 +18,15 @@ availability, meeting status, or system notifications.
 - **Multi-Vendor Support** - Control devices from nine vendors.
 - **Multiple Connection Types** - HID and Serial device support.
 - **Python Library** - Clean, object-oriented API for easy integration.
-- **Rich Light Control** - Colors, brightness, flash patterns, fade effects.
-- **Audio Capabilities** - Sound playback and mute/unmute on supported devices.
 - **Input Detection** - Button press handling on interactive devices.
 - **Multi-LED Support** - Control devices with 1-192 individual LEDs.
-- **Async Task Management** - Built-in support for animations and effects.
 - **Extensible Architecture** - Easy to add support for new devices.
 
 ## Supported Hardware
 
 | Vendor | Device Models |
 |--------|---------------|
-| **Agile Innovative** | BlinkStick Square |
+| **Agile Innovative** | BlinkStick, BlinkStick Pro, BlinkStick Flex, BlickStick Nano, BlinkStick Strip, BlinkStick Square |
 | **CompuLab** | fit-statUSB |
 | **EPOS** | Busylight |
 | **Embrava** | Blynclight, Blynclight Mini, Blynclight Plus |
