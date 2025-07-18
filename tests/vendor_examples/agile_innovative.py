@@ -4,7 +4,7 @@ This module provides mock hardware definitions for testing Agile Innovative
 busylight devices, including the BlinkStick product line.
 """
 
-from busylight_core.vendors.agile_innovative import BlinkStick
+from busylight_core.vendors.agile_innovative import BlinkStickSquare
 
 from .utils import make_hardware
 
@@ -21,5 +21,5 @@ blinkstick_square_template = {
 }
 
 AGILE_INNOVATIVE_HARDWARE = {
-    BlinkStick: make_hardware(BlinkStick, blinkstick_square_template),
+    BlinkStickSquare: make_hardware(BlinkStickSquare, blinkstick_square_template),
 }

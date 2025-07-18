@@ -44,7 +44,7 @@ class BlinkStickSquare(Light):
     @cached_property
     def state(self) -> State:
         """Get the current state of the BlinkStick Square."""
-        return State.Square()
+        return State.blinkstick_square()
 
     def __bytes__(self) -> bytes:
         """Return the byte representation of the BlinkStick Square state."""
