@@ -1,4 +1,4 @@
-"""Agile Innovative Blinkstick Square implementation details."""
+"""Agile Innovative Blinkstick Nano implementation details."""
 
 from __future__ import annotations
 
@@ -8,24 +8,23 @@ from typing import TYPE_CHECKING, ClassVar
 if TYPE_CHECKING:
     from busylight_core.hardware import Hardware
 
-
 from ._blinkstick import BaseBlinkStick, State
 
 
-class BlinkStickSquare(BaseBlinkStick):
-    """Agile Innovative BlinkStick Square status light controller.
+class BlinkStickNano(BaseBlinkStick):
+    """Agile Innovative BlinkStick Nano status light controller.
 
-    The BlinkStick Square is a USB-connected RGB LED device with a square form factor
+    The BlinkStick Nano is a USB-connected RGB LED device with a nano form factor
     that can be controlled to display various colors and patterns for status indication.
     """
 
     supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
-        (0x20A0, 0x41E5): "BlinkStick Square",
+        (0x20A0, 0x41E5): "BlinkStick Nano",
     }
 
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
-        """Return True if the hardware describes a BlinkStick Square."""
+        """Check if the hardware describes a BlinkStick Nano."""
         claim = super().claims(hardware)
 
         try:
@@ -33,9 +32,9 @@ class BlinkStickSquare(BaseBlinkStick):
         except ValueError:
             return False
 
-        return claim and major == 3 and hardware.release_number == 0x200
+        return claim and major == 3 and hardware.release_number == 0x202
 
     @cached_property
     def state(self) -> State:
-        """Get the current state of the BlinkStick Square."""
-        return State.blinkstick_square()
+        """Get the current state of the BlinkStick Nano."""
+        return State.blinkstick_nano()
