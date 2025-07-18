@@ -78,7 +78,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         """Return a list of all subclasses of this class."""
         subclasses = []
 
-        if cls != Light:
+        if cls != Light and cls.supported_device_ids is not None:
             subclasses.append(cls)
 
         for subclass in cls.__subclasses__():
