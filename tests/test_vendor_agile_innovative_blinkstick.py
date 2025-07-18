@@ -14,68 +14,75 @@ class TestBlinkStickState:
 
     def test_state_initialization(self) -> None:
         """Test State initializes with correct parameters."""
-        state = State(1, 8)
+        state = State(1, 8, "Test Device")
         assert state.report == 1
         assert state.nleds == 8
+        assert state.name == "Test Device"
         assert state.channel == 0
-        assert state.colors == []
+        assert state.colors == [(0, 0, 0)] * 8
 
     def test_state_blinkstick_factory(self) -> None:
         """Test blinkstick() factory method."""
         state = State.blinkstick()
         assert state.report == 1
         assert state.nleds == 1
+        assert state.name == "BlinkStick"
         assert state.channel == 0
-        assert state.colors == []
+        assert state.colors == [(0, 0, 0)] * 1
 
     def test_state_blinkstick_pro_factory(self) -> None:
         """Test blinkstick_pro() factory method."""
         state = State.blinkstick_pro()
         assert state.report == 2
         assert state.nleds == 192
+        assert state.name == "BlinkStick Pro"
         assert state.channel == 0
-        assert state.colors == []
+        assert state.colors == [(0, 0, 0)] * 192
 
     def test_state_blinkstick_square_factory(self) -> None:
         """Test blinkstick_square() factory method."""
         state = State.blinkstick_square()
         assert state.report == 6
         assert state.nleds == 8
+        assert state.name == "BlinkStick Square"
         assert state.channel == 0
-        assert state.colors == []
+        assert state.colors == [(0, 0, 0)] * 8
 
     def test_state_blinkstick_strip_factory(self) -> None:
         """Test blinkstick_strip() factory method."""
         state = State.blinkstick_strip()
         assert state.report == 6
         assert state.nleds == 8
+        assert state.name == "BlinkStick Strip"
         assert state.channel == 0
-        assert state.colors == []
+        assert state.colors == [(0, 0, 0)] * 8
 
     def test_state_blinkstick_nano_factory(self) -> None:
         """Test blinkstick_nano() factory method."""
         state = State.blinkstick_nano()
         assert state.report == 6
         assert state.nleds == 2
+        assert state.name == "BlinkStick Nano"
         assert state.channel == 0
-        assert state.colors == []
+        assert state.colors == [(0, 0, 0)] * 2
 
     def test_state_blinkstick_flex_factory(self) -> None:
         """Test blinkstick_flex() factory method."""
         state = State.blinkstick_flex()
         assert state.report == 6
         assert state.nleds == 32
+        assert state.name == "BlinkStick Flex"
         assert state.channel == 0
-        assert state.colors == []
+        assert state.colors == [(0, 0, 0)] * 32
 
     def test_state_color_property_getter_empty(self) -> None:
         """Test color property getter with empty colors."""
-        state = State(1, 4)
+        state = State(1, 4, "Test Device")
         assert state.color == (0, 0, 0)
 
     def test_state_color_property_getter_with_colors(self) -> None:
         """Test color property getter with colors set."""
-        state = State(1, 4)
+        state = State(1, 4, "Test Device")
         # Set colors in GRB format internally
         state.colors = [(0, 0, 0), (128, 255, 64), (0, 0, 0), (0, 0, 0)]
         # Should return first non-zero color converted to RGB
@@ -83,13 +90,13 @@ class TestBlinkStickState:
 
     def test_state_color_property_getter_all_zero(self) -> None:
         """Test color property getter with all zero colors."""
-        state = State(1, 4)
+        state = State(1, 4, "Test Device")
         state.colors = [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)]
         assert state.color == (0, 0, 0)
 
     def test_state_color_property_setter(self) -> None:
         """Test color property setter converts RGB to GRB."""
-        state = State(1, 4)
+        state = State(1, 4, "Test Device")
         state.color = (255, 128, 64)  # RGB
         # Should be converted to GRB and set for all LEDs
         expected_grb = (128, 255, 64)  # GRB format
@@ -97,7 +104,7 @@ class TestBlinkStickState:
 
     def test_state_get_led_valid_index(self) -> None:
         """Test get_led() with valid index."""
-        state = State(1, 4)
+        state = State(1, 4, "Test Device")
         state.colors = [(128, 255, 64), (0, 128, 255), (255, 0, 128), (64, 32, 16)]
         # Should return RGB format (converted from internal GRB)
         assert state.get_led(0) == (
@@ -119,14 +126,14 @@ class TestBlinkStickState:
 
     def test_state_get_led_invalid_index(self) -> None:
         """Test get_led() with invalid index returns (0, 0, 0)."""
-        state = State(1, 4)
+        state = State(1, 4, "Test Device")
         state.colors = [(128, 255, 64), (0, 128, 255)]
         assert state.get_led(5) == (0, 0, 0)  # Index out of range
         assert state.get_led(10) == (0, 0, 0)  # Index out of range
 
     def test_state_set_led_valid_index(self) -> None:
         """Test set_led() with valid index."""
-        state = State(1, 4)
+        state = State(1, 4, "Test Device")
         state.colors = [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)]
         state.set_led(1, (255, 128, 64))  # RGB input
         # Should be converted to GRB and set at index 1
@@ -138,8 +145,7 @@ class TestBlinkStickState:
 
     def test_state_set_led_invalid_index(self) -> None:
         """Test set_led() with invalid index (should be suppressed)."""
-        state = State(1, 2)
-        state.colors = [(0, 0, 0), (0, 0, 0)]
+        state = State(1, 2, "Test Device")
         # Should not raise IndexError due to contextlib.suppress
         state.set_led(5, (255, 128, 64))
         # Colors should remain unchanged
@@ -147,14 +153,14 @@ class TestBlinkStickState:
 
     def test_state_bytes_empty(self) -> None:
         """Test __bytes__() with empty colors."""
-        state = State(1, 4)
+        state = State(1, 4, "Test Device")
         result = bytes(state)
-        expected = bytes([1, 0])  # [report, channel]
+        expected = bytes([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])  # [report, channel] + 4 empty RGB tuples
         assert result == expected
 
     def test_state_bytes_with_colors(self) -> None:
         """Test __bytes__() with colors set."""
-        state = State(6, 3)
+        state = State(6, 3, "Test Device")
         state.colors = [(128, 255, 64), (0, 128, 255), (255, 0, 128)]
         result = bytes(state)
         expected = bytes(
@@ -164,7 +170,7 @@ class TestBlinkStickState:
 
     def test_state_bytes_single_led(self) -> None:
         """Test __bytes__() with single LED."""
-        state = State(1, 1)
+        state = State(1, 1, "Test Device")
         state.colors = [(100, 200, 50)]
         result = bytes(state)
         expected = bytes([1, 0, 100, 200, 50])  # [report, channel] + single color
@@ -172,7 +178,7 @@ class TestBlinkStickState:
 
     def test_state_rgb_grb_conversion_consistency(self) -> None:
         """Test RGB to GRB conversion consistency."""
-        state = State(1, 1)
+        state = State(1, 1, "Test Device")
         rgb_color = (255, 128, 64)
         state.color = rgb_color
         retrieved_color = state.color
@@ -180,7 +186,7 @@ class TestBlinkStickState:
 
     def test_state_multiple_led_operations(self) -> None:
         """Test operations with multiple LEDs."""
-        state = State(6, 4)
+        state = State(6, 4, "Test Device")
         # Initialize colors array first
         state.colors = [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)]
 
@@ -201,7 +207,7 @@ class TestBlinkStickState:
 
     def test_state_color_property_overrides_individual_leds(self) -> None:
         """Test that setting color property overrides individual LED colors."""
-        state = State(1, 4)
+        state = State(1, 4, "Test Device")
         # Set individual LEDs first
         state.set_led(0, (255, 0, 0))
         state.set_led(1, (0, 255, 0))
