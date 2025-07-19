@@ -1,6 +1,5 @@
 """Embrava Blynclight Support"""
 
-import struct
 from functools import cached_property
 from typing import ClassVar
 
@@ -27,22 +26,13 @@ class Blynclight(Light):
         """Get the device state manager for controlling light behavior."""
         return State()
 
-    @cached_property
-    def struct(self) -> struct.Struct:
-        """Get the binary struct formatter for device communication."""
-        return struct.Struct("!xBBBBBBH")
-
     def __bytes__(self) -> bytes:
-        self.state.off = not self.is_lit
-
-        if self.state.off:
+        if not self.is_lit:
+            self.state.off = True
             self.state.flash = False
             self.state.dim = False
 
-        return self.struct.pack(
-            *bytes(self.state),
-            0xFF22,
-        )
+        return bytes([0, *bytes(self.state), 0xFF, 0x22])
 
     def on(self, color: tuple[int, int, int], led: int = 0) -> None:
         """Turn on the Blynclight with the specified color.
@@ -79,11 +69,9 @@ class Blynclight(Light):
     ) -> None:
         """Play a sound on the Blynclight device.
 
-        Args:
-            music: Sound ID to play (0-9)
-            volume: Volume level (1-10)
-            repeat: Whether to repeat the sound continuously
-
+        :param music: Music track number to play (0-7)
+        :param volume: Volume level (0-3)
+        :param repeat: Whether the music repeats
         """
         with self.batch_update():
             self.state.repeat = repeat
@@ -110,9 +98,8 @@ class Blynclight(Light):
     def flash(self, color: tuple[int, int, int], speed: FlashSpeed = None) -> None:
         """Flash the light with the specified color and speed.
 
-        Args:
-            color: RGB color tuple (red, green, blue) with values 0-255
-            speed: Flash speed (slow, medium, fast) - defaults to slow
+        :param color: RGB color tuple to flash
+        :param speed: Flashing speed (default is slow)
 
         """
         speed = speed or FlashSpeed.slow
@@ -130,5 +117,4 @@ class Blynclight(Light):
     def reset(self) -> None:
         """Reset the device to its default state (off, no sound)."""
         self.state.reset()
-        self.color = (0, 0, 0)
         self.update()
