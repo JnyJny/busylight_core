@@ -11,6 +11,25 @@ class FlashSpeed(int, Enum):
     fast: int = 4
 
 
+class RedField(BitField):
+    """8-bit red color."""
+
+    def __init__(self) -> None:
+        super().__init__(40, 8)
+
+
+class BlueField(BitField):
+    """8-bit blue color."""
+
+    def __init__(self) -> None:
+        super().__init__(32, 8)
+
+
+class GreenField(BitField):
+    def __init__(self) -> None:
+        super().__init__(24, 8)
+
+
 class OffBit(BitField):
     """1 bit field to turn light off, clear to turn light on."""
 
@@ -76,13 +95,16 @@ class MuteBit(BitField):
 
 class State(Word):
     def __init__(self) -> None:
-        super().__init__(0, 24)
+        super().__init__(0, 48)
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(0x{self!s})"
 
     def __str__(self) -> str:
         fields = [
+            f"red:    {self.red:#04x}",
+            f"blue:   {self.blue:#04x}",
+            f"green:  {self.green:#04x}",
             f"off:    {self.off}",
             f"dim:    {self.dim}",
             f"flash:  {self.flash}",
@@ -97,6 +119,9 @@ class State(Word):
 
     def reset(self) -> None:
         """Reset the state to default values."""
+        self.red = 0
+        self.blue = 0
+        self.green = 0
         self.off = True
         self.dim = False
         self.flash = False
@@ -107,6 +132,9 @@ class State(Word):
         self.music = 0
         self.volume = 0
 
+    red = RedField()
+    blue = BlueField()
+    green = GreenField()
     off = OffBit()
     dim = DimBit()
     flash = FlashBit()

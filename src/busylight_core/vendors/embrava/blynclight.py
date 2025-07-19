@@ -35,16 +35,11 @@ class Blynclight(Light):
     def __bytes__(self) -> bytes:
         self.state.off = not self.is_lit
 
-        if self.state.flash and self.state.off:
+        if self.state.off:
             self.state.flash = False
-
-        if self.state.dim and self.state.off:
             self.state.dim = False
 
         return self.struct.pack(
-            self.red,
-            self.blue,
-            self.green,
             *bytes(self.state),
             0xFF22,
         )
@@ -52,13 +47,19 @@ class Blynclight(Light):
     def on(self, color: tuple[int, int, int], led: int = 0) -> None:
         """Turn on the Blynclight with the specified color.
 
-        Args:
-            color: RGB color tuple (red, green, blue) with values 0-255
-            led: LED index (unused for Blynclight)
-
+        :param value: RGB color tuple (red, green, blue)
         """
         with self.batch_update():
             self.color = color
+
+    @property
+    def color(self) -> tuple[int, int, int]:
+        """Get the current RGB color of the Blynclight."""
+        return (self.state.red, self.state.green, self.state.blue)
+
+    @color.setter
+    def color(self, value: tuple[int, int, int]) -> None:
+        self.state.red, self.state.green, self.state.blue = value
 
     def dim(self) -> None:
         """Set the light to dim mode (reduced brightness)."""

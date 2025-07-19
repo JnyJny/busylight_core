@@ -48,6 +48,7 @@ class InvalidHardwareError(_BaseHardwareError):
     """The device dictionary is missing required key/value pairs."""
 
     def __init__(self, device_description: dict) -> None:
+        """Initialize with the invalid device description."""
         self.device_description = device_description
 
 

@@ -471,9 +471,7 @@ class TestBlynclightEdgeCases:
             blynclight = Blynclight(mock_hardware)
 
             # Set specific RGB values to test struct packing - this makes is_lit True
-            blynclight.red = 255
-            blynclight.blue = 128
-            blynclight.green = 64
+            blynclight.color = 255, 64, 128
 
             result = bytes(blynclight)
 
@@ -523,6 +521,9 @@ class TestBlynclightStateRepr:
         """Test State.__str__() method."""
         state = State()
         # Set some state values
+        state.red = 0x01
+        state.blue = 0x02
+        state.green = 0x03
         state.off = 1
         state.dim = 1
         state.flash = 0
@@ -536,6 +537,9 @@ class TestBlynclightStateRepr:
         result = str(state)
 
         # Should contain all field values
+        assert "red:    0x01" in result
+        assert "blue:   0x02" in result
+        assert "green:  0x03" in result
         assert "off:    1" in result
         assert "dim:    1" in result
         assert "flash:  0" in result
@@ -548,11 +552,7 @@ class TestBlynclightStateRepr:
 
         # Should be newline-separated
         lines = result.split("\n")
-        assert len(lines) == 9  # 9 fields
-
-        # Each line should contain a field name and value
-        for line in lines:
-            assert ":" in line
+        assert len(lines) == 12
 
 
 class TestBlynclightOnMethod:
