@@ -1,10 +1,7 @@
 """Tests for Agile Innovative BlinkStick State implementation."""
 
-from unittest.mock import Mock, patch
 
-import pytest
 
-from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.vendors.agile_innovative._blinkstick import State
 
 
