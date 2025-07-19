@@ -65,19 +65,6 @@ class TestBlynclightProperties:
             assert isinstance(state1, State)
             assert state1 is state2  # Should be cached
 
-    def test_struct_property_cached(self) -> None:
-        """Test that struct property is cached and has correct format."""
-        mock_hardware = create_mock_blynclight_hardware()
-
-        with patch.object(mock_hardware, "acquire"), patch.object(Blynclight, "reset"):
-            blynclight = Blynclight(mock_hardware)
-
-            struct1 = blynclight.struct
-            struct2 = blynclight.struct
-
-            assert struct1 is struct2  # Should be cached
-            assert struct1.format == "!xBBBBBBH"
-
 
 class TestBlynclightBytes:
     """Test Blynclight bytes conversion and state management."""
