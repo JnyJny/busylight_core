@@ -15,7 +15,7 @@ def test_light_init_fails(hardware_devices: list[Hardware]) -> None:
 
 def test_light_abstractclassmethod_supported_device_ids() -> None:
     """Test that Light.supported_device_ids returns None for abstract class."""
-    assert Light.supported_device_ids is None
+    assert Light.supported_device_ids == {}
 
 
 def test_light_classmethod_vendor() -> None:
