@@ -1,4 +1,9 @@
-"""USB Hardware Description"""
+"""USB Hardware Description
+
+This module provides a description of USB hardware devices, including
+HID and serial connections.
+
+"""
 
 from __future__ import annotations
 
@@ -19,7 +24,7 @@ from . import hid
 
 
 class ConnectionType(int, Enum):
-    """USB Harddware connection types."""
+    """USB Hardware connection types."""
 
     ANY: int = -1
     UNKNOWN: int = 0
@@ -101,18 +106,18 @@ class Hardware:
         return (self.vendor_id, self.product_id)
 
     def __str__(self) -> str:
-        fields = [
-            f"{self.vendor_id:04x}:{self.product_id:04x}",
-            self.manufacturer_string,
-            self.product_string,
-            self.serial_number,
-            self.path.decode("utf-8"),
-        ]
-        return " ".join([field for field in fields if field])
+        return "{vid:04x}:{pid:04x} {man} {prod} {ser} {path}".format(
+            vid=self.vendor_id,
+            pid=self.product_id,
+            man=self.manufacturer_string,
+            prod=self.product_string or "",
+            ser=self.serial_number or "",
+            path=self.path.decode("utf-8"),
+        )
 
     @cached_property
     def handle(self) -> HardwareHandle:
-        """An I/O handle for this hardware device."""
+        """Hardware device I/O handle."""
         handle: HardwareHandle
 
         match self.device_type:
@@ -127,7 +132,13 @@ class Hardware:
         return handle
 
     def acquire(self) -> None:
-        """Open the hardware device."""
+        """Open the hardware device.
+
+        The device is available for I/O operations after this method
+        returns. If the device is already acquired, no actions are
+        taken.
+
+        """
         if self.is_acquired:
             logger.debug(f"{self} already acquired")
             return
@@ -144,7 +155,12 @@ class Hardware:
                 raise NotImplementedError(msg)
 
     def release(self) -> None:
-        """Close the hardware device."""
+        """Close the hardware device.
+
+        Subsequent I/O operations to this device will fail after this
+        method returns. If the device has already been released, no
+        action is taken.
+        """
         if not self.is_acquired:
             logger.debug(f"{self} already released")
             return
