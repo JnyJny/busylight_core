@@ -77,8 +77,6 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
     blynclight = Blynclight.first_light()
     flag = Flag.first_light()
     ```
-
-
     """
 
     supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {}
@@ -198,7 +196,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         processes from using the light until it is released.
 
         Raises:
-        - NoLightsFoundError: if no lights are available.
+        - NoLightsFoundError
 
         """
         for subclass, devices in cls.available_lights().items():
@@ -209,7 +207,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
                     logger.info(f"Failed to acquire {device}: {error}")
                     raise
 
-        raise NoLightsFoundError
+        raise NoLightsFoundError(cls)
 
     def __init__(
         self,
@@ -243,7 +241,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
 
         """
         if not self.__class__.claims(hardware):
-            raise HardwareUnsupportedError(hardware)
+            raise HardwareUnsupportedError(hardware, self.__class__)
 
         self.hardware = hardware
         self._reset = reset
@@ -350,6 +348,9 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
 
         If the device is not acquired in exclusive mode, it will be
         acquired and released automatically.
+
+        No actions are taken if the light is already acquired
+        in exclusive mode.
         """
         if not self._exclusive:
             self.hardware.acquire()

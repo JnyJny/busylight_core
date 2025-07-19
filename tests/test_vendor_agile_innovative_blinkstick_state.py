@@ -1,7 +1,5 @@
 """Tests for Agile Innovative BlinkStick State implementation."""
 
-
-
 from busylight_core.vendors.agile_innovative._blinkstick import State
 
 
@@ -151,7 +149,8 @@ class TestBlinkStickState:
         """Test __bytes__() with empty colors."""
         state = State(1, 4, "Test Device")
         result = bytes(state)
-        expected = bytes([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])  # [report, channel] + 4 empty RGB tuples
+        # [report, channel] + 4 empty RGB tuples
+        expected = bytes([1, 0] + [0, 0, 0] * 4)
         assert result == expected
 
     def test_state_bytes_with_colors(self) -> None:

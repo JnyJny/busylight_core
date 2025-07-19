@@ -41,11 +41,14 @@ class HardwareUnsupportedError(_BaseLightError):
 
 
 class NoLightsFoundError(_BaseLightError):
-    """No lights were discovered by Light or a subclass of Light."""
+    """No lights were discovered by this Light subclass."""
 
 
 class InvalidHardwareError(_BaseHardwareError):
     """The device dictionary is missing required key/value pairs."""
+
+    def __init__(self, device_description: dict) -> None:
+        self.device_description = device_description
 
 
 class HardwareAlreadyOpenError(_BaseHardwareError):

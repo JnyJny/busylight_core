@@ -21,7 +21,7 @@ class TaskableMixin:
 
     @cached_property
     def tasks(self) -> dict[str, asyncio.Task]:
-        """Active tasks that are associated with this class."""
+        """Active tasks that are associated with this instance."""
         return {}
 
     def add_task(self, name: str, coroutine: Awaitable) -> asyncio.Task:

@@ -15,20 +15,20 @@ code.
 I originally picked the trezor/cython-hidapi package for HID support
 because it does not require the user to install additional non-Python
 software.  The pyhidapi package is a ctypes interface to the hidapi
-shared object which the user must install in an operation separate
-from the `pip install`.
+shared object which the user must install in a seperate operation.
 
-Both cython-hidapi and pyhidapi support a function `enumerate` which
-returns a list of dictionaries, each dictionary describing discovered
-USB devices.
+Both cython-hidapi and pyhidapi modules provide a function `enumerate`
+which returns a list of dictionaries, each dictionary describing
+discovered USB devices.
 
 The Device class in this module wallpapers over the differences
-between cython-hidapi::hid.device and pyhidapi::hid.Device, favoring
-the open() semantics of hid.device since it requires fewer changes to
-the consumer in this package.
+between cython-hidapi:hid.device and pyhidapi:hid.Device, favoring
+the open() semantics of cython-hidapi:hid.device since it requires
+fewer changes to the consumer in this package.
 
 Hopefully at some point in the future the two projects can come to an
-agreement and remove the namespace collision.
+agreement and resolve the namespace collision. Then this file can go
+away and the project can consume hid directly.
 
 """
 
@@ -39,7 +39,7 @@ from .exceptions import HardwareAlreadyOpenError, HardwareNotOpenError
 
 
 def enumerate() -> list[dict]:  # noqa: A001
-    """Return a list of dictionaries, each describing a USB device."""
+    """Return a list of dicts, each item describing a USB device."""
     return [dict(**d) for d in hid.enumerate()]
 
 
@@ -50,8 +50,10 @@ class Device:
         """Initialize the Device wrapper."""
         try:
             self._handle = hid.device()
+            # Initialized a hidapi device handle
         except AttributeError:
             self._handle = None
+            # Fallback for pyhidapi
         self._is_open = False
 
     @property
@@ -80,14 +82,22 @@ class Device:
     ) -> None:
         """Open the first device matching vendor_id, product_id or serial number.
 
-        If the device is already open, raises IOError.
+        :param vendor_id: 16-bit USB vendor ID of the device
+        :param product_id: 16-bit USB product ID of the device
+        :param serial_number: Optional serial number of the device
+
+        Raises:
+        - HardwareAlreadyOpenError
+
         """
         if self.is_open:
-            raise HardwareAlreadyOpenError
+            raise HardwareAlreadyOpenError(self)
 
         if self._handle:
+            # hidapi
             self._handle.open(vendor_id, product_id, serial_number)
         else:
+            # pyhidapi
             self._handle = hid.Device(
                 vid=vendor_id,
                 pid=product_id,
@@ -98,10 +108,18 @@ class Device:
     def open_path(self, path: bytes | str) -> None:
         """Open the device specified by path.
 
-        If the device is already open, raises IOError.
+        If the path is given as a string, it is encoded to bytes
+        before opening the device.
+
+        :param path: Filesystem path to the device
+
+        Raises:
+        - HardwareAlreadyOpenError
+        - OSError
+
         """
         if self.is_open:
-            raise HardwareAlreadyOpenError
+            raise HardwareAlreadyOpenError(self)
 
         if isinstance(path, str):
             path = path.encode("utf-8")
@@ -114,40 +132,82 @@ class Device:
         else:
             # pyhidapi
             self._handle = hid.Device(path=path)
+
         self._is_open = True
 
     def close(self) -> None:
-        """Close this device."""
+        """Close this device.
+
+        Raises:
+        - HardwareNotOpenError
+        - OSError
+
+        """
         try:
             self._handle.close()
             self._is_open = False
         except AttributeError:
-            raise HardwareNotOpenError from None
+            raise HardwareNotOpenError(self) from None
 
     def read(self, nbytes: int, timeout_ms: int | None = None) -> list[int]:
-        """Read nbytes from the device, returns a list of ints."""
+        """Read nbytes from the device, returns a list of ints.
+
+        If timeout_ms is None, the read operation will block until
+        the requested number of bytes are read or an error occurs.
+
+        :param nbytes: Number of bytes to read
+        :param timeout_ms: Optional timeout in milliseconds for the read operation
+
+        Raises:
+        - HardwareNotOpenError
+        - OSError
+
+        """
         if not self.is_open:
-            raise HardwareNotOpenError
+            raise HardwareNotOpenError(self)
 
         return self._handle.read(nbytes, timeout_ms)
 
     def write(self, buf: bytes) -> int:
-        """Write bytes in buf to the device."""
+        """Write bytes in buf to the device.
+
+        :param buf: Bytes to write to the device
+        Raises:
+        - HardwareNotOpenError
+        - OSError
+        """
         if not self.is_open:
-            raise HardwareNotOpenError
+            raise HardwareNotOpenError(self)
 
         return self._handle.write(buf)
 
     def get_feature_report(self, report: int, nbytes: int) -> list[int]:
-        """Read a nbytes feature report from the device."""
+        """Read a nbytes feature report from the device.
+
+        :param report: Feature report ID to read
+        :param nbytes: Number of bytes to read from the feature report
+
+        Raises:
+        - HardwareNotOpenError
+        - OSError
+
+        """
         if not self.is_open:
-            raise HardwareNotOpenError
+            raise HardwareNotOpenError(self)
 
         return self._handle.get_feature_report(report, nbytes)
 
     def send_feature_report(self, buf: bytes) -> int:
-        """Write bytes in buf using device feature report."""
+        """Write bytes in buf using device feature report.
+
+        :param buf: Bytes to send as a feature report
+
+        Raises:
+        - HardwareNotOpenError
+        - OSError
+
+        """
         if not self.is_open:
-            raise HardwareNotOpenError
+            raise HardwareNotOpenError(self)
 
         return self._handle.send_feature_report(buf)

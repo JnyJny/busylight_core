@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     from serial.tools.list_ports_common import ListPortInfo
 
 from . import hid
+from .exceptions import InvalidHardwareError
 
 
 class ConnectionType(int, Enum):
@@ -56,54 +57,84 @@ class Hardware:
 
     @classmethod
     def enumerate(cls, by_type: ConnectionType = ConnectionType.ANY) -> list[Hardware]:
-        """List of all connected hardware devices."""
+        """List of all connected hardware devices.
+
+        Raises:
+        - NotImplementedError
+
+        """
         hardware_info = []
 
         match by_type:
             case ConnectionType.ANY:
-                for connection_type in ConnectionType:
-                    if connection_type <= 0:
-                        continue
+                for connection_type in list(ConnectionType)[2:]:
                     with contextlib.suppress(NotImplementedError):
                         hardware_info.extend(cls.enumerate(connection_type))
+
             case ConnectionType.HID:
-                hardware_info.extend(
-                    cls.from_hid(device_dict) for device_dict in hid.enumerate()
-                )
+                for device_dict in hid.enumerate():
+                    with contextlib.suppress(InvalidHardwareError):
+                        hardware_info.append(cls.from_hid(device_dict))
+
             case ConnectionType.SERIAL:
-                hardware_info.extend(
-                    cls.from_portinfo(port_info) for port_info in list_ports.comports()
-                )
+                for port_info in list_ports.comports():
+                    with contextlib.suppress(InvalidHardwareError):
+                        hardware_info.append(cls.from_portinfo(port_info))
 
             case _:
-                msg = f"Device type {by_type} not implemented"
+                msg = f"Device connection {by_type.name} not implemented"
                 raise NotImplementedError(msg)
 
         return hardware_info
 
     @classmethod
     def from_portinfo(cls, port_info: ListPortInfo) -> Hardware:
-        """Create a Hardware object from a serial port info object."""
-        return cls(
-            device_type=ConnectionType.SERIAL,
-            vendor_id=port_info.vid,
-            product_id=port_info.pid,
-            path=port_info.device.encode("utf-8"),
-            serial_number=port_info.serial_number,
-            manufacturer_string=port_info.manufacturer,
-            product_string=port_info.product,
-            bus_type=1,
-        )
+        """Create a Hardware object from a serial port info object.
+
+        Raises:
+        - InvalidHardwareError
+
+        """
+        try:
+            return cls(
+                device_type=ConnectionType.SERIAL,
+                vendor_id=port_info.vid,
+                product_id=port_info.pid,
+                path=port_info.device.encode("utf-8"),
+                serial_number=port_info.serial_number,
+                manufacturer_string=port_info.manufacturer,
+                product_string=port_info.product,
+                bus_type=1,
+            )
+        except Exception:
+            logger.exception("%s", port_info)
+            raise InvalidHardwareError(port_info.__dict__) from None
 
     @classmethod
     def from_hid(cls, device: dict) -> Hardware:
-        """Create a Hardware object from a HID dictionary."""
-        return cls(device_type=ConnectionType.HID, **device)
+        """Create a Hardware object from a HID dictionary.
+
+        Raises:
+        - InvalidHardwareError
+
+        """
+        try:
+            return cls(device_type=ConnectionType.HID, **device)
+        except Exception:
+            logger.exception("%s", device)
+            raise InvalidHardwareError(device) from None
 
     @cached_property
     def device_id(self) -> tuple[int, int]:
-        """A tuple of the vendor and product identifiers."""
+        """A tuple of the vendor and product identifiers.
+
+        Each item in the tuple is a 16-bit integer.
+        """
         return (self.vendor_id, self.product_id)
+
+    def __post_init__(self) -> None:
+        self.vendor_id &= 0x0FFFF
+        self.product_id &= 0x0FFFF
 
     def __str__(self) -> str:
         return "{vid:04x}:{pid:04x} {man} {prod} {ser} {path}".format(
