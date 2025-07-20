@@ -196,9 +196,9 @@ class TestKuandoBusylightBase:
         mock_hardware.handle.read = Mock(return_value=b"\x00" * 64)
 
         # Mock the claims method to allow instantiation
-        with patch.object(BusylightBase, 'claims', return_value=True):
+        with patch.object(BusylightBase, "claims", return_value=True):
             instance = BusylightBase(mock_hardware, reset=False, exclusive=False)
-        
+
         # Mock the name property to avoid device_id lookup issues
         instance.name = "Test Busylight"
         return instance

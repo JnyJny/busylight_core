@@ -10,6 +10,7 @@ from busylight_core.vendors.kuando import Busylight_Omega
 
 class TestKuandoBusylightOmega:
     """Test the Busylight Omega device-specific functionality."""
+
     @pytest.fixture
     def mock_hardware(self) -> Hardware:
         """Create mock hardware for testing Omega-specific device IDs."""
@@ -51,19 +52,19 @@ class TestKuandoBusylightOmega:
         # Test with Omega device ID
         mock_hardware.device_id = (0x27BB, 0x3BCD)
         assert Busylight_Omega.claims(mock_hardware) is True
-        
+
         # Test with another Omega device ID
         mock_hardware.device_id = (0x27BB, 0x3BCF)
         assert Busylight_Omega.claims(mock_hardware) is True
-        
+
         # Test with Alpha device ID (should not claim)
         mock_hardware.device_id = (0x04D8, 0xF848)
         assert Busylight_Omega.claims(mock_hardware) is False
-        
+
         # Test with another Alpha device ID (should not claim)
         mock_hardware.device_id = (0x27BB, 0x3BCA)
         assert Busylight_Omega.claims(mock_hardware) is False
-        
+
         # Test with unknown device ID
         mock_hardware.device_id = (0x1234, 0x5678)
         assert Busylight_Omega.claims(mock_hardware) is False
