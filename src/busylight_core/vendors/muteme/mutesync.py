@@ -4,9 +4,10 @@ from typing import ClassVar
 
 from busylight_core.hardware import Hardware
 from busylight_core.light import Light
+from busylight_core.mixins import ColorableMixin
 
 
-class MuteSync(Light):
+class MuteSync(ColorableMixin, Light):
     """MuteSync status light and button controller.
 
     The MuteSync is a USB-connected device that combines button
@@ -19,12 +20,12 @@ class MuteSync(Light):
 
     @staticmethod
     def vendor() -> str:
-        """Return the vendor name for this device."""
+        """The vendor name for this device."""
         return "MuteMe"
 
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
-        """Return True if the hardware describes a MuteSync Button."""
+        """True if the hardware describes a MuteSync device."""
         # Addresses busylight-for-humans issue #356 where MuteSync
         # claims another hardware with a SiliconLabs CP2102 USB to
         # Serial controller that is not MuteSync hardware.
@@ -49,31 +50,19 @@ class MuteSync(Light):
 
     @property
     def is_button(self) -> bool:
-        """Check if this device has button functionality.
-
-        Returns:
-            True, as the MuteSync device has a button
-
-        """
+        """True if this device has button functionality."""
         return True
 
     @property
     def button_on(self) -> bool:
-        """Check if the mute button is currently pressed.
-
-        Returns:
-            Always False in current implementation
-
-        """
+        """True if the mute button is currently pressed."""
         return False
 
     def on(self, color: tuple[int, int, int], led: int = 0) -> None:
         """Turn on the MuteSync with the specified color.
 
-        Args:
-            color: RGB color tuple (red, green, blue) with values 0-255
-            led: LED index (unused for MuteSync)
-
+        :param color: RGB color tuple (red, green, blue) with values 0-255
+        :param led: LED index (unused for MuteSync)
         """
         with self.batch_update():
             self.color = color

@@ -38,10 +38,10 @@ from .exceptions import (
     NoLightsFoundError,
 )
 from .hardware import Hardware
-from .mixins import ColorableMixin, TaskableMixin
+from .mixins import TaskableMixin
 
 
-class Light(abc.ABC, ColorableMixin, TaskableMixin):
+class Light(abc.ABC, TaskableMixin):
     """Base class for USB connected lights.
 
     This base class provides a common interface for USB connected lights.
@@ -478,3 +478,23 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
     def __bytes__(self) -> bytes:
         """Return the light's state suitable for writing to the device."""
         raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def color(self) -> tuple[int, int, int]:
+        """Get the current RGB color of the light."""
+        raise NotImplementedError
+
+    @color.setter
+    @abc.abstractmethod
+    def color(self, value: tuple[int, int, int]) -> None:
+        """Set the RGB color of the light.
+
+        :param: value: tuple[int, int, int] - RGB color tuple
+        """
+        raise NotImplementedError
+
+    @property
+    def is_lit(self) -> bool:
+        """Check if the light is currently lit."""
+        return any(self.color)

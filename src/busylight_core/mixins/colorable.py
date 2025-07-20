@@ -2,45 +2,32 @@
 
 
 class ColorableMixin:
-    """Mixin providing color manipulation properties for Light classes."""
+    """Mixin providing color properties."""
 
-    @property
-    def red(self) -> int:
-        """Red color value."""
-        return getattr(self, "_red", 0)
+    red = property(
+        lambda self: getattr(self, "_red", 0),
+        lambda self, value: setattr(self, "_red", value),
+        doc="Red color value.",
+    )
 
-    @red.setter
-    def red(self, value: int) -> None:
-        self._red = value
+    green = property(
+        lambda self: getattr(self, "_green", 0),
+        lambda self, value: setattr(self, "_green", value),
+        doc="Green color value.",
+    )
 
-    @property
-    def green(self) -> int:
-        """Green color value."""
-        return getattr(self, "_green", 0)
-
-    @green.setter
-    def green(self, value: int) -> None:
-        self._green = value
-
-    @property
-    def blue(self) -> int:
-        """Blue color value."""
-        return getattr(self, "_blue", 0)
-
-    @blue.setter
-    def blue(self, value: int) -> None:
-        self._blue = value
+    blue = property(
+        lambda self: getattr(self, "_blue", 0),
+        lambda self, value: setattr(self, "_blue", value),
+        doc="Blue color value.",
+    )
 
     @property
     def color(self) -> tuple[int, int, int]:
-        """A tuple of red, green, and blue color values."""
-        return self.red, self.green, self.blue
+        """Tuple of RGB color values."""
+        return (self.red, self.green, self.blue)
 
     @color.setter
     def color(self, value: tuple[int, int, int]) -> None:
+        """Tuple of RGB color values."""
         self.red, self.green, self.blue = value
-
-    @property
-    def is_lit(self) -> bool:
-        """True if any color value is greater than 0."""
-        return any(self.color)

@@ -5,11 +5,12 @@ from functools import cached_property
 from typing import ClassVar
 
 from busylight_core.light import Light
+from busylight_core.mixins import ColorableMixin
 
 from ._busylight import State
 
 
-class Busylight_Alpha(Light):
+class Busylight_Alpha(ColorableMixin, Light):
     """Kuando Busylight Alpha status light controller.
 
     The Busylight Alpha is a USB-connected RGB LED device that requires
@@ -34,10 +35,8 @@ class Busylight_Alpha(Light):
     def on(self, color: tuple[int, int, int], led: int = 0) -> None:
         """Turn on the Busylight Alpha with the specified color.
 
-        Args:
-            color: RGB color tuple (red, green, blue) with values 0-255
-            led: LED index (unused for Busylight Alpha)
-
+        :param color: RGB color tuple (red, green, blue) with values 0-255
+        :param led: LED index (unused for Busylight Alpha)
         """
         self.color = color
         with self.batch_update():
@@ -47,9 +46,7 @@ class Busylight_Alpha(Light):
     def off(self, led: int = 0) -> None:
         """Turn off the Busylight Alpha.
 
-        Args:
-            led: LED index (unused for Busylight Alpha)
-
+        :param led: LED index (unused for Busylight Alpha)
         """
         self.color = (0, 0, 0)
         with self.batch_update():

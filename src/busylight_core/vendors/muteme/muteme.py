@@ -37,17 +37,21 @@ class MuteMe(Light):
         return struct.Struct("!xB")
 
     def __bytes__(self) -> bytes:
-        self.state.color = self.color
         return self.struct.pack(self.state.value)
 
     @property
+    def color(self) -> tuple[int, int, int]:
+        """The current color tuple of a MuteMe device."""
+        return self.state.color
+
+    @color.setter
+    def color(self, value: tuple[int, int, int]) -> None:
+        """The color of the MuteMe device."""
+        self.state.color = value
+
+    @property
     def is_pluggedin(self) -> bool:
-        """Check if the device is plugged in and responsive.
-
-        Returns:
-            True if device responds to feature report, False otherwise
-
-        """
+        """True if the device is plugged in and responsive."""
         # EJO No reason for eight, just a power of two.
         try:
             nbytes = self.hardware.send_feature_report([0] * 8)
@@ -59,34 +63,19 @@ class MuteMe(Light):
 
     @property
     def is_button(self) -> bool:
-        """Check if this device has button functionality.
-
-        Returns:
-            True, as the MuteMe device has a button
-
-        """
+        """True if this device has button functionality."""
         return True
 
     @property
     def button_on(self) -> bool:
-        """Check if the mute button is currently pressed.
-
-        Returns:
-            True if the button is pressed, False otherwise
-
-        Raises:
-            NotImplementedError: Button state reading not implemented
-
-        """
+        """True if the mute button is currently pressed."""
         raise NotImplementedError
 
     def on(self, color: tuple[int, int, int], led: int = 0) -> None:
         """Turn on the MuteMe with the specified color.
 
-        Args:
-            color: RGB color tuple (red, green, blue) with values 0-255
-            led: LED index (unused for MuteMe)
-
+        :param color: RGB color tuple (red, green, blue) with values 0-255
+        :param led: LED index (unused for MuteMe)
         """
         with self.batch_update():
             self.color = color

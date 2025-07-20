@@ -237,7 +237,7 @@ class TestMuteMe:
         return hardware
 
     @pytest.fixture
-    def muteme(self, mock_hardware) -> MuteMe:
+    def muteme(self, mock_hardware: Hardware) -> MuteMe:
         """Create a MuteMe instance for testing."""
         mock_hardware.handle = Mock()
         mock_hardware.handle.write = Mock(return_value=2)
@@ -328,7 +328,7 @@ class TestMuteMe:
 
     def test_on_method(self, muteme) -> None:
         """Test on() method updates color."""
-        color = (255, 128, 64)
+        color = (255, 255, 255)
         with patch.object(muteme, "batch_update") as mock_batch:
             mock_batch.return_value.__enter__ = Mock()
             mock_batch.return_value.__exit__ = Mock()
@@ -340,7 +340,7 @@ class TestMuteMe:
 
     def test_on_method_with_led_parameter(self, muteme) -> None:
         """Test on() method with led parameter (should be ignored)."""
-        color = (128, 255, 32)
+        color = (255, 255, 255)
         with patch.object(muteme, "batch_update") as mock_batch:
             mock_batch.return_value.__enter__ = Mock()
             mock_batch.return_value.__exit__ = Mock()

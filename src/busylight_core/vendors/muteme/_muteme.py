@@ -65,7 +65,11 @@ class State(Word):
 
     @property
     def color(self) -> tuple[int, int, int]:
-        return self.red, self.green, self.blue
+        return (
+            0xFF if self.red else 0,
+            0xFF if self.green else 0,
+            0xFF if self.blue else 0,
+        )
 
     @color.setter
     def color(self, values: tuple[int, int, int]) -> None:

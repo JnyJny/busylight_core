@@ -8,9 +8,10 @@ import pytest
 from busylight_core.exceptions import HardwareUnsupportedError, LightUnavailableError
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.light import Light
+from busylight_core.mixins import ColorableMixin
 
 
-class MockLightSubclass(Light):
+class MockLightSubclass(ColorableMixin, Light):
     """Mock Light subclass for testing."""
 
     supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {

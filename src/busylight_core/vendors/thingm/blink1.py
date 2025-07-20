@@ -6,7 +6,7 @@ from typing import ClassVar
 
 from busylight_core.light import Light
 
-from ._blink1 import LEDS, State
+from ._blink1 import LEDS, State, Report, Action
 
 
 class Blink1(Light):
@@ -22,12 +22,12 @@ class Blink1(Light):
 
     @staticmethod
     def vendor() -> str:
-        """Return the vendor name for this device."""
+        """The vendor name for this device."""
         return "ThingM"
 
     @cached_property
     def state(self) -> State:
-        """Get the device state manager for controlling LED patterns."""
+        """The device state manager for controlling LED patterns."""
         return State()
 
     def __bytes__(self) -> bytes:
@@ -36,14 +36,26 @@ class Blink1(Light):
     def on(self, color: tuple[int, int, int], led: int = 0) -> None:
         """Turn on the Blink(1) with the specified color.
 
-        Args:
-            color: RGB color tuple (red, green, blue) with values 0-255
-            led: LED index for targeting specific LEDs
-
+        :param color: RGB color tuple (red, green, blue) with values 0-255
+        :param led: LED index (0 for the first LED, 1 for the second, etc.)
         """
-        self.color = color
+
         with self.batch_update():
-            self.state.fade_to_color(self.color, leds=LEDS(led))
+            self.state.clear()
+            self.state.report = Report.One
+            self.state.action = Action.FadeColor
+            self.state.color = color
+            self.state.fade = 10  # Default fade time in milliseconds
+            self.state.leds = LEDS(led)
+
+    @property
+    def color(self) -> tuple[int, int, int]:
+        """The current color of the Blink(1) device."""
+        return self.state.color
+
+    @color.setter
+    def color(self, value: tuple[int, int, int]) -> None:
+        self.state.color = value
 
     @property
     def write_strategy(self) -> Callable:

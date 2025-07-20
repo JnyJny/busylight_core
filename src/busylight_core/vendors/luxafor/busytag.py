@@ -3,11 +3,12 @@
 from typing import ClassVar
 
 from busylight_core.light import Light
+from busylight_core.mixins import ColorableMixin
 
 from ._busytag import Command
 
 
-class BusyTag(Light):
+class BusyTag(ColorableMixin, Light):
     """BusyTag status light controller.
 
     The BusyTag is a wireless status light that uses command strings
@@ -38,10 +39,8 @@ class BusyTag(Light):
     def on(self, color: tuple[int, int, int], led: int = 0) -> None:
         """Turn on the BusyTag with the specified color.
 
-        Args:
-            color: RGB color tuple (red, green, blue) with values 0-255
-            led: LED index for specific LED targeting
-
+        :param color: RGB color tuple (red, green, blue)
+        :param led: LED index (default is 0, for the first LED)
         """
         with self.batch_update():
             self.color = color

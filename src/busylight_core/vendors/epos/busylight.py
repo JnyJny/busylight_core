@@ -5,7 +5,7 @@ from typing import ClassVar
 
 from busylight_core.light import Light
 
-from ._busylight import State
+from ._busylight import Action, Report, State
 
 
 class Busylight(Light):
@@ -21,12 +21,12 @@ class Busylight(Light):
 
     @staticmethod
     def vendor() -> str:
-        """Return the vendor name for this device."""
+        """The vendor name for this device."""
         return "EPOS"
 
     @cached_property
     def state(self) -> State:
-        """Get the device state manager for controlling LED patterns."""
+        """The device state manager for controlling LED patterns."""
         return State()
 
     def __bytes__(self) -> bytes:
@@ -35,16 +35,31 @@ class Busylight(Light):
     def on(self, color: tuple[int, int, int], led: int = 0) -> None:
         """Turn on the EPOS Busylight with the specified color.
 
-        Args:
-            color: RGB color tuple (red, green, blue) with values 0-255
-            led: LED index for targeting specific LEDs
-
+        :param color: RGB color tuple (red, green, blue) with values 0-255
+        :param led: LED index (0 for both LEDs, 1 for first LED, 2 for second LED)
         """
-        self.color = color
         with self.batch_update():
-            self.state.set_color(color, led)
+            match led:
+                case 1:
+                    self.state.color0 = color
+                case 2:
+                    self.state.color1 = color
+                case _:
+                    self.state.color = color
+
+            self.state.report = Report.ONE
+            self.state.action = Action.SetColor
+
+    @property
+    def color(self) -> tuple[int, int, int]:
+        """The device color as a tuple of RGB values."""
+        return self.state.color
+
+    @color.setter
+    def color(self, color: tuple[int, int, int]) -> None:
+        self.state.color = color
 
     def reset(self) -> None:
         """Reset the device to its default state."""
-        self.state.reset()
+        self.state.clear()
         super().reset()

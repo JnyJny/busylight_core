@@ -24,14 +24,9 @@ class Flag(Light):
 
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
-        """Check if this class can handle the given hardware device.
+        """Check if this class claims the given hardware device.
 
-        Args:
-            hardware: Hardware device to check
-
-        Returns:
-            True if this class can handle the hardware
-
+        :param hardware: A hardware instance
         """
         if not super().claims(hardware):
             return False
@@ -48,24 +43,29 @@ class Flag(Light):
 
     @cached_property
     def state(self) -> State:
-        """Get the device state manager for controlling LED patterns."""
+        """The device state manager for controlling a Luxfor device."""
         return State()
 
     def __bytes__(self) -> bytes:
-        self.state.color = self.color
         return bytes(self.state)
 
     def on(self, color: tuple[int, int, int], led: int = 0) -> None:
-        """Turn on the Luxafor Flag with the specified color.
+        """Turn on a Luxafor device with the specified color tuple.
 
-        Args:
-            color: RGB color tuple (red, green, blue) with values 0-255
-            led: LED index (0 for all LEDs, or specific LED number)
-
+        :param color: RGB color tuple (red, green, blue)
         """
         with self.batch_update():
+            self.color = color
             try:
                 self.state.leds = LEDS(led)
             except ValueError:
                 self.state.leds = LEDS.All
-            self.color = color
+
+    @property
+    def color(self) -> tuple[int, int, int]:
+        """The current RGB color of a Luxafor device."""
+        return self.state.color
+
+    @color.setter
+    def color(self, value: tuple[int, int, int]) -> None:
+        self.state.color = value

@@ -46,25 +46,9 @@ class State(Word):
 
     on = OnField(0, 8)
 
-    def set_color(
-        self,
-        color: tuple[int, int, int],
-        led: int = 0,
-    ) -> None:
-        """Set color for the specified LED."""
-        self.report = Report.ONE
-        self.action = Action.SetColor
-        match led:
-            case 0:
-                self.color = color
-            case 1:
-                self.color0 = color
-            case 2:
-                self.color1 = color
-
     @property
     def color0(self) -> tuple[int, int, int]:
-        """Return the first color as a tuple of RGB values."""
+        """Return the first LED color as a tuple of RGB values."""
         return (self.red0, self.green0, self.blue0)
 
     @color0.setter
@@ -73,7 +57,7 @@ class State(Word):
 
     @property
     def color1(self) -> tuple[int, int, int]:
-        """Return the second color as a tuple of RGB values."""
+        """Return the second LED color as a tuple of RGB values."""
         return (self.red1, self.green1, self.blue1)
 
     @color1.setter
@@ -82,21 +66,13 @@ class State(Word):
 
     @property
     def color(self) -> tuple[int, int, int]:
-        return self.color0
+        """The first non-black LED color as a tuple of RGB values."""
+        for color in (self.color0, self.color1):
+            if any(color):
+                return color
+        return (0, 0, 0)
 
     @color.setter
     def color(self, color: tuple[int, int, int]) -> None:
         self.color0 = color
         self.color1 = color
-
-    def reset(self) -> None:
-        """Reset state to default value."""
-        self.report = 0
-        self.action = 0
-        self.red0 = 0
-        self.green0 = 0
-        self.blue0 = 0
-        self.red1 = 0
-        self.green1 = 0
-        self.blue1 = 0
-        self.on = 0

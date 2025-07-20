@@ -49,7 +49,7 @@ class TestMuteMeMuteSync:
         mock_hardware.product_string = "Some Product"
 
         # Mock super().claims() to return True
-        with patch.object(MuteSync.__bases__[0], "claims", return_value=True):
+        with patch.object(MuteSync.__bases__[1], "claims", return_value=True):
             assert MuteSync.claims(mock_hardware) is True
 
     def test_claims_method_with_mutesync_product(self, mock_hardware) -> None:
@@ -58,7 +58,7 @@ class TestMuteMeMuteSync:
         mock_hardware.product_string = "MuteSync Button"
 
         # Mock super().claims() to return True
-        with patch.object(MuteSync.__bases__[0], "claims", return_value=True):
+        with patch.object(MuteSync.__bases__[1], "claims", return_value=True):
             assert MuteSync.claims(mock_hardware) is True
 
     def test_claims_method_without_mutesync_strings(self, mock_hardware) -> None:
@@ -67,7 +67,7 @@ class TestMuteMeMuteSync:
         mock_hardware.product_string = "Other Product"
 
         # Mock super().claims() to return True
-        with patch.object(MuteSync.__bases__[0], "claims", return_value=True):
+        with patch.object(MuteSync.__bases__[1], "claims", return_value=True):
             assert MuteSync.claims(mock_hardware) is False
 
     def test_claims_method_with_super_false(self, mock_hardware) -> None:
@@ -76,7 +76,7 @@ class TestMuteMeMuteSync:
         mock_hardware.product_string = "MuteSync Button"
 
         # Mock super().claims() to return False
-        with patch.object(MuteSync.__bases__[0], "claims", return_value=False):
+        with patch.object(MuteSync.__bases__[1], "claims", return_value=False):
             assert MuteSync.claims(mock_hardware) is False
 
     def test_claims_method_with_attribute_error_manufacturer(
@@ -87,7 +87,7 @@ class TestMuteMeMuteSync:
         mock_hardware.product_string = "MuteSync Button"
 
         # Mock super().claims() to return True
-        with patch.object(MuteSync.__bases__[0], "claims", return_value=True):
+        with patch.object(MuteSync.__bases__[1], "claims", return_value=True):
             assert MuteSync.claims(mock_hardware) is True
 
     def test_claims_method_with_attribute_error_product(self, mock_hardware) -> None:
@@ -96,7 +96,7 @@ class TestMuteMeMuteSync:
         del mock_hardware.product_string  # Remove the attribute
 
         # Mock super().claims() to return True
-        with patch.object(MuteSync.__bases__[0], "claims", return_value=True):
+        with patch.object(MuteSync.__bases__[1], "claims", return_value=True):
             assert MuteSync.claims(mock_hardware) is True
 
     def test_claims_method_with_attribute_error_both(self, mock_hardware) -> None:
@@ -105,7 +105,7 @@ class TestMuteMeMuteSync:
         del mock_hardware.product_string  # Remove the attribute
 
         # Mock super().claims() to return True
-        with patch.object(MuteSync.__bases__[0], "claims", return_value=True):
+        with patch.object(MuteSync.__bases__[1], "claims", return_value=True):
             assert MuteSync.claims(mock_hardware) is False
 
     def test_bytes_method(self, mutesync) -> None:
@@ -212,7 +212,7 @@ class TestMuteMeMuteSync:
         ]
 
         # Mock super().claims() to return True
-        with patch.object(MuteSync.__bases__[0], "claims", return_value=True):
+        with patch.object(MuteSync.__bases__[1], "claims", return_value=True):
             for manufacturer, product in test_cases:
                 mock_hardware.manufacturer_string = manufacturer
                 mock_hardware.product_string = product

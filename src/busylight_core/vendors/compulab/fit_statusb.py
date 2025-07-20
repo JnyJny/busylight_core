@@ -3,9 +3,10 @@
 from typing import ClassVar
 
 from busylight_core.light import Light
+from busylight_core.mixins import ColorableMixin
 
 
-class Fit_StatUSB(Light):
+class Fit_StatUSB(ColorableMixin, Light):
     """CompuLab fit-statUSB status light controller.
 
     The fit-statUSB is a USB-connected RGB LED device that communicates

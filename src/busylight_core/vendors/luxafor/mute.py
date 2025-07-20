@@ -18,22 +18,12 @@ class Mute(Flag):
 
     @property
     def is_button(self) -> bool:
-        """Check if this device has button functionality.
-
-        Returns:
-            True, as the Mute device has a button
-
-        """
+        """Return True if this device has button functionality."""
         return True
 
     @property
     def button_on(self) -> bool:
-        """Check if the mute button is currently pressed.
-
-        Returns:
-            True if the button is pressed, False otherwise
-
-        """
+        """Return True if the mute button is currently pressed."""
         results = self.read_strategy(8, 200)
 
         try:

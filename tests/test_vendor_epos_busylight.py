@@ -58,38 +58,8 @@ class TestEPOSBusylightState:
         assert state.color0 == color
         assert state.color1 == color
 
-    def test_state_set_color_led_0(self) -> None:
-        """Test set_color with LED 0 (default)."""
-        state = State()
-        color = (255, 0, 128)
-        state.set_color(color, led=0)
-        assert state.report == Report.ONE
-        assert state.action == Action.SetColor
-        assert state.color0 == color
-        assert state.color1 == color  # color property sets both
-
-    def test_state_set_color_led_1(self) -> None:
-        """Test set_color with LED 1."""
-        state = State()
-        color = (128, 255, 0)
-        state.set_color(color, led=1)
-        assert state.report == Report.ONE
-        assert state.action == Action.SetColor
-        assert state.color0 == color
-        assert state.color1 == (0, 0, 0)  # color0 property only affects first LED
-
-    def test_state_set_color_led_2(self) -> None:
-        """Test set_color with LED 2."""
-        state = State()
-        color = (0, 128, 255)
-        state.set_color(color, led=2)
-        assert state.report == Report.ONE
-        assert state.action == Action.SetColor
-        assert state.color0 == (0, 0, 0)  # color1 property only affects second LED
-        assert state.color1 == color
-
-    def test_state_reset(self) -> None:
-        """Test state reset functionality."""
+    def test_state_clear(self) -> None:
+        """Test state clear functionality."""
         state = State()
         # Set some values
         state.report = Report.ONE
@@ -98,8 +68,9 @@ class TestEPOSBusylightState:
         state.color1 = (128, 128, 128)
         state.on = 1
 
-        # Reset should clear all fields
-        state.reset()
+        # Clear should zero all fields
+        state.clear()
+
         assert state.report == 0
         assert state.action == 0
         assert state.red0 == 0
@@ -167,7 +138,6 @@ class TestEPOSBusylight:
         color = (255, 128, 64)
         with (
             patch.object(busylight, "batch_update") as mock_batch,
-            patch.object(busylight.state, "set_color") as mock_set_color,
         ):
             mock_batch.return_value.__enter__ = Mock()
             mock_batch.return_value.__exit__ = Mock()
@@ -175,7 +145,6 @@ class TestEPOSBusylight:
             busylight.on(color)
 
             assert busylight.color == color
-            mock_set_color.assert_called_once_with(color, 0)
             mock_batch.assert_called_once()
 
     def test_on_method_specific_led(self, busylight) -> None:
@@ -184,7 +153,6 @@ class TestEPOSBusylight:
         led = 1
         with (
             patch.object(busylight, "batch_update") as mock_batch,
-            patch.object(busylight.state, "set_color") as mock_set_color,
         ):
             mock_batch.return_value.__enter__ = Mock()
             mock_batch.return_value.__exit__ = Mock()
@@ -192,13 +160,12 @@ class TestEPOSBusylight:
             busylight.on(color, led=led)
 
             assert busylight.color == color
-            mock_set_color.assert_called_once_with(color, led)
             mock_batch.assert_called_once()
 
     def test_reset_method(self, busylight) -> None:
-        """Test reset() method calls state.reset() and super().reset()."""
+        """Test reset() method calls state.clear() and super().reset()."""
         with (
-            patch.object(busylight.state, "reset") as mock_state_reset,
+            patch.object(busylight.state, "clear") as mock_state_reset,
             patch.object(busylight.__class__.__bases__[0], "reset") as mock_super_reset,
         ):
             busylight.reset()
@@ -236,7 +203,7 @@ class TestEPOSBusylight:
             assert busylight.state.color1 == color1
 
             # Reset state
-            busylight.state.reset()
+            busylight.state.clear()
 
             # Test LED 1 (should set only color0)
             busylight.on(color2, led=1)
@@ -244,7 +211,7 @@ class TestEPOSBusylight:
             assert busylight.state.color1 == (0, 0, 0)
 
             # Reset state
-            busylight.state.reset()
+            busylight.state.clear()
 
             # Test LED 2 (should set only color1)
             busylight.on(color3, led=2)
