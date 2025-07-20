@@ -8,10 +8,11 @@ from typing import TYPE_CHECKING, ClassVar
 if TYPE_CHECKING:
     from busylight_core.hardware import Hardware
 
-from ._blinkstick import BaseBlinkStick, State
+from ._blinkstick import State
+from .blinkstick_base import BlinkStickBase
 
 
-class BlinkStickPro(BaseBlinkStick):
+class BlinkStickPro(BlinkStickBase):
     """Agile Innovative BlinkStick Pro status light controller.
 
     The BlinkStick Pro is a USB-connected RGB LED device with a pro form factor

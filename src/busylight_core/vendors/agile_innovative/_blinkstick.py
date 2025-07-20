@@ -4,56 +4,6 @@ from __future__ import annotations
 
 import contextlib
 
-from busylight_core import Light
-
-
-class BaseBlinkStick(Light):
-    """Base BlinkStick Implementation
-
-    Subclasses should provide a claims classmethod and a state
-    instance property that provides a properly initialized State
-    instance for the specific BlinkStick variant.
-    """
-
-    @staticmethod
-    def get_version(serial_number: str) -> tuple[int, int]:
-        """Extract the major and minor version from the hardware serial number.
-
-        Raises:
-        - ValueError: If the serial number does not contain a valid version.
-
-        """
-        if not serial_number or not serial_number.startswith("BS"):
-            msg = "Invalid BlinkStick serial number"
-            raise ValueError(msg)
-
-        try:
-            return map(int, serial_number[-3:].split("."))
-        except (IndexError, TypeError, ValueError):
-            raise ValueError from None
-
-    @staticmethod
-    def vendor() -> str:
-        """Return the vendor name for this device."""
-        return "Agile Innovative"
-
-    @property
-    def name(self) -> str:
-        return self.state.name
-
-    def __bytes__(self) -> bytes:
-        """Return the byte representation of the BlinkStick Square state."""
-        return bytes(self.state)
-
-    def on(self, color: tuple[int, int, int], led: int = 0) -> None:
-        """Activate the light with the given red, green, blue color tuple."""
-        with self.batch_update():
-            self.color = color
-            if led == 0:
-                self.state.color = self.color
-            else:
-                self.state.set_led(led - 1, color)
-
 
 class State:
     """BlinkStick State
@@ -67,37 +17,36 @@ class State:
     @classmethod
     def blinkstick(cls) -> State:
         """Return the BlinkStick state variant."""
-        return cls(1, 1, "BlinkStick")
+        return cls(report=1, nleds=1)
 
     @classmethod
     def blinkstick_pro(cls) -> State:
         """Return the BlinkStick Pro state variant."""
-        return cls(2, 192, "BlinkStick Pro")
+        return cls(report=2, nleds=192)
 
     @classmethod
     def blinkstick_square(cls) -> State:
         """Return the BlinkStick Square state variant."""
-        return cls(6, 8, "BlinkStick Square")
+        return cls(report=6, nleds=8)
 
     @classmethod
     def blinkstick_strip(cls) -> State:
         """Return the BlinkStick Strip state variant."""
-        return cls(6, 8, "BlinkStick Strip")
+        return cls(report=6, nleds=8)
 
     @classmethod
     def blinkstick_nano(cls) -> State:
         """Return the BlinkStick Nano state variant."""
-        return cls(6, 2, "BlinkStick Nano")
+        return cls(report=6, nleds=2)
 
     @classmethod
     def blinkstick_flex(cls) -> State:
         """Return BlinkStick Flex state variant."""
-        return cls(6, 32, "BlinkStick Flex")
+        return cls(report=6, nleds=32)
 
-    def __init__(self, report: int, nleds: int, name: str) -> None:
+    def __init__(self, *, report: int, nleds: int) -> None:
         self.report = report
         self.nleds = nleds
-        self.name = name
         self.channel = 0
         self.colors: list[tuple[int, int, int]] = [(0, 0, 0)] * nleds
 

@@ -5,10 +5,11 @@ from typing import ClassVar
 
 from busylight_core import Hardware
 
-from ._blinkstick import BaseBlinkStick, State
+from ._blinkstick import State
+from .blinkstick_base import BlinkStickBase
 
 
-class BlinkStick(BaseBlinkStick):
+class BlinkStick(BlinkStickBase):
     """Agile Innovative BlinkStick status light controller.
 
     The BlinkStick is a USB-connected RGB LED device that can be controlled

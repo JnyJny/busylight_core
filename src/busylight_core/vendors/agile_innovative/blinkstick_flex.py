@@ -8,10 +8,11 @@ from typing import TYPE_CHECKING, ClassVar
 if TYPE_CHECKING:
     from busylight_core.hardware import Hardware
 
-from ._blinkstick import BaseBlinkStick, State
+from ._blinkstick import State
+from .blinkstick_base import BlinkStickBase
 
 
-class BlinkStickFlex(BaseBlinkStick):
+class BlinkStickFlex(BlinkStickBase):
     """Agile Innovative BlinkStick Flex status light controller.
 
     The BlinkStick Flex is a USB-connected RGB LED device with a flex form factor

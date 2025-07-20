@@ -90,7 +90,6 @@ class TestBlinkStickStrip:
         assert isinstance(state, State)
         assert state.report == 6
         assert state.nleds == 8
-        assert state.name == "BlinkStick Strip"
         # Should be cached
         assert blinkstick_strip.state is state
 

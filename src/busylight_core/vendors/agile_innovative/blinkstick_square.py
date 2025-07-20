@@ -8,11 +8,11 @@ from typing import TYPE_CHECKING, ClassVar
 if TYPE_CHECKING:
     from busylight_core.hardware import Hardware
 
+from ._blinkstick import State
+from .blinkstick_base import BlinkStickBase
 
-from ._blinkstick import BaseBlinkStick, State
 
-
-class BlinkStickSquare(BaseBlinkStick):
+class BlinkStickSquare(BlinkStickBase):
     """Agile Innovative BlinkStick Square status light controller.
 
     The BlinkStick Square is a USB-connected RGB LED device with a square form factor
