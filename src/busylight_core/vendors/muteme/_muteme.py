@@ -4,11 +4,11 @@ from busylight_core.word import BitField, Word
 
 
 class OneBitField(BitField):
-    def __get__(self, instance, owner) -> int:
+    def __get__(self, instance: Word, owner: type | None = None) -> int:
         return 0xFF if super().__get__(instance, owner) else 0
 
-    def __set__(self, instance, value) -> None:
-        super().__set__(instance, value & 1)
+    def __set__(self, instance: Word, value: int) -> None:
+        super().__set__(instance, int(bool(value)))
 
 
 class RedBit(OneBitField):
@@ -65,11 +65,7 @@ class State(Word):
 
     @property
     def color(self) -> tuple[int, int, int]:
-        return (
-            0xFF if self.red else 0,
-            0xFF if self.green else 0,
-            0xFF if self.blue else 0,
-        )
+        return (self.red, self.green, self.blue)
 
     @color.setter
     def color(self, values: tuple[int, int, int]) -> None:

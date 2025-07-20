@@ -60,20 +60,20 @@ class TestMuteMeOneBitField:
             field.__set__(mock_instance, 0)
             mock_set.assert_called_once_with(mock_instance, 0)
 
-    def test_onebitfield_set_masking(self) -> None:
-        """Test OneBitField __set__ method masks value to 1 bit."""
+    def test_onebitfield_setg(self) -> None:
+        """Test OneBitField __set__ method."""
         field = OneBitField(0, 1)
         mock_instance = Mock()
 
         with patch.object(OneBitField.__bases__[0], "__set__") as mock_set:
             # Test various values that should be masked
             test_values = [
-                (0x00, 0),  # 0 & 1 = 0
-                (0x01, 1),  # 1 & 1 = 1
-                (0x02, 0),  # 2 & 1 = 0
-                (0x03, 1),  # 3 & 1 = 1
-                (0xFF, 1),  # 255 & 1 = 1
-                (0xFE, 0),  # 254 & 1 = 0
+                (0x00, 0),
+                (0x01, 1),
+                (0x02, 1),
+                (0x03, 1),
+                (0xFF, 1),
+                (0xFE, 1),
             ]
 
             for input_val, expected_val in test_values:
@@ -178,13 +178,13 @@ class TestMuteMeState:
         """Test bit field masking behavior."""
         state = State()
 
-        # Test that non-zero values are treated as true (but need to be odd for OneBitField)
-        state.red = 255  # 255 & 1 = 1, so should be 0xFF
-        state.green = 128  # 128 & 1 = 0, so should be 0
-        state.blue = 1  # 1 & 1 = 1, so should be 0xFF
+        # Test that non-zero values are treated as true
+        state.red = 255
+        state.green = 128
+        state.blue = 1
 
         assert state.red == 0xFF
-        assert state.green == 0  # Even numbers become 0
+        assert state.green == 0xFF
         assert state.blue == 0xFF
 
         # Test that zero values are treated as false
