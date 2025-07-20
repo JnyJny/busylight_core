@@ -5,9 +5,9 @@ from unittest.mock import Mock, patch
 import pytest
 
 from busylight_core.hardware import ConnectionType, Hardware
-from busylight_core.vendors.plantronics import Status_Indicator
-from busylight_core.vendors.embrava.blynclight import Blynclight
 from busylight_core.vendors.embrava._blynclight import FlashSpeed
+from busylight_core.vendors.embrava.blynclight import Blynclight
+from busylight_core.vendors.plantronics import Status_Indicator
 
 
 class TestPlantronicsStatusIndicator:
@@ -54,11 +54,11 @@ class TestPlantronicsStatusIndicator:
         # Test with correct Status Indicator device ID
         mock_hardware.device_id = (0x047F, 0xD005)
         assert Status_Indicator.claims(mock_hardware) is True
-        
+
         # Test with Embrava Blynclight device ID (should not claim)
         mock_hardware.device_id = (0x2C0D, 0x0001)
         assert Status_Indicator.claims(mock_hardware) is False
-        
+
         # Test with unknown device ID
         mock_hardware.device_id = (0x1234, 0x5678)
         assert Status_Indicator.claims(mock_hardware) is False
@@ -68,20 +68,20 @@ class TestPlantronicsStatusIndicator:
         # Should be an instance of both Status_Indicator and Blynclight
         assert isinstance(status_indicator, Status_Indicator)
         assert isinstance(status_indicator, Blynclight)
-        
+
         # Should have all Blynclight methods
-        assert hasattr(status_indicator, 'on')
-        assert hasattr(status_indicator, 'off')
-        assert hasattr(status_indicator, 'color')
-        assert hasattr(status_indicator, 'dim')
-        assert hasattr(status_indicator, 'bright')
-        assert hasattr(status_indicator, 'play_sound')
-        assert hasattr(status_indicator, 'stop_sound')
-        assert hasattr(status_indicator, 'mute')
-        assert hasattr(status_indicator, 'unmute')
-        assert hasattr(status_indicator, 'flash')
-        assert hasattr(status_indicator, 'stop_flashing')
-        assert hasattr(status_indicator, 'reset')
+        assert hasattr(status_indicator, "on")
+        assert hasattr(status_indicator, "off")
+        assert hasattr(status_indicator, "color")
+        assert hasattr(status_indicator, "dim")
+        assert hasattr(status_indicator, "bright")
+        assert hasattr(status_indicator, "play_sound")
+        assert hasattr(status_indicator, "stop_sound")
+        assert hasattr(status_indicator, "mute")
+        assert hasattr(status_indicator, "unmute")
+        assert hasattr(status_indicator, "flash")
+        assert hasattr(status_indicator, "stop_flashing")
+        assert hasattr(status_indicator, "reset")
 
     def test_color_property_inherited(self, status_indicator) -> None:
         """Test color property inherited from Blynclight."""
@@ -89,7 +89,7 @@ class TestPlantronicsStatusIndicator:
         test_color = (255, 128, 64)
         status_indicator.color = test_color
         assert status_indicator.color == test_color
-        
+
         # Test that it uses the state object from Blynclight
         assert status_indicator.state.red == 255
         assert status_indicator.state.green == 128
@@ -105,11 +105,11 @@ class TestPlantronicsStatusIndicator:
         """Test dim() and bright() methods inherited from Blynclight."""
         # First turn on the device with some color
         status_indicator.on((100, 100, 100))
-        
+
         # Test dim functionality
         status_indicator.dim()
         assert status_indicator.state.dim == 1
-        
+
         # Test bright functionality
         status_indicator.bright()
         assert status_indicator.state.dim == 0
@@ -123,15 +123,15 @@ class TestPlantronicsStatusIndicator:
         assert status_indicator.state.volume == 3
         assert status_indicator.state.repeat == 1
         assert status_indicator.state.mute == 0
-        
+
         # Test stop_sound
         status_indicator.stop_sound()
         assert status_indicator.state.play == 0
-        
+
         # Test mute
         status_indicator.mute()
         assert status_indicator.state.mute == 1
-        
+
         # Test unmute
         status_indicator.unmute()
         assert status_indicator.state.mute == 0
@@ -139,17 +139,17 @@ class TestPlantronicsStatusIndicator:
     def test_flash_methods_inherited(self, status_indicator) -> None:
         """Test flash-related methods inherited from Blynclight."""
         color = (255, 0, 0)
-        
+
         # Test flash with default speed
         status_indicator.flash(color)
         assert status_indicator.color == color
         assert status_indicator.state.flash == 1
         assert status_indicator.state.speed == FlashSpeed.slow.value
-        
+
         # Test flash with custom speed
         status_indicator.flash(color, FlashSpeed.fast)
         assert status_indicator.state.speed == FlashSpeed.fast.value
-        
+
         # Test stop_flashing
         status_indicator.stop_flashing()
         assert status_indicator.state.flash == 0
@@ -159,7 +159,7 @@ class TestPlantronicsStatusIndicator:
         # Set a color and test the byte output format
         status_indicator.color = (128, 64, 192)
         result = bytes(status_indicator)
-        
+
         # Should follow Blynclight format: [0, state_bytes..., 0xFF, 0x22]
         assert isinstance(result, bytes)
         assert len(result) == 9  # 1 + 6 state bytes + 1 + 1
@@ -170,11 +170,9 @@ class TestPlantronicsStatusIndicator:
     def test_bytes_method_when_off(self, status_indicator) -> None:
         """Test __bytes__ method when device is off."""
         # Turn off the device
-        status_indicator.color = (0, 0, 0)
-        result = bytes(status_indicator)
-        
+        status_indicator.off((0, 0, 0))
+
         # Should set off, disable flash and dim when not lit
-        state_bytes = bytes(status_indicator.state)
         assert status_indicator.state.off == 1
         assert status_indicator.state.flash == 0
         assert status_indicator.state.dim == 0
@@ -186,9 +184,9 @@ class TestPlantronicsStatusIndicator:
         status_indicator.flash((255, 0, 0))
         status_indicator.play_sound(music=3, volume=2)
         status_indicator.dim()
-        
+
         # Reset should clear all state
-        with patch.object(status_indicator, 'update') as mock_update:
+        with patch.object(status_indicator, "update") as mock_update:
             status_indicator.reset()
             mock_update.assert_called_once()
 
@@ -197,10 +195,10 @@ class TestPlantronicsStatusIndicator:
         # Status Indicator should have different device IDs than base Blynclight
         blynclight_ids = Blynclight.supported_device_ids
         status_indicator_ids = Status_Indicator.supported_device_ids
-        
+
         # Should not share any device IDs
         assert not set(blynclight_ids.keys()) & set(status_indicator_ids.keys())
-        
+
         # Should be identified correctly
         assert status_indicator.name == "Status Indicator"
 
@@ -210,7 +208,7 @@ class TestPlantronicsStatusIndicator:
         mock_hardware.device_id = (0x047F, 0xD005)
         assert Status_Indicator.claims(mock_hardware) is True
         assert Blynclight.claims(mock_hardware) is False
-        
+
         # Embrava device should only be claimed by Blynclight
         mock_hardware.device_id = (0x2C0D, 0x0001)
         assert Status_Indicator.claims(mock_hardware) is False
@@ -219,53 +217,53 @@ class TestPlantronicsStatusIndicator:
     def test_state_object_functionality(self, status_indicator) -> None:
         """Test that the state object works correctly."""
         # Should have a state object from Blynclight
-        assert hasattr(status_indicator, 'state')
+        assert hasattr(status_indicator, "state")
         state = status_indicator.state
-        
+
         # State should have all expected attributes
-        assert hasattr(state, 'red')
-        assert hasattr(state, 'green') 
-        assert hasattr(state, 'blue')
-        assert hasattr(state, 'flash')
-        assert hasattr(state, 'dim')
-        assert hasattr(state, 'off')
-        assert hasattr(state, 'play')
-        assert hasattr(state, 'music')
-        assert hasattr(state, 'volume')
-        assert hasattr(state, 'repeat')
-        assert hasattr(state, 'mute')
-        assert hasattr(state, 'speed')
+        assert hasattr(state, "red")
+        assert hasattr(state, "green")
+        assert hasattr(state, "blue")
+        assert hasattr(state, "flash")
+        assert hasattr(state, "dim")
+        assert hasattr(state, "off")
+        assert hasattr(state, "play")
+        assert hasattr(state, "music")
+        assert hasattr(state, "volume")
+        assert hasattr(state, "repeat")
+        assert hasattr(state, "mute")
+        assert hasattr(state, "speed")
 
     def test_all_blynclight_features_available(self, status_indicator) -> None:
         """Test that all Blynclight features are available on Status Indicator."""
         # Color control
         status_indicator.on((255, 128, 64))
         assert status_indicator.is_lit
-        
+
         # Brightness control
         status_indicator.dim()
         status_indicator.bright()
-        
+
         # Sound control
         status_indicator.play_sound(music=1, volume=2, repeat=False)
         status_indicator.stop_sound()
         status_indicator.mute()
         status_indicator.unmute()
-        
+
         # Flash control
         status_indicator.flash((255, 0, 0), FlashSpeed.fast)
         status_indicator.stop_flashing()
-        
+
         # Device should handle all operations without errors
         assert True  # If we get here, all operations succeeded
 
     def test_batch_update_inherited(self, status_indicator) -> None:
         """Test that batch_update functionality is inherited."""
         # batch_update should be available from Light base class
-        assert hasattr(status_indicator, 'batch_update')
-        
+        assert hasattr(status_indicator, "batch_update")
+
         # Test that operations use batch_update (inherited behavior)
-        with patch.object(status_indicator, 'update') as mock_update:
+        with patch.object(status_indicator, "update") as mock_update:
             status_indicator.on((255, 128, 64))
             # Should call update due to batch_update context
             mock_update.assert_called()
@@ -274,15 +272,15 @@ class TestPlantronicsStatusIndicator:
         """Test the class hierarchy is correct."""
         # Status_Indicator should inherit from Blynclight
         assert issubclass(Status_Indicator, Blynclight)
-        
+
         # Should have the same method resolution order except for the class itself
         status_mro = Status_Indicator.__mro__
         blync_mro = Blynclight.__mro__
-        
+
         # Status_Indicator should be first, then Blynclight
         assert status_mro[0] == Status_Indicator
         assert status_mro[1] == Blynclight
-        
+
         # Rest should be the same
         assert status_mro[2:] == blync_mro[1:]
 
