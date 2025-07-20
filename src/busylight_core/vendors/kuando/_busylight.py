@@ -55,31 +55,31 @@ class RepeatField(BitField):
 
 
 class ColorField(BitField):
-    def __set__(self, instance, value) -> None:
-        super().__set__(instance, int((value / 255) * 100))
+    """A scaled color field."""
 
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
+    def __get__(self, instance: Word, owner: type | None = None) -> int:
         return int(super().__get__(instance, owner) / 100 * 0xFF)
+
+    def __set__(self, instance: Word, value: int) -> None:
+        super().__set__(instance, int((value / 255) * 100))
 
 
 class RedField(ColorField):
-    """8-bit red"""
+    """8-bit red."""
 
     def __init__(self) -> None:
         super().__init__(40, 8)
 
 
 class GreenField(ColorField):
-    """8-bit green"""
+    """8-bit gree.n"""
 
     def __init__(self) -> None:
         super().__init__(32, 8)
 
 
 class BlueField(ColorField):
-    """8-bit blue"""
+    """8-bit blue."""
 
     def __init__(self) -> None:
         super().__init__(24, 8)
