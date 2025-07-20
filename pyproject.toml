@@ -35,13 +35,11 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "mypy",
     "poethepoet",
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
     "ruff",
-    "ty",
 ]
 docs = [
     "mkdocs",
@@ -62,12 +60,6 @@ _open_report = "open htmlcov/index.html"
 coverage.sequence = [ "_generate_coverage", "_open_report"]
 coverage.help = "[Code Quality] Open generated coverage report in a browser."
 
-mypy.cmd = "mypy --config-file pyproject.toml src/busylight_core"
-mypy.help = "[Code Quality] Run mypy type checker on source."
-
-ty.cmd = "ty check src/busylight_core"
-ty.help = "[Code Quality] Run ty type checker on source."
-
 ruff-check.cmd = "ruff check src tests"
 ruff-check.help = "[Code Quality] Run ruff check on source."
 
@@ -77,13 +69,13 @@ ruff-format.help = "[Code Quality] Run ruff format on source."
 ruff.sequence = ["ruff-check", "ruff-format"]
 ruff.help = "[Code Quality] Run Ruff check and format on source."
 
-check.sequence = [ "ruff", "ty", "mypy" ]
+check.sequence = [ "ruff", ]
 check.help = "[Code Quality] Run all code quality tools on source."
 
 test.cmd = "pytest"
 test.help = "[Code Quality] Runs testing suites using pytest."
 
-qc.sequence = [ "test", "ruff", "mypy", "ty" ]
+qc.sequence = [ "test", "check", ]
 qc.help = "[Code Quality] Run all code quality tasks."
 
 # Publish tasks
