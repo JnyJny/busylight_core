@@ -35,16 +35,6 @@ class BlinkStickBase(Light):
         """Return the vendor name for this device."""
         return "Agile Innovative"
 
-    @classmethod
-    def unique_device_ids(cls) -> list[str]:
-        devices = []
-        for subclass in cls.subclasses():
-            print(subclass)
-            devices.extend(subclass.supported_device_ids.keys())
-        u = list(set(devices))
-        print("XXX", u)
-        return u
-
     @property
     def state(self) -> State:
         """BlinkStick state property."""
