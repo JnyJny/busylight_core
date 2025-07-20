@@ -98,6 +98,12 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         return sorted(set(cls.supported_device_ids.values()))
 
     @classmethod
+    @lru_cache(maxsize=1)
+    def unique_device_ids(cls) -> list[tuple[int, int]]:
+        """Return a list of unique device IDs."""
+        return sorted(set(cls.supported_device_ids.keys()))
+
+    @classmethod
     def claims(cls, hardware: Hardware) -> bool:
         """Return True if the hardware is claimed by this class."""
         return hardware.device_id in cls.supported_device_ids
@@ -108,7 +114,7 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
         """Return a list of all subclasses of this class."""
         subclasses = []
 
-        if cls != Light and len(cls.supported_device_ids):
+        if cls != Light and cls.supported_device_ids:
             subclasses.append(cls)
 
         for subclass in cls.__subclasses__():
@@ -208,6 +214,39 @@ class Light(abc.ABC, ColorableMixin, TaskableMixin):
                     raise
 
         raise NoLightsFoundError(cls)
+
+    @classmethod
+    def udev_rules(cls, mode: int = 0o666) -> dict[tuple[int, int], list[str]]:
+        """Return a dictionary of udev rules for the light subclass.
+
+        The keys of the dictionary are device ID tuples, while the
+        values are lists of udev rules for a particular light.  If
+        duplicate device IDs are encountered, the first device ID
+        wins and subsequent device IDs are ignored.
+
+        :param mode: int - file permissions for the device, defaults to 0o666
+        """
+        rules = {}
+
+        rule_formats = [
+            'SUBSYSTEMS=="usb", ATTRS{{idVendor}}=="{vid:04x}", ATTRS{{idProduct}}=="{pid:04x}", MODE="{mode:04o}"',  # noqa: E501
+            'KERNEL=="hidraw*", ATTRS{{idVendor}}=="{vid:04x}", ATTRS{{idProduct}}=="{pid:04x}", MODE="{mode:04o}"',  # noqa: E501
+        ]
+
+        if cls.supported_device_ids:
+            for vid, pid in cls.unique_device_ids():
+                content = rules.setdefault((vid, pid), [])
+                content.append(f"# {cls.vendor()} {cls.__name__} udev rules")
+                for rule_format in rule_formats:
+                    content.append(rule_format.format(vid=vid, pid=pid, mode=mode))
+        else:
+            for subclass in cls.subclasses():
+                subclass_rules = subclass.udev_rules(mode=mode)
+                for key, value in subclass_rules.items():
+                    if key not in rules:
+                        rules[key] = value
+
+        return rules
 
     def __init__(
         self,
