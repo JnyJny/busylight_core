@@ -462,22 +462,22 @@ class TestLightUdevRules:
         """Test udev_rules method with a concrete subclass that has supported_device_ids."""
         # Use MockLightSubclass which has supported_device_ids
         rules = MockLightSubclass.udev_rules()
-        
+
         # Should return a dictionary with device ID as key
         assert isinstance(rules, dict)
         assert (0x1234, 0x5678) in rules
-        
+
         rule_list = rules[(0x1234, 0x5678)]
         assert isinstance(rule_list, list)
         assert len(rule_list) == 3  # Comment + 2 rule formats
-        
+
         # Check comment line
         assert rule_list[0] == "# Tests MockLightSubclass udev rules"
-        
+
         # Check USB subsystem rule
         expected_usb = 'SUBSYSTEMS=="usb", ATTRS{idVendor}=="1234", ATTRS{idProduct}=="5678", MODE="0666"'
         assert rule_list[1] == expected_usb
-        
+
         # Check hidraw rule
         expected_hidraw = 'KERNEL=="hidraw*", ATTRS{idVendor}=="1234", ATTRS{idProduct}=="5678", MODE="0666"'
         assert rule_list[2] == expected_hidraw
@@ -485,82 +485,86 @@ class TestLightUdevRules:
     def test_udev_rules_with_custom_mode(self) -> None:
         """Test udev_rules method with custom file mode."""
         rules = MockLightSubclass.udev_rules(mode=0o664)
-        
+
         rule_list = rules[(0x1234, 0x5678)]
-        
+
         # Check that custom mode is applied
         expected_usb = 'SUBSYSTEMS=="usb", ATTRS{idVendor}=="1234", ATTRS{idProduct}=="5678", MODE="0664"'
         assert rule_list[1] == expected_usb
-        
+
         expected_hidraw = 'KERNEL=="hidraw*", ATTRS{idVendor}=="1234", ATTRS{idProduct}=="5678", MODE="0664"'
         assert rule_list[2] == expected_hidraw
 
     def test_udev_rules_with_multiple_device_ids(self) -> None:
         """Test udev_rules method with multiple device IDs."""
-        
+
         class MultiDeviceMockLight(ColorableMixin, Light):
             """Mock Light with multiple device IDs."""
-            
+
             supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
                 (0x1234, 0x5678): "Device1",
                 (0xABCD, 0xEF01): "Device2",
                 (0x0001, 0x0002): "Device3",
             }
-            
+
             def __bytes__(self) -> bytes:
                 return b"\x01\x02\x03\x04"
-            
+
             def on(self, color: tuple[int, int, int], led: int = 0) -> None:
                 pass
-        
+
         rules = MultiDeviceMockLight.udev_rules()
-        
+
         # Should have rules for all device IDs
         assert len(rules) == 3
         assert (0x1234, 0x5678) in rules
         assert (0xABCD, 0xEF01) in rules
         assert (0x0001, 0x0002) in rules
-        
+
         # Check that each device has correct vendor/product IDs
         rule_list_1 = rules[(0x1234, 0x5678)]
         assert 'ATTRS{idVendor}=="1234"' in rule_list_1[1]
         assert 'ATTRS{idProduct}=="5678"' in rule_list_1[1]
-        
+
         rule_list_2 = rules[(0xABCD, 0xEF01)]
         assert 'ATTRS{idVendor}=="abcd"' in rule_list_2[1]
         assert 'ATTRS{idProduct}=="ef01"' in rule_list_2[1]
 
     def test_udev_rules_with_no_supported_device_ids(self) -> None:
         """Test udev_rules method with abstract base class (no supported_device_ids)."""
-        
+
         class AbstractMockLight(Light):
             """Mock Light with no supported_device_ids (abstract)."""
-            
+
             supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {}
-            
+
             def __bytes__(self) -> bytes:
                 return b"\x01\x02\x03\x04"
-            
+
             def on(self, color: tuple[int, int, int], led: int = 0) -> None:
                 pass
-        
+
         class ConcreteMockLight1(ColorableMixin, AbstractMockLight):
             """Concrete implementation 1."""
-            
+
             supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
                 (0x1111, 0x2222): "Concrete1"
             }
-        
+
         class ConcreteMockLight2(ColorableMixin, AbstractMockLight):
             """Concrete implementation 2."""
-            
+
             supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
                 (0x3333, 0x4444): "Concrete2"
             }
-        
-        with patch.object(AbstractMockLight, 'subclasses', return_value=[ConcreteMockLight1, ConcreteMockLight2]):
+
+        with patch.object(
+            AbstractMockLight,
+            "subclasses",
+            return_value=[ConcreteMockLight1, ConcreteMockLight2],
+        ):
             rules = AbstractMockLight.udev_rules()
-        
+
         # Should aggregate rules from all subclasses
         assert len(rules) == 2
         assert (0x1111, 0x2222) in rules
@@ -568,107 +572,110 @@ class TestLightUdevRules:
 
     def test_udev_rules_duplicate_device_ids_first_wins(self) -> None:
         """Test that when duplicate device IDs exist, first one wins."""
-        
+
         class DuplicateDeviceMockLight1(ColorableMixin, Light):
             """First mock light with shared device ID."""
-            
+
             supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
                 (0x1234, 0x5678): "FirstDevice"
             }
-            
+
             def __bytes__(self) -> bytes:
                 return b"\x01"
-            
+
             def on(self, color: tuple[int, int, int], led: int = 0) -> None:
                 pass
-        
+
         class DuplicateDeviceMockLight2(ColorableMixin, Light):
             """Second mock light with same device ID."""
-            
+
             supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
                 (0x1234, 0x5678): "SecondDevice"
             }
-            
+
             def __bytes__(self) -> bytes:
                 return b"\x02"
-            
+
             def on(self, color: tuple[int, int, int], led: int = 0) -> None:
                 pass
-        
+
         class AbstractDuplicateLight(Light):
             """Abstract class to test duplicate handling."""
-            
+
             supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {}
-            
+
             def __bytes__(self) -> bytes:
                 return b"\x00"
-            
+
             def on(self, color: tuple[int, int, int], led: int = 0) -> None:
                 pass
-        
+
         # Mock subclasses method to return duplicates
-        with patch.object(AbstractDuplicateLight, 'subclasses', 
-                         return_value=[DuplicateDeviceMockLight1, DuplicateDeviceMockLight2]):
+        with patch.object(
+            AbstractDuplicateLight,
+            "subclasses",
+            return_value=[DuplicateDeviceMockLight1, DuplicateDeviceMockLight2],
+        ):
             rules = AbstractDuplicateLight.udev_rules()
-        
+
         # Should only have one entry for the duplicate device ID
         assert len(rules) == 1
         assert (0x1234, 0x5678) in rules
-        
+
         # Should be from the first subclass
         rule_list = rules[(0x1234, 0x5678)]
         assert "DuplicateDeviceMockLight1" in rule_list[0]
 
     def test_udev_rules_vendor_method_called(self) -> None:
         """Test that vendor() method is called for comment generation."""
-        
+
         class VendorMockLight(ColorableMixin, Light):
             """Mock Light to test vendor method usage."""
-            
+
             supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
                 (0x1234, 0x5678): "TestDevice"
             }
-            
+
             @staticmethod
             def vendor() -> str:
                 return "TestVendor"
-            
+
             def __bytes__(self) -> bytes:
                 return b"\x01"
-            
+
             def on(self, color: tuple[int, int, int], led: int = 0) -> None:
                 pass
-        
+
         rules = VendorMockLight.udev_rules()
         rule_list = rules[(0x1234, 0x5678)]
-        
+
         # Check that vendor name appears in comment
         assert rule_list[0] == "# TestVendor VendorMockLight udev rules"
 
     def test_udev_rules_hexadecimal_formatting(self) -> None:
         """Test that vendor and product IDs are correctly formatted as hex."""
-        
+
         class HexTestMockLight(ColorableMixin, Light):
             """Mock Light to test hex formatting."""
-            
+
             supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
-                (0x001, 0x002): "LowNumbers",    # Should be padded to 4 digits
-                (0xFFFF, 0xABCD): "HighNumbers"  # Should be lowercase
+                (0x001, 0x002): "LowNumbers",  # Should be padded to 4 digits
+                (0xFFFF, 0xABCD): "HighNumbers",  # Should be lowercase
             }
-            
+
             def __bytes__(self) -> bytes:
                 return b"\x01"
-            
+
             def on(self, color: tuple[int, int, int], led: int = 0) -> None:
                 pass
-        
+
         rules = HexTestMockLight.udev_rules()
-        
+
         # Check low numbers are padded
         low_rules = rules[(0x001, 0x002)]
         assert 'ATTRS{idVendor}=="0001"' in low_rules[1]
         assert 'ATTRS{idProduct}=="0002"' in low_rules[1]
-        
+
         # Check high numbers are lowercase
         high_rules = rules[(0xFFFF, 0xABCD)]
         assert 'ATTRS{idVendor}=="ffff"' in high_rules[1]

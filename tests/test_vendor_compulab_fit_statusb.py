@@ -50,7 +50,7 @@ class TestCompuLabFitStatUSB:
         # Test with correct fit-statUSB device ID
         mock_hardware.device_id = (0x2047, 0x03DF)
         assert Fit_StatUSB.claims(mock_hardware) is True
-        
+
         # Test with unknown device ID
         mock_hardware.device_id = (0x1234, 0x5678)
         assert Fit_StatUSB.claims(mock_hardware) is False
@@ -122,10 +122,10 @@ class TestCompuLabFitStatUSB:
         mock_batch.__enter__ = Mock()
         mock_batch.__exit__ = Mock()
         fit_statusb.batch_update = Mock(return_value=mock_batch)
-        
+
         color = (255, 128, 64)
         fit_statusb.on(color)
-        
+
         # Verify batch_update was called
         fit_statusb.batch_update.assert_called_once()
 
@@ -135,7 +135,7 @@ class TestCompuLabFitStatUSB:
         test_color = (100, 200, 50)
         fit_statusb.color = test_color
         assert fit_statusb.color == test_color
-        
+
         # Test individual RGB components
         assert fit_statusb.red == 100
         assert fit_statusb.green == 200
@@ -147,10 +147,10 @@ class TestCompuLabFitStatUSB:
         fit_statusb.red = 128
         fit_statusb.green = 64
         fit_statusb.blue = 192
-        
+
         # Check color tuple
         assert fit_statusb.color == (128, 64, 192)
-        
+
         # Check bytes output format
         result = bytes(fit_statusb)
         expected = b"B#8040c0\n"  # 128=0x80, 64=0x40, 192=0xC0
@@ -161,17 +161,17 @@ class TestCompuLabFitStatUSB:
         # Black color should not be lit
         fit_statusb.color = (0, 0, 0)
         assert fit_statusb.is_lit is False
-        
+
         # Any non-zero color should be lit
         fit_statusb.color = (1, 0, 0)
         assert fit_statusb.is_lit is True
-        
+
         fit_statusb.color = (0, 1, 0)
         assert fit_statusb.is_lit is True
-        
+
         fit_statusb.color = (0, 0, 1)
         assert fit_statusb.is_lit is True
-        
+
         fit_statusb.color = (255, 255, 255)
         assert fit_statusb.is_lit is True
 
@@ -185,7 +185,7 @@ class TestCompuLabFitStatUSB:
             ((171, 205, 239), b"B#abcdef\n"),  # 0xAB, 0xCD, 0xEF
             ((16, 32, 48), b"B#102030\n"),
         ]
-        
+
         for color, expected_bytes in test_cases:
             fit_statusb.color = color
             result = bytes(fit_statusb)
@@ -195,19 +195,19 @@ class TestCompuLabFitStatUSB:
         """Test that the device uses text-based protocol with proper encoding."""
         fit_statusb.color = (0xAB, 0xCD, 0xEF)
         result = bytes(fit_statusb)
-        
+
         # Should be text-based protocol
         assert result.startswith(b"B#")
         assert result.endswith(b"\n")
-        
+
         # Should be lowercase hex
         assert b"abcdef" in result
-        
+
         # Should be properly encoded bytes
         assert isinstance(result, bytes)
-        
+
         # Should decode to valid text
-        text = result.decode('ascii')
+        text = result.decode("ascii")
         assert text == "B#abcdef\n"
 
     def test_hex_formatting_edge_cases(self, fit_statusb) -> None:
@@ -217,7 +217,7 @@ class TestCompuLabFitStatUSB:
         result = bytes(fit_statusb)
         expected = b"B#050a0f\n"
         assert result == expected
-        
+
         # Test high values
         fit_statusb.color = (240, 250, 255)
         result = bytes(fit_statusb)
@@ -227,31 +227,31 @@ class TestCompuLabFitStatUSB:
     def test_inheritance_from_colorable_mixin_and_light(self, fit_statusb) -> None:
         """Test that Fit_StatUSB properly inherits from both ColorableMixin and Light."""
         # Test ColorableMixin inheritance
-        assert hasattr(fit_statusb, 'red')
-        assert hasattr(fit_statusb, 'green')
-        assert hasattr(fit_statusb, 'blue')
-        assert hasattr(fit_statusb, 'color')
-        assert hasattr(fit_statusb, 'is_lit')
-        
+        assert hasattr(fit_statusb, "red")
+        assert hasattr(fit_statusb, "green")
+        assert hasattr(fit_statusb, "blue")
+        assert hasattr(fit_statusb, "color")
+        assert hasattr(fit_statusb, "is_lit")
+
         # Test Light inheritance
-        assert hasattr(fit_statusb, 'on')
-        assert hasattr(fit_statusb, 'off')
-        assert hasattr(fit_statusb, 'reset')
-        assert hasattr(fit_statusb, 'vendor')
-        assert hasattr(fit_statusb, 'claims')
-        assert hasattr(fit_statusb, 'supported_device_ids')
+        assert hasattr(fit_statusb, "on")
+        assert hasattr(fit_statusb, "off")
+        assert hasattr(fit_statusb, "reset")
+        assert hasattr(fit_statusb, "vendor")
+        assert hasattr(fit_statusb, "claims")
+        assert hasattr(fit_statusb, "supported_device_ids")
 
     def test_device_specific_functionality(self, fit_statusb) -> None:
         """Test device-specific functionality of fit-statUSB."""
         # Test that it uses the correct protocol format (B# prefix)
         fit_statusb.color = (100, 150, 200)
         result = bytes(fit_statusb)
-        
+
         # Specific to fit-statUSB protocol
         assert result.startswith(b"B#")
         assert result.endswith(b"\n")
         assert len(result) == 9  # "B#" + 6 hex chars + "\n"
-        
+
         # Test protocol is case-insensitive but outputs lowercase
         expected = b"B#6496c8\n"  # 100=0x64, 150=0x96, 200=0xC8 -> lowercase
         assert result == expected
