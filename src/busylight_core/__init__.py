@@ -28,7 +28,14 @@ from .exceptions import (
 )
 from .hardware import Hardware
 from .light import Light
-from .vendors.agile_innovative import BlinkStickSquare
+from .vendors.agile_innovative import (
+    BlinkStick,
+    BlinkStickFlex,
+    BlinkStickNano,
+    BlinkStickPro,
+    BlinkStickSquare,
+    BlinkStickStrip,
+)
 from .vendors.compulab import Fit_StatUSB
 from .vendors.embrava import Blynclight, Blynclight_Mini, Blynclight_Plus
 from .vendors.epos import Busylight
@@ -40,7 +47,12 @@ from .vendors.thingm import Blink1
 
 __all__ = [
     "Blink1",
+    "BlinkStick",
+    "BlinkStickFlex",
+    "BlinkStickNano",
+    "BlinkStickPro",
     "BlinkStickSquare",
+    "BlinkStickStrip",
     "Bluetooth",
     "Blynclight",
     "Blynclight_Mini",

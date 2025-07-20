@@ -8,10 +8,11 @@ from typing import TYPE_CHECKING, ClassVar
 if TYPE_CHECKING:
     from busylight_core.hardware import Hardware
 
-from ._blinkstick import BaseBlinkStick, State
+from ._blinkstick import State
+from .blinkstick_base import BlinkStickBase
 
 
-class BlinkStickNano(BaseBlinkStick):
+class BlinkStickNano(BlinkStickBase):
     """Agile Innovative BlinkStick Nano status light controller.
 
     The BlinkStick Nano is a USB-connected RGB LED device with a nano form factor
