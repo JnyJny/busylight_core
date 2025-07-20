@@ -2,10 +2,10 @@
 
 from typing import ClassVar
 
-from .busylight_alpha import Busylight_Alpha
+from .busylight_base import BusylightBase
 
 
-class Busylight_Omega(Busylight_Alpha):
+class Busylight_Omega(BusylightBase):
     """Kuando Busylight Omega status light controller.
 
     The Busylight Omega is an enhanced version of the Busylight Alpha

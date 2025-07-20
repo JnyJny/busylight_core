@@ -8,7 +8,7 @@ import pytest
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.vendors.kuando import Busylight_Alpha
 from busylight_core.vendors.kuando._busylight import OpCode, Ring, State, Step
-from busylight_core.vendors.kuando.busylight_alpha import _keepalive
+from busylight_core.vendors.kuando.busylight_base import _keepalive
 
 
 class TestKuandoBusylightStep:
