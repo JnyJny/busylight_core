@@ -45,7 +45,11 @@ class BlinkStickBase(Light):
         return bytes(self.state)
 
     def on(self, color: tuple[int, int, int], led: int = 0) -> None:
-        """Activate the light with the given red, green, blue color tuple."""
+        """Activate the light with the given red, green, blue color tuple.
+
+        :param color: RGB color tuple (red, green, blue) with values 0-255
+        :param led: LED index (0 for main LED, 1+ for additional LEDs)
+        """
         with self.batch_update():
             if led == 0:
                 self.color = color
@@ -54,10 +58,9 @@ class BlinkStickBase(Light):
 
     @property
     def color(self) -> tuple[int, int, int]:
-        """Get the current color of the BlinkStick."""
+        """Tuple of RGB color values."""
         return self.state.color
 
     @color.setter
     def color(self, value: tuple[int, int, int]) -> None:
-        """Set the current color of the BlinkStick."""
         self.state.color = value

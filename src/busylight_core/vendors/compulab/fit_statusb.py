@@ -30,10 +30,8 @@ class Fit_StatUSB(ColorableMixin, Light):
     def on(self, color: tuple[int, int, int], led: int = 0) -> None:
         """Turn on the fit-statUSB with the specified color.
 
-        Args:
-            color: RGB color tuple (red, green, blue) with values 0-255
-            led: LED index (unused for fit-statUSB)
-
+        :param color: RGB tuple (red, green, blue).
+        :param led: LED index (not used by fit-statUSB).
         """
         with self.batch_update():
             self.color = color

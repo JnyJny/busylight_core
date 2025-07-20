@@ -28,12 +28,12 @@ class MuteMe(Light):
 
     @cached_property
     def state(self) -> State():
-        """Get the device state manager for controlling light behavior."""
+        """The device state manager for controlling light behavior."""
         return State()
 
     @cached_property
     def struct(self) -> struct.Struct:
-        """Get the binary struct formatter for device communication."""
+        """The binary struct formatter for device communication."""
         return struct.Struct("!xB")
 
     def __bytes__(self) -> bytes:
@@ -41,12 +41,11 @@ class MuteMe(Light):
 
     @property
     def color(self) -> tuple[int, int, int]:
-        """The current color tuple of a MuteMe device."""
+        """Tuple of RGB color values."""
         return self.state.color
 
     @color.setter
     def color(self, value: tuple[int, int, int]) -> None:
-        """The color of the MuteMe device."""
         self.state.color = value
 
     @property

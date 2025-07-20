@@ -21,7 +21,7 @@ class Busylight(Light):
 
     @staticmethod
     def vendor() -> str:
-        """The vendor name for this device."""
+        """Return the vendor name for this device."""
         return "EPOS"
 
     @cached_property

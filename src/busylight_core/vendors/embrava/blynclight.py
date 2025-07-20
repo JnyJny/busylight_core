@@ -23,7 +23,7 @@ class Blynclight(Light):
 
     @cached_property
     def state(self) -> State:
-        """Get the device state manager for controlling light behavior."""
+        """The device state manager."""
         return State()
 
     def __bytes__(self) -> bytes:
@@ -44,7 +44,7 @@ class Blynclight(Light):
 
     @property
     def color(self) -> tuple[int, int, int]:
-        """Get the current RGB color of the Blynclight."""
+        """Tuple of RGB color values."""
         return (self.state.red, self.state.green, self.state.blue)
 
     @color.setter

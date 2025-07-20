@@ -20,12 +20,12 @@ class MuteSync(ColorableMixin, Light):
 
     @staticmethod
     def vendor() -> str:
-        """The vendor name for this device."""
+        """Return the vendor name for this device."""
         return "MuteMe"
 
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
-        """True if the hardware describes a MuteSync device."""
+        """Return True if the hardware describes a MuteSync device."""
         # Addresses busylight-for-humans issue #356 where MuteSync
         # claims another hardware with a SiliconLabs CP2102 USB to
         # Serial controller that is not MuteSync hardware.

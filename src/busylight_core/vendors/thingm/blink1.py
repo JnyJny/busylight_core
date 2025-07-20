@@ -6,7 +6,7 @@ from typing import ClassVar
 
 from busylight_core.light import Light
 
-from ._blink1 import LEDS, State, Report, Action
+from ._blink1 import LEDS, Action, Report, State
 
 
 class Blink1(Light):
@@ -22,12 +22,12 @@ class Blink1(Light):
 
     @staticmethod
     def vendor() -> str:
-        """The vendor name for this device."""
+        """Return the vendor name for this device."""
         return "ThingM"
 
     @cached_property
     def state(self) -> State:
-        """The device state manager for controlling LED patterns."""
+        """The device state manager."""
         return State()
 
     def __bytes__(self) -> bytes:
@@ -39,7 +39,6 @@ class Blink1(Light):
         :param color: RGB color tuple (red, green, blue) with values 0-255
         :param led: LED index (0 for the first LED, 1 for the second, etc.)
         """
-
         with self.batch_update():
             self.state.clear()
             self.state.report = Report.One
@@ -50,7 +49,7 @@ class Blink1(Light):
 
     @property
     def color(self) -> tuple[int, int, int]:
-        """The current color of the Blink(1) device."""
+        """Tuple of RGB color values."""
         return self.state.color
 
     @color.setter
@@ -59,10 +58,5 @@ class Blink1(Light):
 
     @property
     def write_strategy(self) -> Callable:
-        """Get the write strategy for communicating with the device.
-
-        Returns:
-            The hardware's send_feature_report method
-
-        """
+        """The write strategy for communicating with the device."""
         return self.hardware.handle.send_feature_report

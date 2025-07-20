@@ -29,5 +29,4 @@ class ColorableMixin:
 
     @color.setter
     def color(self, value: tuple[int, int, int]) -> None:
-        """Tuple of RGB color values."""
         self.red, self.green, self.blue = value
