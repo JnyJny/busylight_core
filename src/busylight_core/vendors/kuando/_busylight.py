@@ -1,5 +1,7 @@
 """Kuando Busylight device implementation details."""
 
+from __future__ import annotations
+
 import struct
 from enum import Enum
 
@@ -54,32 +56,34 @@ class RepeatField(BitField):
         super().__init__(48, 8)
 
 
-class ColorField(BitField):
+class ScaledColorField(BitField):
     """A scaled color field."""
 
-    def __get__(self, instance: Word, owner: type | None = None) -> int:
-        return int(super().__get__(instance, owner) / 100 * 0xFF)
+    def __get__(self, instance: Word | None, owner: type | None = None) -> int:
+        if instance is None:
+            return self
+        return (instance[self.field] / 100) * 0xFF
 
     def __set__(self, instance: Word, value: int) -> None:
-        super().__set__(instance, int((value / 255) * 100))
+        instance[self.field] = int((value / 0xFF) * 100)
 
 
-class RedField(ColorField):
-    """8-bit red."""
+class RedField(ScaledColorField):
+    """8-bit red color."""
 
     def __init__(self) -> None:
         super().__init__(40, 8)
 
 
-class GreenField(ColorField):
-    """8-bit gree.n"""
+class GreenField(ScaledColorField):
+    """8-bit green color."""
 
     def __init__(self) -> None:
         super().__init__(32, 8)
 
 
-class BlueField(ColorField):
-    """8-bit blue."""
+class BlueField(ScaledColorField):
+    """8-bit blue color."""
 
     def __init__(self) -> None:
         super().__init__(24, 8)
