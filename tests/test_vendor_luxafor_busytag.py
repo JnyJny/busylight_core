@@ -121,7 +121,7 @@ class TestLuxaforBusyTag:
 
     def test_vendor_method(self) -> None:
         """Test vendor() method returns correct vendor name."""
-        assert BusyTag.vendor() == "Busy Tag"
+        assert BusyTag.vendor() == "Luxafor"
 
     def test_supported_device_ids(self) -> None:
         """Test supported_device_ids contains expected devices."""
