@@ -21,7 +21,7 @@ class BusyTag(Light):
     @staticmethod
     def vendor() -> str:
         """Return the vendor name for this device."""
-        return "Busy Tag"
+        return "Luxafor"
 
     @property
     def command(self) -> str:
