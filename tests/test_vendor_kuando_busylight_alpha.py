@@ -5,7 +5,7 @@ from unittest.mock import Mock
 import pytest
 
 from busylight_core.hardware import ConnectionType, Hardware
-from busylight_core.vendors.kuando import Busylight_Alpha
+from busylight_core.vendors.kuando import BusylightAlpha
 
 
 class TestKuandoBusylightAlpha:
@@ -24,18 +24,18 @@ class TestKuandoBusylightAlpha:
         return hardware
 
     @pytest.fixture
-    def busylight(self, mock_hardware) -> Busylight_Alpha:
-        """Create a Busylight_Alpha instance for testing."""
+    def busylight(self, mock_hardware) -> BusylightAlpha:
+        """Create a BusylightAlpha instance for testing."""
         # Mock the hardware handle methods
         mock_hardware.handle = Mock()
         mock_hardware.handle.write = Mock(return_value=64)
         mock_hardware.handle.read = Mock(return_value=b"\x00" * 64)
 
-        return Busylight_Alpha(mock_hardware, reset=False, exclusive=False)
+        return BusylightAlpha(mock_hardware, reset=False, exclusive=False)
 
     def test_supported_device_ids(self) -> None:
         """Test Alpha supported_device_ids contains expected devices."""
-        device_ids = Busylight_Alpha.supported_device_ids
+        device_ids = BusylightAlpha.supported_device_ids
         assert (0x04D8, 0xF848) in device_ids
         assert (0x27BB, 0x3BCA) in device_ids
         assert (0x27BB, 0x3BCB) in device_ids
@@ -53,16 +53,16 @@ class TestKuandoBusylightAlpha:
         """Test claims() method with Alpha-specific hardware."""
         # Test with Alpha device ID
         mock_hardware.device_id = (0x04D8, 0xF848)
-        assert Busylight_Alpha.claims(mock_hardware) is True
+        assert BusylightAlpha.claims(mock_hardware) is True
 
         # Test with another Alpha device ID
         mock_hardware.device_id = (0x27BB, 0x3BCA)
-        assert Busylight_Alpha.claims(mock_hardware) is True
+        assert BusylightAlpha.claims(mock_hardware) is True
 
         # Test with Omega device ID (should not claim)
         mock_hardware.device_id = (0x27BB, 0x3BCD)
-        assert Busylight_Alpha.claims(mock_hardware) is False
+        assert BusylightAlpha.claims(mock_hardware) is False
 
         # Test with unknown device ID
         mock_hardware.device_id = (0x1234, 0x5678)
-        assert Busylight_Alpha.claims(mock_hardware) is False
+        assert BusylightAlpha.claims(mock_hardware) is False

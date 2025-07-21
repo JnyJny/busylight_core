@@ -20,7 +20,25 @@ class Word:
         return f"{self.__class__.__name__}(value={self.hex})"
 
     def __str__(self) -> str:
-        return self.hex
+        """Return a human-readable representation showing field breakdown."""
+        # Start with basic info
+        lines = [f"{self.__class__.__name__}(length={self.length}, value={self.hex})"]
+        
+        # Use introspection to find BitFields on this instance's class
+        bitfields = []
+        for attr_name in dir(self.__class__):
+            attr = getattr(self.__class__, attr_name)
+            if isinstance(attr, (BitField, ReadOnlyBitField)):
+                bitfields.append((attr_name, attr.offset, attr.width))
+        
+        if bitfields:
+            lines.append("Fields:")
+            # Sort by offset for logical display
+            for name, offset, width in sorted(bitfields, key=lambda x: x[1]):
+                field_value = self[slice(offset, offset + width)]
+                lines.append(f"  {name}: bits[{offset}:{offset+width}] = {field_value} (0x{field_value:x})")
+        
+        return "\n".join(lines)
 
     @property
     def value(self) -> int:
@@ -75,6 +93,8 @@ class ReadOnlyBitField:
     def __init__(self, offset: int, width: int = 1) -> None:
         """Initialize a bitfield with the given offset and width."""
         self.field = slice(offset, offset + width)
+        self.offset = offset  # Store for introspection
+        self.width = width    # Store for introspection
 
     def __get__(self, instance: Word, owner: type | None = None) -> int:
         if instance is None:

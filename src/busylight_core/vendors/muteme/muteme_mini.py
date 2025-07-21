@@ -2,10 +2,10 @@
 
 from typing import ClassVar
 
-from .muteme import MuteMe
+from .muteme_base import MuteMeBase
 
 
-class MuteMe_Mini(MuteMe):
+class MuteMeMini(MuteMeBase):
     """MuteMe Mini status light and button controller.
 
     A smaller version of the MuteMe device with the same button

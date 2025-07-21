@@ -2,10 +2,10 @@
 
 from typing import ClassVar
 
-from .blynclight import Blynclight
+from .embrava_base import EmbravaBase
 
 
-class Blynclight_Plus(Blynclight):
+class BlynclightPlus(EmbravaBase):
     """Embrava Blynclight Plus status light controller.
 
     An enhanced version of the Blynclight with additional features

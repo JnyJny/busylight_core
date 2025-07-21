@@ -5,7 +5,7 @@ busylight devices, including the MuteMe, MuteMe Mini, and MuteSync product lines
 """
 
 from busylight_core.hardware import ConnectionType
-from busylight_core.vendors.muteme import MuteMe, MuteMe_Mini, MuteSync
+from busylight_core.vendors.muteme import MuteMe, MuteMeMini, MuteSync
 
 from .utils import make_hardware
 
@@ -44,6 +44,6 @@ mutesync_template = {
 
 MUTEME_HARDWARE = {
     MuteMe: make_hardware(MuteMe, muteme_template),
-    MuteMe_Mini: make_hardware(MuteMe_Mini, muteme_mini_template),
+    MuteMeMini: make_hardware(MuteMeMini, muteme_mini_template),
     MuteSync: make_hardware(MuteSync, mutesync_template),
 }

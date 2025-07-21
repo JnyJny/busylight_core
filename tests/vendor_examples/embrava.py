@@ -4,7 +4,7 @@ This module provides mock hardware definitions for testing Embrava
 busylight devices, including the Blynclight product line.
 """
 
-from busylight_core.vendors.embrava import Blynclight, Blynclight_Mini, Blynclight_Plus
+from busylight_core.vendors.embrava import Blynclight, BlynclightMini, BlynclightPlus
 
 from .utils import make_hardware
 
@@ -47,6 +47,6 @@ blynclight_plus_template = {
 
 EMBRAVA_HARDWARE = {
     Blynclight: make_hardware(Blynclight, blynclight_template),
-    Blynclight_Mini: make_hardware(Blynclight_Mini, blynclight_mini_template),
-    Blynclight_Plus: make_hardware(Blynclight_Plus, blynclight_plus_template),
+    BlynclightMini: make_hardware(BlynclightMini, blynclight_mini_template),
+    BlynclightPlus: make_hardware(BlynclightPlus, blynclight_plus_template),
 }

@@ -7,7 +7,7 @@ import pytest
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.vendors.embrava._blynclight import FlashSpeed
 from busylight_core.vendors.embrava.blynclight import Blynclight
-from busylight_core.vendors.plantronics import Status_Indicator
+from busylight_core.vendors.plantronics import StatusIndicator
 
 
 class TestPlantronicsStatusIndicator:
@@ -26,18 +26,18 @@ class TestPlantronicsStatusIndicator:
         return hardware
 
     @pytest.fixture
-    def status_indicator(self, mock_hardware) -> Status_Indicator:
-        """Create a Status_Indicator instance for testing."""
+    def status_indicator(self, mock_hardware) -> StatusIndicator:
+        """Create a StatusIndicator instance for testing."""
         # Mock the hardware handle methods
         mock_hardware.handle = Mock()
         mock_hardware.handle.write = Mock(return_value=9)
         mock_hardware.handle.read = Mock(return_value=b"\x00" * 9)
 
-        return Status_Indicator(mock_hardware, reset=False, exclusive=False)
+        return StatusIndicator(mock_hardware, reset=False, exclusive=False)
 
     def test_supported_device_ids(self) -> None:
         """Test supported_device_ids contains expected Status Indicator device."""
-        device_ids = Status_Indicator.supported_device_ids
+        device_ids = StatusIndicator.supported_device_ids
         assert (0x047F, 0xD005) in device_ids
         assert device_ids[(0x047F, 0xD005)] == "Status Indicator"
         # Should only have one device ID for Plantronics
@@ -47,27 +47,28 @@ class TestPlantronicsStatusIndicator:
         """Test vendor() method returns correct vendor name."""
         # Should inherit the vendor method from Blynclight base class
         # which gets vendor from module path (plantronics)
-        assert Status_Indicator.vendor() == "Plantronics"
+        assert StatusIndicator.vendor() == "Plantronics"
 
     def test_claims_method_with_status_indicator_hardware(self, mock_hardware) -> None:
         """Test claims() method with Status Indicator hardware."""
         # Test with correct Status Indicator device ID
         mock_hardware.device_id = (0x047F, 0xD005)
-        assert Status_Indicator.claims(mock_hardware) is True
+        assert StatusIndicator.claims(mock_hardware) is True
 
         # Test with Embrava Blynclight device ID (should not claim)
         mock_hardware.device_id = (0x2C0D, 0x0001)
-        assert Status_Indicator.claims(mock_hardware) is False
+        assert StatusIndicator.claims(mock_hardware) is False
 
         # Test with unknown device ID
         mock_hardware.device_id = (0x1234, 0x5678)
-        assert Status_Indicator.claims(mock_hardware) is False
+        assert StatusIndicator.claims(mock_hardware) is False
 
     def test_inheritance_from_blynclight(self, status_indicator) -> None:
-        """Test that Status_Indicator properly inherits from Blynclight."""
-        # Should be an instance of both Status_Indicator and Blynclight
-        assert isinstance(status_indicator, Status_Indicator)
-        assert isinstance(status_indicator, Blynclight)
+        """Test that StatusIndicator properly inherits from EmbravaBase."""
+        # Should be an instance of both StatusIndicator and EmbravaBase
+        assert isinstance(status_indicator, StatusIndicator)
+        from busylight_core.vendors.embrava.embrava_base import EmbravaBase
+        assert isinstance(status_indicator, EmbravaBase)
 
         # Should have all Blynclight methods
         assert hasattr(status_indicator, "on")
@@ -194,7 +195,7 @@ class TestPlantronicsStatusIndicator:
         """Test device-specific identification vs base Blynclight."""
         # Status Indicator should have different device IDs than base Blynclight
         blynclight_ids = Blynclight.supported_device_ids
-        status_indicator_ids = Status_Indicator.supported_device_ids
+        status_indicator_ids = StatusIndicator.supported_device_ids
 
         # Should not share any device IDs
         assert not set(blynclight_ids.keys()) & set(status_indicator_ids.keys())
@@ -204,14 +205,14 @@ class TestPlantronicsStatusIndicator:
 
     def test_plantronics_vs_embrava_claiming(self, mock_hardware) -> None:
         """Test that Plantronics and Embrava devices don't cross-claim."""
-        # Plantronics device should only be claimed by Status_Indicator
+        # Plantronics device should only be claimed by StatusIndicator
         mock_hardware.device_id = (0x047F, 0xD005)
-        assert Status_Indicator.claims(mock_hardware) is True
+        assert StatusIndicator.claims(mock_hardware) is True
         assert Blynclight.claims(mock_hardware) is False
 
         # Embrava device should only be claimed by Blynclight
         mock_hardware.device_id = (0x2C0D, 0x0001)
-        assert Status_Indicator.claims(mock_hardware) is False
+        assert StatusIndicator.claims(mock_hardware) is False
         assert Blynclight.claims(mock_hardware) is True
 
     def test_state_object_functionality(self, status_indicator) -> None:
@@ -270,23 +271,24 @@ class TestPlantronicsStatusIndicator:
 
     def test_class_hierarchy(self) -> None:
         """Test the class hierarchy is correct."""
-        # Status_Indicator should inherit from Blynclight
-        assert issubclass(Status_Indicator, Blynclight)
+        # StatusIndicator should inherit from EmbravaBase
+        from busylight_core.vendors.embrava.embrava_base import EmbravaBase
+        assert issubclass(StatusIndicator, EmbravaBase)
 
-        # Should have the same method resolution order except for the class itself
-        status_mro = Status_Indicator.__mro__
-        blync_mro = Blynclight.__mro__
+        # Should have the same method resolution order as EmbravaBase except for the class itself
+        status_mro = StatusIndicator.__mro__
+        embrava_mro = EmbravaBase.__mro__
 
-        # Status_Indicator should be first, then Blynclight
-        assert status_mro[0] == Status_Indicator
-        assert status_mro[1] == Blynclight
+        # StatusIndicator should be first, then EmbravaBase
+        assert status_mro[0] == StatusIndicator
+        assert status_mro[1] == EmbravaBase
 
         # Rest should be the same
-        assert status_mro[2:] == blync_mro[1:]
+        assert status_mro[2:] == embrava_mro[1:]
 
     def test_module_path_vendor_detection(self) -> None:
         """Test that vendor detection works via module path."""
         # The vendor method should extract 'plantronics' from the module path
-        # Status_Indicator is in busylight_core.vendors.plantronics.status_indicator
-        vendor = Status_Indicator.vendor()
+        # StatusIndicator is in busylight_core.vendors.plantronics.status_indicator
+        vendor = StatusIndicator.vendor()
         assert vendor == "Plantronics"

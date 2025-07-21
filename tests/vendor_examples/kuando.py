@@ -4,7 +4,7 @@ This module provides mock hardware definitions for testing Kuando
 busylight devices, including the Busylight Alpha and Omega product lines.
 """
 
-from busylight_core.vendors.kuando import Busylight_Alpha, Busylight_Omega
+from busylight_core.vendors.kuando import BusylightAlpha, BusylightOmega
 
 from .utils import make_hardware
 
@@ -33,6 +33,6 @@ busylight_omega_template = {
 }
 
 KUANDO_HARDWARE = {
-    Busylight_Alpha: make_hardware(Busylight_Alpha, busylight_alpha_template),
-    Busylight_Omega: make_hardware(Busylight_Omega, busylight_omega_template),
+    BusylightAlpha: make_hardware(BusylightAlpha, busylight_alpha_template),
+    BusylightOmega: make_hardware(BusylightOmega, busylight_omega_template),
 }
