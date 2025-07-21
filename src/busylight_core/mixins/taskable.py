@@ -1,6 +1,7 @@
 """Asynchronous task support for animating lights."""
 
 import asyncio
+import contextlib
 import time
 from collections.abc import Awaitable
 from dataclasses import dataclass
@@ -159,20 +160,15 @@ class TaskableMixin:
         :param name: Name of task to cancel
         :return: The cancelled task or None if not found
         """
-        try:
+        with contextlib.suppress(KeyError):
             task = self.tasks[name]
             del self.tasks[name]
             if name in self.task_info:
                 del self.task_info[name]
             
-            try:
+            with contextlib.suppress(AttributeError):
                 task.cancel()
                 return task
-            except AttributeError:
-                return None
-                
-        except KeyError:
-            pass
         
         return None
 
@@ -264,11 +260,9 @@ class TaskableMixin:
         
         completed_tasks = []
         for name, task in self.tasks.items():
-            try:
+            with contextlib.suppress(AttributeError, TypeError):
                 if isinstance(task, asyncio.Task) and task.done():
                     completed_tasks.append(name)
-            except (AttributeError, TypeError):
-                pass
         
         for name in completed_tasks:
             del self.tasks[name]
