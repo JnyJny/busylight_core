@@ -217,3 +217,27 @@ class TestEPOSBusylight:
             busylight.on(color3, led=2)
             assert busylight.state.color0 == (0, 0, 0)
             assert busylight.state.color1 == color3
+
+    def test_vendor_hierarchy(self, busylight) -> None:
+        """Test Busylight inherits from EposBase properly."""
+        from busylight_core.vendors.epos.epos_base import EposBase
+        
+        # Test inheritance hierarchy
+        assert isinstance(busylight, Busylight)
+        assert isinstance(busylight, EposBase)
+        
+        # Test class hierarchy
+        assert issubclass(Busylight, EposBase)
+        
+        # Test vendor method comes from EposBase
+        assert Busylight.vendor() == "EPOS"
+        assert EposBase.vendor() == "EPOS"
+
+    def test_method_resolution_order(self) -> None:
+        """Test MRO follows expected pattern."""
+        mro = Busylight.__mro__
+        
+        # Should be: Busylight -> EposBase -> Light -> ...
+        assert mro[0] == Busylight
+        assert mro[1].__name__ == "EposBase"
+        assert mro[2].__name__ == "Light"

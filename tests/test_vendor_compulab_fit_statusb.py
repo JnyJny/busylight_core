@@ -255,3 +255,29 @@ class TestCompuLabFitStatUSB:
         # Test protocol is case-insensitive but outputs lowercase
         expected = b"B#6496c8\n"  # 100=0x64, 150=0x96, 200=0xC8 -> lowercase
         assert result == expected
+
+    def test_vendor_hierarchy(self, fit_statusb) -> None:
+        """Test FitStatUSB inherits from CompuLabBase properly."""
+        from busylight_core.vendors.compulab.compulab_base import CompuLabBase
+        
+        # Test inheritance hierarchy
+        assert isinstance(fit_statusb, FitStatUSB)
+        assert isinstance(fit_statusb, CompuLabBase)
+        
+        # Test class hierarchy
+        assert issubclass(FitStatUSB, CompuLabBase)
+        
+        # Test vendor method comes from CompuLabBase
+        assert FitStatUSB.vendor() == "CompuLab"
+        assert CompuLabBase.vendor() == "CompuLab"
+
+    def test_method_resolution_order(self) -> None:
+        """Test MRO follows expected pattern."""
+        from busylight_core.mixins import ColorableMixin
+        mro = FitStatUSB.__mro__
+        
+        # Should be: FitStatUSB -> ColorableMixin -> CompuLabBase -> Light -> ...
+        assert mro[0] == FitStatUSB
+        assert mro[1] == ColorableMixin
+        assert mro[2].__name__ == "CompuLabBase"
+        assert mro[3].__name__ == "Light"
