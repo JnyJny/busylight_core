@@ -3,15 +3,11 @@
 from functools import cached_property
 from typing import ClassVar
 
-from loguru import logger
-
-from busylight_core.hardware import Hardware
-from busylight_core.light import Light
-
 from ._flag import LEDS, State
+from .luxafor_base import LuxaforBase
 
 
-class Flag(Light):
+class Flag(LuxaforBase):
     """Luxafor Flag status light controller.
 
     The Luxafor Flag is a USB-connected RGB LED device with multiple
@@ -22,24 +18,6 @@ class Flag(Light):
         (0x4D8, 0xF372): "Flag",
     }
 
-    @classmethod
-    def claims(cls, hardware: Hardware) -> bool:
-        """Check if this class claims the given hardware device.
-
-        :param hardware: A hardware instance
-        """
-        if not super().claims(hardware):
-            return False
-
-        try:
-            product = hardware.product_string.split()[-1].casefold()
-        except (KeyError, IndexError) as error:
-            logger.debug(f"problem {error} processing {hardware}")
-            return False
-
-        return product in [
-            value.casefold() for value in cls.supported_device_ids.values()
-        ]
 
     @cached_property
     def state(self) -> State:

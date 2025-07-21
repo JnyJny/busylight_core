@@ -2,13 +2,13 @@
 
 from typing import ClassVar
 
-from busylight_core.light import Light
 from busylight_core.mixins import ColorableMixin
 
 from ._busytag import Command
+from .luxafor_base import LuxaforBase
 
 
-class BusyTag(ColorableMixin, Light):
+class BusyTag(ColorableMixin, LuxaforBase):
     """BusyTag status light controller.
 
     The BusyTag is a wireless status light that uses command strings
@@ -19,10 +19,15 @@ class BusyTag(ColorableMixin, Light):
         (0x303A, 0x81DF): "Busy Tag",
     }
 
-    @staticmethod
-    def vendor() -> str:
-        """Return the vendor name for this device."""
-        return "Luxafor"
+    @classmethod
+    def claims(cls, hardware) -> bool:
+        """Use standard device ID claim method for BusyTag.
+        
+        BusyTag doesn't use the complex product string parsing that
+        other Luxafor devices require.
+        """
+        return hardware.device_id in cls.supported_device_ids
+
 
     @property
     def command(self) -> str:

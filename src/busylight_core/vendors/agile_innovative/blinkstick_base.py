@@ -1,11 +1,10 @@
 """Base BlinkStick Implementation"""
 
-from busylight_core import Light
-
 from ._blinkstick import State
+from .agile_innovative_base import AgileInnovativeBase
 
 
-class BlinkStickBase(Light):
+class BlinkStickBase(AgileInnovativeBase):
     """Base BlinkStick Implementation
 
     Subclasses should provide a claims classmethod and a state

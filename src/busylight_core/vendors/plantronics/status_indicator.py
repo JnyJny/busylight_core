@@ -2,10 +2,10 @@
 
 from typing import ClassVar
 
-from busylight_core.vendors.embrava.embrava_base import EmbravaBase
+from .plantronics_base import PlantronicsBase
 
 
-class StatusIndicator(EmbravaBase):
+class StatusIndicator(PlantronicsBase):
     """Plantronics Status Indicator status light controller.
 
     A Plantronics-branded version of the Blynclight device with
@@ -16,7 +16,3 @@ class StatusIndicator(EmbravaBase):
         (0x047F, 0xD005): "Status Indicator",
     }
 
-    @staticmethod
-    def vendor() -> str:
-        """Return the vendor name for this device."""
-        return "Plantronics"

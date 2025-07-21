@@ -3,12 +3,11 @@
 from functools import cached_property
 from typing import ClassVar
 
-from busylight_core.light import Light
-
 from ._busylight import Action, Report, State
+from .epos_base import EposBase
 
 
-class Busylight(Light):
+class Busylight(EposBase):
     """EPOS Busylight status light controller.
 
     The EPOS Busylight is a USB-connected RGB LED device that provides
@@ -19,10 +18,6 @@ class Busylight(Light):
         (0x1395, 0x0074): "Busylight",
     }
 
-    @staticmethod
-    def vendor() -> str:
-        """Return the vendor name for this device."""
-        return "EPOS"
 
     @cached_property
     def state(self) -> State:

@@ -3,11 +3,12 @@
 from typing import ClassVar
 
 from busylight_core.hardware import Hardware
-from busylight_core.light import Light
 from busylight_core.mixins import ColorableMixin
 
+from .muteme_base import MuteMeBase
 
-class MuteSync(ColorableMixin, Light):
+
+class MuteSync(ColorableMixin, MuteMeBase):
     """MuteSync status light and button controller.
 
     The MuteSync is a USB-connected device that combines button
@@ -18,10 +19,6 @@ class MuteSync(ColorableMixin, Light):
         (0x10C4, 0xEA60): "MuteSync Button",
     }
 
-    @staticmethod
-    def vendor() -> str:
-        """Return the vendor name for this device."""
-        return "MuteMe"
 
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:

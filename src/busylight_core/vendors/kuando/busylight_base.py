@@ -3,13 +3,13 @@
 import asyncio
 from functools import cached_property
 
-from busylight_core import Light
 from busylight_core.mixins import ColorableMixin
 
 from ._busylight import State
+from .kuando_base import KuandoBase
 
 
-class BusylightBase(ColorableMixin, Light):
+class BusylightBase(ColorableMixin, KuandoBase):
     """Base Busylight implementation."""
 
     @cached_property

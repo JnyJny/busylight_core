@@ -271,20 +271,20 @@ class TestPlantronicsStatusIndicator:
 
     def test_class_hierarchy(self) -> None:
         """Test the class hierarchy is correct."""
-        # StatusIndicator should inherit from EmbravaBase
+        # StatusIndicator should inherit from PlantronicsBase which inherits from EmbravaBase
+        from busylight_core.vendors.plantronics.plantronics_base import PlantronicsBase
         from busylight_core.vendors.embrava.embrava_base import EmbravaBase
+        
+        assert issubclass(StatusIndicator, PlantronicsBase)
         assert issubclass(StatusIndicator, EmbravaBase)
 
-        # Should have the same method resolution order as EmbravaBase except for the class itself
+        # Should have the expected method resolution order
         status_mro = StatusIndicator.__mro__
-        embrava_mro = EmbravaBase.__mro__
 
-        # StatusIndicator should be first, then EmbravaBase
+        # StatusIndicator -> PlantronicsBase -> EmbravaBase -> Light -> ...
         assert status_mro[0] == StatusIndicator
-        assert status_mro[1] == EmbravaBase
-
-        # Rest should be the same
-        assert status_mro[2:] == embrava_mro[1:]
+        assert status_mro[1] == PlantronicsBase
+        assert status_mro[2] == EmbravaBase
 
     def test_module_path_vendor_detection(self) -> None:
         """Test that vendor detection works via module path."""

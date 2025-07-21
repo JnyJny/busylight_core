@@ -50,10 +50,11 @@ class TestLuxaforFlag:
         mock_product_string.split.side_effect = KeyError("test error")
         mock_hardware.product_string = mock_product_string
 
-        # Mock super().claims() to return True
+        # Mock super().claims() to return True (need to patch Light.claims)
+        from busylight_core.light import Light
         with (
-            patch.object(Flag.__bases__[0], "claims", return_value=True),
-            patch("busylight_core.vendors.luxafor.flag.logger") as mock_logger,
+            patch.object(Light, "claims", return_value=True),
+            patch("busylight_core.vendors.luxafor.luxafor_base.logger") as mock_logger,
         ):
             result = Flag.claims(mock_hardware)
 
@@ -67,10 +68,11 @@ class TestLuxaforFlag:
         # Empty string will cause IndexError when split()[-1] is accessed
         mock_hardware.product_string = ""
 
-        # Mock super().claims() to return True
+        # Mock super().claims() to return True (need to patch Light.claims)
+        from busylight_core.light import Light
         with (
-            patch.object(Flag.__bases__[0], "claims", return_value=True),
-            patch("busylight_core.vendors.luxafor.flag.logger") as mock_logger,
+            patch.object(Light, "claims", return_value=True),
+            patch("busylight_core.vendors.luxafor.luxafor_base.logger") as mock_logger,
         ):
             result = Flag.claims(mock_hardware)
 
