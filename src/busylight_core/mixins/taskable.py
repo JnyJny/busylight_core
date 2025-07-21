@@ -298,5 +298,5 @@ class TaskableMixin:
             else:
                 logger.debug(f"Task '{task_name}' completed successfully")
                 
-        except Exception as e:
-            logger.error(f"Error in task completion callback: {e}")
+        except Exception as error:
+            logger.error(f"Error in task completion callback: {error}")
