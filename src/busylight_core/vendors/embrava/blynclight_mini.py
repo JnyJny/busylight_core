@@ -2,10 +2,10 @@
 
 from typing import ClassVar
 
-from .blynclight import Blynclight
+from .embrava_base import EmbravaBase
 
 
-class Blynclight_Mini(Blynclight):
+class BlynclightMini(EmbravaBase):
     """Embrava Blynclight Mini status light controller.
 
     A smaller version of the Blynclight with the same functionality

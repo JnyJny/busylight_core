@@ -199,3 +199,4 @@ cython_debug/
 .claude/
 
 tst.py
+plan.md

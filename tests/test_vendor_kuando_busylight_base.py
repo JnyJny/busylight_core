@@ -292,6 +292,45 @@ class TestKuandoBusylightBase:
             mock_batch.assert_called_once()
             mock_cancel_task.assert_called_once_with("keepalive")
 
+    def test_vendor_hierarchy(self, busylight) -> None:
+        """Test BusylightBase inherits from KuandoBase properly."""
+        from busylight_core.vendors.kuando.kuando_base import KuandoBase
+        from busylight_core.mixins import ColorableMixin
+        
+        # Test inheritance hierarchy
+        assert isinstance(busylight, BusylightBase)
+        assert isinstance(busylight, KuandoBase)
+        assert isinstance(busylight, ColorableMixin)
+        
+        # Test class hierarchy
+        assert issubclass(BusylightBase, KuandoBase)
+        
+        # Test vendor method comes from KuandoBase
+        assert BusylightBase.vendor() == "Kuando"
+        assert KuandoBase.vendor() == "Kuando"
+
+    def test_method_resolution_order(self) -> None:
+        """Test MRO follows expected pattern."""
+        from busylight_core.mixins import ColorableMixin
+        mro = BusylightBase.__mro__
+        
+        # Should be: BusylightBase -> ColorableMixin -> KuandoBase -> Light -> ...
+        assert mro[0] == BusylightBase
+        assert mro[1] == ColorableMixin
+        assert mro[2].__name__ == "KuandoBase"
+        assert mro[3].__name__ == "Light"
+
+    def test_kuando_devices_inherit_from_base(self) -> None:
+        """Test all Kuando devices inherit from KuandoBase."""
+        from busylight_core.vendors.kuando import BusylightAlpha, BusylightOmega
+        from busylight_core.vendors.kuando.kuando_base import KuandoBase
+        
+        kuando_devices = [BusylightBase, BusylightAlpha, BusylightOmega]
+        
+        for device_class in kuando_devices:
+            assert issubclass(device_class, KuandoBase)
+            assert device_class.vendor() == "Kuando"
+
 
 class TestKuandoBusylightKeepAlive:
     """Test the keepalive functionality shared by all Kuando devices."""
@@ -429,3 +468,4 @@ class TestKuandoBusylightKeepAlive:
             mock_light.batch_update.assert_called()
             mock_light.batch_update.return_value.__enter__.assert_called()
             mock_light.batch_update.return_value.__exit__.assert_called()
+

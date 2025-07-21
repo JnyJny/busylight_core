@@ -5,7 +5,7 @@ busylight devices, including the fit-StatUSB product line.
 """
 
 from busylight_core.hardware import ConnectionType
-from busylight_core.vendors.compulab import Fit_StatUSB
+from busylight_core.vendors.compulab import FitStatUSB
 
 from .utils import make_hardware
 
@@ -20,5 +20,5 @@ fit_statusb_template = {
 
 
 COMPULAB_HARDWARE = {
-    Fit_StatUSB: make_hardware(Fit_StatUSB, fit_statusb_template),
+    FitStatUSB: make_hardware(FitStatUSB, fit_statusb_template),
 }

@@ -1,5 +1,5 @@
 """Plantronics status light devices."""
 
-from .status_indicator import Status_Indicator
+from .status_indicator import StatusIndicator
 
-__all__ = ["Status_Indicator"]
+__all__ = ["StatusIndicator"]

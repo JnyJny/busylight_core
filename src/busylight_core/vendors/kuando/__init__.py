@@ -1,9 +1,9 @@
 """Kuando Busylight Support"""
 
-from .busylight_alpha import Busylight_Alpha
-from .busylight_omega import Busylight_Omega
+from .busylight_alpha import BusylightAlpha
+from .busylight_omega import BusylightOmega
 
 __all__ = [
-    "Busylight_Alpha",
-    "Busylight_Omega",
+    "BusylightAlpha",
+    "BusylightOmega",
 ]

@@ -5,7 +5,7 @@ from typing import ClassVar
 from .busylight_base import BusylightBase
 
 
-class Busylight_Alpha(BusylightBase):
+class BusylightAlpha(BusylightBase):
     """Kuando Busylight Alpha status light controller.
 
     The Busylight Alpha is a USB-connected RGB LED device that requires

@@ -4,7 +4,7 @@ This module provides mock hardware definitions for testing Plantronics
 busylight devices, including the Status Indicator product line.
 """
 
-from busylight_core.vendors.plantronics import Status_Indicator
+from busylight_core.vendors.plantronics import StatusIndicator
 
 from .utils import make_hardware
 
@@ -21,5 +21,5 @@ status_indicator_template = {
 }
 
 PLANTRONICS_HARDWARE = {
-    Status_Indicator: make_hardware(Status_Indicator, status_indicator_template),
+    StatusIndicator: make_hardware(StatusIndicator, status_indicator_template),
 }

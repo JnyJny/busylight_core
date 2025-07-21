@@ -2,11 +2,12 @@
 
 from typing import ClassVar
 
-from busylight_core.light import Light
 from busylight_core.mixins import ColorableMixin
 
+from .compulab_base import CompuLabBase
 
-class Fit_StatUSB(ColorableMixin, Light):
+
+class FitStatUSB(ColorableMixin, CompuLabBase):
     """CompuLab fit-statUSB status light controller.
 
     The fit-statUSB is a USB-connected RGB LED device that communicates
@@ -17,10 +18,6 @@ class Fit_StatUSB(ColorableMixin, Light):
         (0x2047, 0x03DF): "fit-statUSB",
     }
 
-    @staticmethod
-    def vendor() -> str:
-        """Return the vendor name for this device."""
-        return "CompuLab"
 
     def __bytes__(self) -> bytes:
         buf = f"B#{self.red:02x}{self.green:02x}{self.blue:02x}\n"

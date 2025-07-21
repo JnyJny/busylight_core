@@ -5,7 +5,7 @@ from unittest.mock import Mock
 import pytest
 
 from busylight_core.hardware import ConnectionType, Hardware
-from busylight_core.vendors.compulab import Fit_StatUSB
+from busylight_core.vendors.compulab import FitStatUSB
 
 
 class TestCompuLabFitStatUSB:
@@ -24,18 +24,18 @@ class TestCompuLabFitStatUSB:
         return hardware
 
     @pytest.fixture
-    def fit_statusb(self, mock_hardware) -> Fit_StatUSB:
-        """Create a Fit_StatUSB instance for testing."""
+    def fit_statusb(self, mock_hardware) -> FitStatUSB:
+        """Create a FitStatUSB instance for testing."""
         # Mock the hardware handle methods
         mock_hardware.handle = Mock()
         mock_hardware.handle.write = Mock(return_value=16)
         mock_hardware.handle.read = Mock(return_value=b"\x00" * 16)
 
-        return Fit_StatUSB(mock_hardware, reset=False, exclusive=False)
+        return FitStatUSB(mock_hardware, reset=False, exclusive=False)
 
     def test_supported_device_ids(self) -> None:
         """Test supported_device_ids contains expected fit-statUSB device."""
-        device_ids = Fit_StatUSB.supported_device_ids
+        device_ids = FitStatUSB.supported_device_ids
         assert (0x2047, 0x03DF) in device_ids
         assert device_ids[(0x2047, 0x03DF)] == "fit-statUSB"
         # Should only have one device ID
@@ -43,17 +43,17 @@ class TestCompuLabFitStatUSB:
 
     def test_vendor_method(self) -> None:
         """Test vendor() method returns correct vendor name."""
-        assert Fit_StatUSB.vendor() == "CompuLab"
+        assert FitStatUSB.vendor() == "CompuLab"
 
     def test_claims_method_with_fit_statusb_hardware(self, mock_hardware) -> None:
         """Test claims() method with fit-statUSB hardware."""
         # Test with correct fit-statUSB device ID
         mock_hardware.device_id = (0x2047, 0x03DF)
-        assert Fit_StatUSB.claims(mock_hardware) is True
+        assert FitStatUSB.claims(mock_hardware) is True
 
         # Test with unknown device ID
         mock_hardware.device_id = (0x1234, 0x5678)
-        assert Fit_StatUSB.claims(mock_hardware) is False
+        assert FitStatUSB.claims(mock_hardware) is False
 
     def test_bytes_method_black_color(self, fit_statusb) -> None:
         """Test __bytes__ method with black color (all zeros)."""
@@ -225,7 +225,7 @@ class TestCompuLabFitStatUSB:
         assert result == expected
 
     def test_inheritance_from_colorable_mixin_and_light(self, fit_statusb) -> None:
-        """Test that Fit_StatUSB properly inherits from both ColorableMixin and Light."""
+        """Test that FitStatUSB properly inherits from both ColorableMixin and Light."""
         # Test ColorableMixin inheritance
         assert hasattr(fit_statusb, "red")
         assert hasattr(fit_statusb, "green")
@@ -255,3 +255,29 @@ class TestCompuLabFitStatUSB:
         # Test protocol is case-insensitive but outputs lowercase
         expected = b"B#6496c8\n"  # 100=0x64, 150=0x96, 200=0xC8 -> lowercase
         assert result == expected
+
+    def test_vendor_hierarchy(self, fit_statusb) -> None:
+        """Test FitStatUSB inherits from CompuLabBase properly."""
+        from busylight_core.vendors.compulab.compulab_base import CompuLabBase
+        
+        # Test inheritance hierarchy
+        assert isinstance(fit_statusb, FitStatUSB)
+        assert isinstance(fit_statusb, CompuLabBase)
+        
+        # Test class hierarchy
+        assert issubclass(FitStatUSB, CompuLabBase)
+        
+        # Test vendor method comes from CompuLabBase
+        assert FitStatUSB.vendor() == "CompuLab"
+        assert CompuLabBase.vendor() == "CompuLab"
+
+    def test_method_resolution_order(self) -> None:
+        """Test MRO follows expected pattern."""
+        from busylight_core.mixins import ColorableMixin
+        mro = FitStatUSB.__mro__
+        
+        # Should be: FitStatUSB -> ColorableMixin -> CompuLabBase -> Light -> ...
+        assert mro[0] == FitStatUSB
+        assert mro[1] == ColorableMixin
+        assert mro[2].__name__ == "CompuLabBase"
+        assert mro[3].__name__ == "Light"

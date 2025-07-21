@@ -4,12 +4,11 @@ from collections.abc import Callable
 from functools import cached_property
 from typing import ClassVar
 
-from busylight_core.light import Light
-
 from ._blink1 import LEDS, Action, Report, State
+from .thingm_base import ThingMBase
 
 
-class Blink1(Light):
+class Blink1(ThingMBase):
     """ThingM Blink(1) status light controller.
 
     The Blink(1) is a USB-connected RGB LED device that uses
@@ -20,10 +19,6 @@ class Blink1(Light):
         (0x27B8, 0x01ED): "Blink(1)",
     }
 
-    @staticmethod
-    def vendor() -> str:
-        """Return the vendor name for this device."""
-        return "ThingM"
 
     @cached_property
     def state(self) -> State:

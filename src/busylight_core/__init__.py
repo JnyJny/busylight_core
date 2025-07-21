@@ -36,13 +36,13 @@ from .vendors.agile_innovative import (
     BlinkStickSquare,
     BlinkStickStrip,
 )
-from .vendors.compulab import Fit_StatUSB
-from .vendors.embrava import Blynclight, Blynclight_Mini, Blynclight_Plus
+from .vendors.compulab import FitStatUSB
+from .vendors.embrava import Blynclight, BlynclightMini, BlynclightPlus
 from .vendors.epos import Busylight
-from .vendors.kuando import Busylight_Alpha, Busylight_Omega
+from .vendors.kuando import BusylightAlpha, BusylightOmega
 from .vendors.luxafor import Bluetooth, BusyTag, Flag, Mute, Orb
-from .vendors.muteme import MuteMe, MuteMe_Mini, MuteSync
-from .vendors.plantronics import Status_Indicator
+from .vendors.muteme import MuteMe, MuteMeMini, MuteSync
+from .vendors.plantronics import StatusIndicator
 from .vendors.thingm import Blink1
 
 __all__ = [
@@ -55,13 +55,13 @@ __all__ = [
     "BlinkStickStrip",
     "Bluetooth",
     "Blynclight",
-    "Blynclight_Mini",
-    "Blynclight_Plus",
+    "BlynclightMini",
+    "BlynclightPlus",
     "BusyTag",
     "Busylight",
-    "Busylight_Alpha",
-    "Busylight_Omega",
-    "Fit_StatUSB",
+    "BusylightAlpha",
+    "BusylightOmega",
+    "FitStatUSB",
     "Flag",
     "Hardware",
     "HardwareUnsupportedError",
@@ -70,11 +70,11 @@ __all__ = [
     "LightUnavailableError",
     "Mute",
     "MuteMe",
-    "MuteMe_Mini",
+    "MuteMeMini",
     "MuteSync",
     "NoLightsFoundError",
     "Orb",
-    "Status_Indicator",
+    "StatusIndicator",
 ]
 
 logger.disable("busylight_core")
