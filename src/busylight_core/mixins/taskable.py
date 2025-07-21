@@ -12,6 +12,11 @@ from loguru import logger
 
 
 class TaskPriority(IntEnum):
+    """Task priority levels for scheduling.
+    
+    Used to control task execution priority and enable priority-based
+    cancellation of tasks.
+    """
     LOW = 1
     NORMAL = 2
     HIGH = 3
@@ -20,6 +25,11 @@ class TaskPriority(IntEnum):
 
 @dataclass
 class TaskInfo:
+    """Information about a managed task.
+    
+    Contains task metadata including priority, creation time, and status
+    information for enhanced task monitoring and debugging.
+    """
     task: asyncio.Task
     priority: TaskPriority
     name: str
@@ -27,28 +37,54 @@ class TaskInfo:
     
     @property
     def is_running(self) -> bool:
+        """Check if task is currently running.
+        
+        Returns True if the task has not completed, been cancelled, or failed.
+        """
         return not self.task.done()
     
     @property
     def is_cancelled(self) -> bool:
+        """Check if task was cancelled.
+        
+        Returns True if the task was explicitly cancelled before completion.
+        """
         return self.task.cancelled()
     
     @property
     def has_exception(self) -> bool:
+        """Check if task completed with an exception.
+        
+        Returns True if the task completed but raised an unhandled exception.
+        """
         return self.task.done() and not self.task.cancelled() and self.task.exception() is not None
     
     @property
     def exception(self) -> BaseException | None:
+        """Get task exception if any.
+        
+        Returns the exception that caused the task to fail, or None if
+        the task completed successfully or is still running.
+        """
         if self.has_exception:
             return self.task.exception()
         return None
 
 
 class TaskableMixin:
-    """Associate and manage asynchronous tasks."""
+    """Associate and manage asynchronous tasks.
+    
+    Provides enhanced task management with prioritization, error handling,
+    and task monitoring capabilities for Light instances.
+    """
 
     @cached_property
     def event_loop(self) -> asyncio.AbstractEventLoop:
+        """The default event loop.
+        
+        Returns the currently running event loop, or creates a new one if
+        no event loop is currently running.
+        """
         try:
             return asyncio.get_running_loop()
         except RuntimeError:
@@ -56,10 +92,19 @@ class TaskableMixin:
 
     @cached_property
     def tasks(self) -> dict[str, asyncio.Task]:
+        """Active tasks that are associated with this instance.
+        
+        Dictionary mapping task names to their corresponding asyncio.Task objects.
+        """
         return {}
     
     @cached_property
     def task_info(self) -> dict[str, TaskInfo]:
+        """Enhanced task information with priority and status tracking.
+        
+        Dictionary mapping task names to TaskInfo objects containing metadata
+        about priority, creation time, and current status.
+        """
         return {}
 
     def add_task(
@@ -69,6 +114,16 @@ class TaskableMixin:
         priority: TaskPriority = TaskPriority.NORMAL,
         replace: bool = False
     ) -> asyncio.Task:
+        """Create a new task using coroutine as the body and stash it in the tasks dict.
+        
+        Creates and manages an asyncio task with enhanced tracking and error handling.
+        
+        :param name: Unique identifier for the task
+        :param coroutine: Awaitable function to run as task
+        :param priority: Task priority level for scheduling
+        :param replace: Whether to replace existing task with same name
+        :return: The created or existing asyncio.Task
+        """
         self._cleanup_completed_tasks()
         
         if not replace:
@@ -97,6 +152,13 @@ class TaskableMixin:
         return task
 
     def cancel_task(self, name: str) -> asyncio.Task | None:
+        """Cancel a task associated with name if it exists.
+        
+        Removes the task from tracking and attempts to cancel it.
+        
+        :param name: Name of task to cancel
+        :return: The cancelled task or None if not found
+        """
         try:
             task = self.tasks[name]
             del self.tasks[name]
@@ -115,6 +177,12 @@ class TaskableMixin:
         return None
 
     def cancel_tasks(self, priority: TaskPriority | None = None) -> None:
+        """Cancel all tasks or tasks of specific priority.
+        
+        Cancels either all tasks or only tasks matching the specified priority level.
+        
+        :param priority: If specified, only cancel tasks of this priority level
+        """
         if priority is None:
             for task in self.tasks.values():
                 task.cancel()
@@ -130,6 +198,14 @@ class TaskableMixin:
             self._cleanup_completed_tasks()
     
     def get_task_status(self, name: str) -> dict[str, Any] | None:
+        """Get detailed status information for a task.
+        
+        Returns comprehensive status information including running state,
+        exceptions, priority, and creation time.
+        
+        :param name: Name of task to check
+        :return: Dictionary with task status details or None if not found
+        """
         task_info = self.task_info.get(name)
         if not task_info:
             task = self.tasks.get(name)
@@ -156,6 +232,12 @@ class TaskableMixin:
         }
     
     def list_active_tasks(self) -> list[str]:
+        """Get list of currently active task names.
+        
+        Returns sorted list of task names that are currently running.
+        
+        :return: List of task names that are currently running
+        """
         active = []
         for name, task_info in self.task_info.items():
             if task_info.is_running:
@@ -168,6 +250,11 @@ class TaskableMixin:
         return sorted(active)
     
     def _cleanup_completed_tasks(self) -> None:
+        """Remove completed tasks from tracking dictionaries.
+        
+        Internal method to clean up task dictionaries by removing references
+        to completed, cancelled, or failed tasks.
+        """
         completed = [
             name for name, task_info in self.task_info.items() 
             if not task_info.is_running
@@ -187,6 +274,13 @@ class TaskableMixin:
             del self.tasks[name]
     
     def _task_completion_callback(self, task: asyncio.Task) -> None:
+        """Handle task completion for error monitoring.
+        
+        Internal callback that logs task completion, cancellation, or failure
+        for debugging and monitoring purposes.
+        
+        :param task: The completed task
+        """
         try:
             task_info = None
             task_name = "unknown"
