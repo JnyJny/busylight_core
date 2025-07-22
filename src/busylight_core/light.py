@@ -63,7 +63,7 @@ class Light(abc.ABC, TaskableMixin):
     and managing USB connected lights without having to know aprori
     details of the hardware present.
 
-    - Light.available_lights() lists devices discovered
+    - Light.available_hardware() lists devices discovered
     - Light.all_lights() returns all discovered lights ready for use
     - Light.first_light() returns the first available light
 
@@ -84,7 +84,14 @@ class Light(abc.ABC, TaskableMixin):
     @classmethod
     @lru_cache(maxsize=1)
     def vendor(cls) -> str:
-        """Return the vendor name in title case."""
+        """Get the vendor name for this device class.
+
+        Returns a human-readable vendor name derived from the module structure.
+        Device-specific subclasses should override this method to provide
+        accurate vendor branding that matches the physical device labeling.
+
+        :return: Title-cased vendor name for display in user interfaces
+        """
         # EJO this is a low-effort way to get the vendor
         #     name from the module name. Subclasses can
         #     and should override this method to provide
@@ -94,18 +101,41 @@ class Light(abc.ABC, TaskableMixin):
     @classmethod
     @lru_cache(maxsize=1)
     def unique_device_names(cls) -> list[str]:
-        """Return a list of unique device names."""
+        """Get all unique marketing names for devices supported by this class.
+
+        Returns the human-readable product names from the supported_device_ids
+        mapping, with duplicates removed. Use this to display available device
+        types to users or for device capability documentation.
+
+        :return: Sorted list of unique device marketing names
+        """
         return sorted(set(cls.supported_device_ids.values()))
 
     @classmethod
     @lru_cache(maxsize=1)
     def unique_device_ids(cls) -> list[tuple[int, int]]:
-        """Return a list of unique device IDs."""
+        """Get all unique vendor/product ID pairs supported by this class.
+
+        Returns the USB vendor and product ID combinations that this class
+        can control. Use this for hardware enumeration, udev rule generation,
+        or debugging device detection issues.
+
+        :return: Sorted list of (vendor_id, product_id) tuples
+        """
         return sorted(set(cls.supported_device_ids.keys()))
 
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
-        """Return True if the hardware is claimed by this class."""
+        """Check if this class can control the given hardware device.
+
+        Determines whether this Light subclass supports the specific hardware
+        by checking if the device's vendor/product ID pair matches any entry
+        in the supported_device_ids mapping. Use this during device discovery
+        to find the appropriate Light subclass for each detected device.
+
+        :param hardware: Hardware instance to test for compatibility
+        :return: True if this class can control the hardware device
+        """
         return hardware.device_id in cls.supported_device_ids
 
     @classmethod
@@ -138,16 +168,19 @@ class Light(abc.ABC, TaskableMixin):
         return supported_lights
 
     @classmethod
-    def available_lights(cls) -> dict[type[Light], list[Hardware]]:
-        """Return a dictionary of available hardware by type.
+    def available_hardware(cls) -> dict[type[Light], list[Hardware]]:
+        """Discover all compatible hardware devices available for control.
 
-        Keys are Light subclasses, values are a list of Hardware instances.
+        Scans the system for USB devices that match known vendor/product ID
+        combinations and groups them by the Light subclass that can control
+        them. Use this for device discovery, inventory management, or when
+        you need to present users with available device options.
 
-        The Hardware instances are a record of light devices that were
-        discovered during the enumeration process and were claimed by
-        a Light subclass. The hardware device may be in use by another
-        process, which will be reported when attempting to acquire the
-        device during Light subclass initialization.
+        The returned Hardware instances represent devices that were found
+        and claimed by Light subclasses, but may still be in use by other
+        processes. Actual device acquisition occurs during Light initialization.
+
+        :return: Mapping from Light subclass to list of compatible Hardware instances
         """
         available_lights: dict[type[Light], list[Hardware]] = {}
 
@@ -168,22 +201,22 @@ class Light(abc.ABC, TaskableMixin):
 
     @classmethod
     def all_lights(cls, *, reset: bool = True, exclusive: bool = True) -> list[Light]:
-        """Return a list of all lights ready for use.
+        """Create initialized Light instances for all available compatible devices.
 
-        All the lights in the list have been initialized with the
-        given reset and exclusive parameters. Lights acquired with
-        exclusive=True can only be used by the current process and
-        will block other processes from using the same hardware until
-        the light is released.
+        Discovers all compatible hardware and returns Light instances ready for
+        immediate use. Each light is initialized with the specified configuration
+        and can be used to control its device without further setup.
 
-        If no lights are found, an empty list is returned.
+        Use this when you want to control all connected lights simultaneously,
+        such as for synchronized effects or system-wide status indication.
 
-        :param: reset - bool - reset the hardware to a known state
-        :param: exclusive - bool - acquire exclusive access to the hardware
+        :param reset: Reset devices to known state during initialization
+        :param exclusive: Acquire exclusive access to prevent interference
+        :return: List of initialized Light instances, empty if none found
         """
         lights: list[Light] = []
 
-        for subclass, devices in cls.available_lights().items():
+        for subclass, devices in cls.available_hardware().items():
             for device in devices:
                 try:
                     lights.append(subclass(device, reset=reset, exclusive=exclusive))
@@ -194,18 +227,19 @@ class Light(abc.ABC, TaskableMixin):
 
     @classmethod
     def first_light(cls, *, reset: bool = True, exclusive: bool = True) -> Light:
-        """Return the first unused light ready for use.
+        """Create the first available Light instance ready for immediate use.
 
-        The light returned has been initialized with the given reset
-        and exclusive parameters. If exclusive=True, the light can
-        only be used by the current process and will block other
-        processes from using the light until it is released.
+        Discovers compatible devices and returns the first successfully
+        initialized Light instance. Use this when you need a single light
+        for simple status indication and don't care about the specific
+        device type or vendor.
 
-        Raises:
-        - NoLightsFoundError
-
+        :param reset: Reset device to known state during initialization
+        :param exclusive: Acquire exclusive access to prevent interference
+        :return: Initialized Light instance ready for control
+        :raises NoLightsFoundError: If no compatible devices found or init fails
         """
-        for subclass, devices in cls.available_lights().items():
+        for subclass, devices in cls.available_hardware().items():
             for device in devices:
                 try:
                     return subclass(device, reset=reset, exclusive=exclusive)
@@ -255,29 +289,19 @@ class Light(abc.ABC, TaskableMixin):
         reset: bool = False,
         exclusive: bool = True,
     ) -> None:
-        """Initialize a Light with the given hardware information.
+        """Initialize a Light instance with the specified hardware device.
 
-        The hardware argument is an instance of the Hardware class
-        usually obtained from the Hardware.enumerate method. Due to
-        vagaries in vendor USB implementations, the supplied hardware
-        can contain incomplete information compared to other vendors
-        and it's up to the Light subclass to fill in some of the
-        blanks.
+        Creates a Light instance bound to the given hardware device and
+        configures it for use. The hardware should be obtained from
+        Hardware.enumerate() and verified with the class's claims() method.
 
-        The reset keyword-only parameter controls whether the hardware
-        is reset to a known state using the Light.reset method.
+        Use this constructor when you have specific hardware and want to
+        create a Light instance for direct device control.
 
-        The exclusive keyword-only parameter controls whether the
-        process creating this light has exclusive access to the
-        hardware.
-
-        :param: hardware  - Hardware
-        :param: reset     - bool
-        :param: exclusive - bool
-
-        Raises:
-        - HardwareUnsupportedError
-
+        :param hardware: Hardware instance representing the device to control
+        :param reset: Reset the device to a known state during initialization
+        :param exclusive: Acquire exclusive access to prevent interference
+        :raises HardwareUnsupportedError: If Light class cannot control hardware
         """
         if not self.__class__.claims(hardware):
             raise HardwareUnsupportedError(hardware, self.__class__)
@@ -400,11 +424,17 @@ class Light(abc.ABC, TaskableMixin):
             self.hardware.release()
 
     def update(self) -> None:
-        """Obtain the current state of the light and write it to the device.
+        """Send the current light state to the physical device.
 
-        Raises:
-        - LightUnavailableError
+        Serializes the light's current state and transmits it to the hardware
+        device using the appropriate platform-specific protocol. Call this
+        method after making changes to light properties to apply them to
+        the physical device.
 
+        The method handles platform-specific protocol differences automatically,
+        such as adding leading zero bytes on Windows 10.
+
+        :raises LightUnavailableError: If device communication fails
         """
         state = bytes(self)
 
@@ -426,12 +456,15 @@ class Light(abc.ABC, TaskableMixin):
 
     @contextlib.contextmanager
     def batch_update(self) -> Generator[None, None, None]:
-        """Update the software state of the light on exit.
+        """Defer device updates until multiple properties are changed.
 
-        This context manager is convenience for updating multiple
-        light attribute values at once and write the new state to the
-        hardware on exit. This approach reduces the number of writes
-        to the hardware, which is beneficial for performance.
+        Context manager that accumulates multiple property changes and sends
+        them to the device in a single update operation when exiting the
+        context. Use this when changing multiple light properties (color,
+        brightness, effects) to reduce USB communication overhead and improve
+        performance.
+
+        :return: Context manager for batching multiple property updates
         """
         yield
         self.update()
@@ -442,30 +475,32 @@ class Light(abc.ABC, TaskableMixin):
         color: tuple[int, int, int],
         led: int = 0,
     ) -> None:
-        """Activate the light with the given red, green, blue color tuple.
+        """Activate the light with the specified RGB color.
 
-        If a subclass supports multiple LEDs, the `led` parameter
-        specifies which LED to activate. If `led` is 0, all LEDs
-        are activated with the specified color. If a subclasss
-        does not support multiple LEDs, the `led` parameter
-        is ignored and defaults to 0.
+        Sets the light to display the given color immediately. This is the
+        primary method for controlling light appearance and should be
+        implemented by all device-specific subclasses.
 
-        Color tuple values should be in the range of 0-255.
+        For devices with multiple LEDs, use led parameter to target specific
+        LEDs or set to 0 to affect all LEDs simultaneously. Single-LED devices
+        should ignore the led parameter.
 
-        :param: color: tuple[int, int, int] - RGB color tuple
-        :param: led: int - LED index, 0 for all LEDs
+        :param color: RGB intensity values from 0-255 for each color component
+        :param led: Target LED index, 0 affects all LEDs on the device
         """
         raise NotImplementedError
 
     def off(self, led: int = 0) -> None:
-        """Deactivate the light.
+        """Turn off the light by setting it to black.
 
-        If a subclass supports multiple LEDs, the `led` parameter
-        specifies which LED to deactivate. If `led` is 0, all LEDs
-        are deactivated. If a subclass does not support multiple LEDs,
-        the `led` parameter is ignored and defaults to 0.
+        Deactivates the specified LED(s) by setting their color to black (0, 0, 0).
+        Use this to turn off status indication while keeping the device available
+        for future color changes.
 
-        :param: led: int - LED index, 0 for all LEDs
+        For multi-LED devices, specify the LED index or use 0 to turn off all LEDs.
+        Single-LED devices ignore the led parameter.
+
+        :param led: Target LED index, 0 affects all LEDs on the device
         """
         self.on((0, 0, 0), led)
 
@@ -490,7 +525,11 @@ class Light(abc.ABC, TaskableMixin):
     def color(self, value: tuple[int, int, int]) -> None:
         """Set the RGB color of the light.
 
-        :param: value: tuple[int, int, int] - RGB color tuple
+        Updates the light's color state to the specified RGB values.
+        Device-specific implementations should store this value and
+        apply it during the next update() call.
+
+        :param value: RGB intensity values from 0-255 for each color component
         """
         raise NotImplementedError
 

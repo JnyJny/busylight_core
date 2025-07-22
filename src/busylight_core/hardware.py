@@ -25,7 +25,12 @@ from .exceptions import InvalidHardwareError
 
 
 class ConnectionType(int, Enum):
-    """USB Hardware connection types."""
+    """USB device connection protocols supported by the library.
+
+    Defines the different communication protocols that can be used
+    to interact with USB status light devices. Use these values
+    with Hardware.enumerate() to filter device discovery by protocol type.
+    """
 
     ANY: int = -1
     UNKNOWN: int = 0
@@ -39,7 +44,14 @@ HardwareHandle = hid.Device | serial.Serial
 
 @dataclass
 class Hardware:
-    """USB Hardware description."""
+    """Represents a USB-connected status light hardware device.
+
+    Contains all the information needed to identify, connect to, and
+    communicate with a USB device that can function as a status light.
+    Hardware instances are typically created through discovery methods
+    (enumerate, from_hid, from_portinfo) and then used to initialize
+    Light instances for device control.
+    """
 
     device_type: ConnectionType
     path: bytes
@@ -57,11 +69,20 @@ class Hardware:
 
     @classmethod
     def enumerate(cls, by_type: ConnectionType = ConnectionType.ANY) -> list[Hardware]:
-        """List of all connected hardware devices.
+        """Discover all USB devices that could potentially be status lights.
 
-        Raises:
-        - NotImplementedError
+        Scans the system for USB devices using HID and serial protocols,
+        creating Hardware instances for each discovered device. Use this
+        for device discovery, inventory management, or when you need to
+        present users with available hardware options.
 
+        The returned Hardware instances represent raw device information
+        and have not been tested for compatibility with specific Light classes.
+        Use Light.claims() to determine which Light class can control each device.
+
+        :param by_type: Limit discovery to specific connection types or scan all types
+        :return: List of Hardware instances representing discovered USB devices
+        :raises NotImplementedError: If the specified connection type is not supported
         """
         hardware_info = []
 
@@ -89,11 +110,16 @@ class Hardware:
 
     @classmethod
     def from_portinfo(cls, port_info: ListPortInfo) -> Hardware:
-        """Create a Hardware object from a serial port info object.
+        """Create Hardware instance from serial port information.
 
-        Raises:
-        - InvalidHardwareError
+        Converts a pyserial ListPortInfo object into a Hardware instance
+        suitable for Light class initialization. Use this when you have
+        serial port information from pyserial's list_ports.comports()
+        and need to create a Hardware representation.
 
+        :param port_info: Serial port information from pyserial enumeration
+        :return: Hardware instance representing the serial device
+        :raises InvalidHardwareError: If port information is incomplete or invalid
         """
         try:
             return cls(
@@ -112,11 +138,15 @@ class Hardware:
 
     @classmethod
     def from_hid(cls, device: dict) -> Hardware:
-        """Create a Hardware object from a HID dictionary.
+        """Create Hardware instance from HID device information.
 
-        Raises:
-        - InvalidHardwareError
+        Converts a HID device dictionary (from hid.enumerate()) into a Hardware
+        instance suitable for Light class initialization. Use this when you have
+        HID device information and need to create a Hardware representation.
 
+        :param device: HID device dictionary from hidapi enumeration
+        :return: Hardware instance representing the HID device
+        :raises InvalidHardwareError: If device information is incomplete or invalid
         """
         try:
             return cls(device_type=ConnectionType.HID, **device)

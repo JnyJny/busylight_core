@@ -10,10 +10,11 @@ from .blinkstick_base import BlinkStickBase
 
 
 class BlinkStick(BlinkStickBase):
-    """Agile Innovative BlinkStick status light controller.
+    """Agile Innovative BlinkStick USB RGB LED controller.
 
-    The BlinkStick is a USB-connected RGB LED device that can be controlled
-    to display various colors and patterns for status indication.
+    The original BlinkStick is a simple USB-connected RGB LED device
+    for basic status indication. Use this class to control the original
+    BlinkStick hardware for simple color display and status signaling.
     """
 
     supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
@@ -22,7 +23,14 @@ class BlinkStick(BlinkStickBase):
 
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
-        """Return True if the hardware matches a BlinkStick."""
+        """Check if hardware is an original BlinkStick device.
+
+        Verifies USB IDs and firmware version to distinguish the original
+        BlinkStick from newer variants with extended capabilities.
+
+        :param hardware: Hardware instance to test for compatibility
+        :return: True if hardware is an original BlinkStick
+        """
         if not super().claims(hardware):
             return False
         try:

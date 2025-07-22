@@ -95,9 +95,9 @@ def test_implementation_classmethod_supported_lights(subclass) -> None:
 
 
 @pytest.mark.parametrize("subclass", VENDOR_SUBCLASSES)
-def test_implementation_classmethod_available_lights(subclass) -> None:
-    """Test that available_lights() returns a dict mapping subclasses to Hardware devices."""
-    results = subclass.available_lights()
+def test_implementation_classmethod_available_hardware(subclass) -> None:
+    """Test that available_hardware() returns a dict mapping subclasses to Hardware devices."""
+    results = subclass.available_hardware()
     assert isinstance(results, dict)
     for subclasses, devices in results.items():
         assert issubclass(subclasses, subclass)

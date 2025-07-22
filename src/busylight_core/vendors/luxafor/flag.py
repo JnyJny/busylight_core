@@ -8,10 +8,11 @@ from .luxafor_base import LuxaforBase
 
 
 class Flag(LuxaforBase):
-    """Luxafor Flag status light controller.
+    """Luxafor Flag USB status light with multiple RGB LEDs.
 
-    The Luxafor Flag is a USB-connected RGB LED device with multiple
-    individually controllable LEDs arranged in a flag pattern.
+    The Luxafor Flag features 6 individually controllable RGB LEDs
+    arranged in a flag pattern. Use this class to control Flag devices
+    for status indication, notifications, or ambient lighting effects.
     """
 
     supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
@@ -20,7 +21,14 @@ class Flag(LuxaforBase):
 
     @cached_property
     def state(self) -> State:
-        """The device state manager for controlling a Luxfor device."""
+        """Device state manager for controlling Flag LED array.
+
+        Returns a State instance that manages the 6-LED array with individual
+        RGB control for each LED position. Use this to modify LED states
+        before calling update() to apply changes to hardware.
+
+        :return: State instance for managing all 6 LEDs
+        """
         return State()
 
     def __bytes__(self) -> bytes:
