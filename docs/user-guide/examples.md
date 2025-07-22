@@ -356,10 +356,10 @@ try:
     
 except NoLightsFound:
     print("No busylights found. Please connect a device.")
-except LightUnavailable as e:
-    print(f"Light unavailable: {e}")
-except Exception as e:
-    print(f"Unexpected error: {e}")
+except LightUnavailable as error:
+    print(f"Light unavailable: {error}")
+except Exception as error:
+    print(f"Unexpected error: {error}")
 ```
 
 ### Debugging Device Issues
