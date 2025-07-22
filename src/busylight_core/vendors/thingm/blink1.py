@@ -19,7 +19,6 @@ class Blink1(ThingMBase):
         (0x27B8, 0x01ED): "Blink(1)",
     }
 
-
     @cached_property
     def state(self) -> State:
         """The device state manager."""

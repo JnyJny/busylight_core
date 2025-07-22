@@ -6,6 +6,17 @@ import pytest
 
 from busylight_core import HardwareUnsupportedError, NoLightsFoundError
 from busylight_core.hardware import Hardware
+from busylight_core.vendors.agile_innovative.agile_innovative_base import (
+    AgileInnovativeBase,
+)
+from busylight_core.vendors.compulab.compulab_base import CompuLabBase
+from busylight_core.vendors.embrava.embrava_base import EmbravaBase
+from busylight_core.vendors.epos.epos_base import EposBase
+from busylight_core.vendors.kuando.kuando_base import KuandoBase
+from busylight_core.vendors.luxafor.luxafor_base import LuxaforBase
+from busylight_core.vendors.muteme.muteme_base import MuteMeBase
+from busylight_core.vendors.plantronics.plantronics_base import PlantronicsBase
+from busylight_core.vendors.thingm.thingm_base import ThingMBase
 
 from .vendor_examples import HardwareCatalog
 
@@ -199,15 +210,6 @@ def test_implementation_init(subclass, devices) -> None:
 def test_vendor_base_class_hierarchies() -> None:
     """Test that all vendor devices inherit from their appropriate vendor base classes."""
     # Import all vendor base classes
-    from busylight_core.vendors.agile_innovative.agile_innovative_base import AgileInnovativeBase
-    from busylight_core.vendors.compulab.compulab_base import CompuLabBase
-    from busylight_core.vendors.embrava.embrava_base import EmbravaBase
-    from busylight_core.vendors.epos.epos_base import EposBase
-    from busylight_core.vendors.kuando.kuando_base import KuandoBase
-    from busylight_core.vendors.luxafor.luxafor_base import LuxaforBase
-    from busylight_core.vendors.muteme.muteme_base import MuteMeBase
-    from busylight_core.vendors.plantronics.plantronics_base import PlantronicsBase
-    from busylight_core.vendors.thingm.thingm_base import ThingMBase
 
     # Define expected vendor mappings
     vendor_hierarchies = {
@@ -230,7 +232,7 @@ def test_vendor_base_class_hierarchies() -> None:
     for device_class in VENDOR_SUBCLASSES:
         vendor_name = device_class.vendor()
         expected_base = vendor_hierarchies.get(vendor_name)
-        
+
         if expected_base:
             assert issubclass(device_class, expected_base), (
                 f"{device_class.__name__} should inherit from {expected_base.__name__} "

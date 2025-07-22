@@ -18,7 +18,6 @@ class Flag(LuxaforBase):
         (0x4D8, 0xF372): "Flag",
     }
 
-
     @cached_property
     def state(self) -> State:
         """The device state manager for controlling a Luxfor device."""

@@ -7,6 +7,12 @@ import pytest
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.vendors.agile_innovative import BlinkStick
 from busylight_core.vendors.agile_innovative._blinkstick import State
+from busylight_core.vendors.agile_innovative.agile_innovative_base import (
+    AgileInnovativeBase,
+)
+from busylight_core.vendors.agile_innovative.blinkstick_base import (
+    BlinkStickBase,
+)
 
 
 class TestBlinkStick:
@@ -117,19 +123,16 @@ class TestBlinkStick:
 
     def test_vendor_hierarchy(self, blinkstick) -> None:
         """Test BlinkStick inherits from AgileInnovativeBase properly."""
-        from busylight_core.vendors.agile_innovative.agile_innovative_base import AgileInnovativeBase
-        from busylight_core.vendors.agile_innovative.blinkstick_base import BlinkStickBase
-        
         # Test inheritance hierarchy
         assert isinstance(blinkstick, BlinkStick)
         assert isinstance(blinkstick, BlinkStickBase)
         assert isinstance(blinkstick, AgileInnovativeBase)
-        
+
         # Test class hierarchy
         assert issubclass(BlinkStick, BlinkStickBase)
         assert issubclass(BlinkStick, AgileInnovativeBase)
         assert issubclass(BlinkStickBase, AgileInnovativeBase)
-        
+
         # Test vendor method comes from AgileInnovativeBase
         assert BlinkStick.vendor() == "Agile Innovative"
         assert BlinkStickBase.vendor() == "Agile Innovative"
@@ -138,7 +141,7 @@ class TestBlinkStick:
     def test_method_resolution_order(self) -> None:
         """Test MRO follows expected pattern."""
         mro = BlinkStick.__mro__
-        
+
         # Should be: BlinkStick -> BlinkStickBase -> AgileInnovativeBase -> Light -> ...
         assert mro[0] == BlinkStick
         assert mro[1].__name__ == "BlinkStickBase"

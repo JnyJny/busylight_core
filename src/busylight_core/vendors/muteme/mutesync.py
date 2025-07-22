@@ -19,7 +19,6 @@ class MuteSync(ColorableMixin, MuteMeBase):
         (0x10C4, 0xEA60): "MuteSync Button",
     }
 
-
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
         """Return True if the hardware describes a MuteSync device."""

@@ -18,7 +18,6 @@ class FitStatUSB(ColorableMixin, CompuLabBase):
         (0x2047, 0x03DF): "fit-statUSB",
     }
 
-
     def __bytes__(self) -> bytes:
         buf = f"B#{self.red:02x}{self.green:02x}{self.blue:02x}\n"
 

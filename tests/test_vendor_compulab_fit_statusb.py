@@ -5,7 +5,9 @@ from unittest.mock import Mock
 import pytest
 
 from busylight_core.hardware import ConnectionType, Hardware
+from busylight_core.mixins import ColorableMixin
 from busylight_core.vendors.compulab import FitStatUSB
+from busylight_core.vendors.compulab.compulab_base import CompuLabBase
 
 
 class TestCompuLabFitStatUSB:
@@ -258,24 +260,21 @@ class TestCompuLabFitStatUSB:
 
     def test_vendor_hierarchy(self, fit_statusb) -> None:
         """Test FitStatUSB inherits from CompuLabBase properly."""
-        from busylight_core.vendors.compulab.compulab_base import CompuLabBase
-        
         # Test inheritance hierarchy
         assert isinstance(fit_statusb, FitStatUSB)
         assert isinstance(fit_statusb, CompuLabBase)
-        
+
         # Test class hierarchy
         assert issubclass(FitStatUSB, CompuLabBase)
-        
+
         # Test vendor method comes from CompuLabBase
         assert FitStatUSB.vendor() == "CompuLab"
         assert CompuLabBase.vendor() == "CompuLab"
 
     def test_method_resolution_order(self) -> None:
         """Test MRO follows expected pattern."""
-        from busylight_core.mixins import ColorableMixin
         mro = FitStatUSB.__mro__
-        
+
         # Should be: FitStatUSB -> ColorableMixin -> CompuLabBase -> Light -> ...
         assert mro[0] == FitStatUSB
         assert mro[1] == ColorableMixin

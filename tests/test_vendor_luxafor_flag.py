@@ -5,8 +5,10 @@ from unittest.mock import Mock, patch
 import pytest
 
 from busylight_core.hardware import ConnectionType, Hardware
-from busylight_core.vendors.luxafor import Flag
+from busylight_core.light import Light
+from busylight_core.vendors.luxafor import Bluetooth, BusyTag, Flag, Mute, Orb
 from busylight_core.vendors.luxafor._flag import Command, State
+from busylight_core.vendors.luxafor.luxafor_base import LuxaforBase
 
 
 class TestLuxaforFlag:
@@ -51,7 +53,7 @@ class TestLuxaforFlag:
         mock_hardware.product_string = mock_product_string
 
         # Mock super().claims() to return True (need to patch Light.claims)
-        from busylight_core.light import Light
+
         with (
             patch.object(Light, "claims", return_value=True),
             patch("busylight_core.vendors.luxafor.luxafor_base.logger") as mock_logger,
@@ -69,7 +71,7 @@ class TestLuxaforFlag:
         mock_hardware.product_string = ""
 
         # Mock super().claims() to return True (need to patch Light.claims)
-        from busylight_core.light import Light
+
         with (
             patch.object(Light, "claims", return_value=True),
             patch("busylight_core.vendors.luxafor.luxafor_base.logger") as mock_logger,
@@ -92,15 +94,13 @@ class TestLuxaforFlag:
 
     def test_vendor_hierarchy(self, flag) -> None:
         """Test Flag inherits from LuxaforBase properly."""
-        from busylight_core.vendors.luxafor.luxafor_base import LuxaforBase
-        
         # Test inheritance hierarchy
         assert isinstance(flag, Flag)
         assert isinstance(flag, LuxaforBase)
-        
+
         # Test class hierarchy
         assert issubclass(Flag, LuxaforBase)
-        
+
         # Test vendor method comes from LuxaforBase
         assert Flag.vendor() == "Luxafor"
         assert LuxaforBase.vendor() == "Luxafor"
@@ -158,23 +158,19 @@ class TestLuxaforFlagState:
                 f"Unsupported command: {mock_command}"
             )
 
-
     def test_method_resolution_order(self) -> None:
         """Test MRO follows expected pattern."""
         mro = Flag.__mro__
-        
+
         # Should be: Flag -> LuxaforBase -> Light -> ...
         assert mro[0] == Flag
-        assert mro[1].__name__ == "LuxaforBase" 
+        assert mro[1].__name__ == "LuxaforBase"
         assert mro[2].__name__ == "Light"
 
     def test_luxafor_devices_inherit_from_base(self) -> None:
         """Test all Luxafor devices inherit from LuxaforBase."""
-        from busylight_core.vendors.luxafor import Bluetooth, BusyTag, Mute, Orb
-        from busylight_core.vendors.luxafor.luxafor_base import LuxaforBase
-        
         luxafor_devices = [Flag, Bluetooth, BusyTag, Mute, Orb]
-        
+
         for device_class in luxafor_devices:
             assert issubclass(device_class, LuxaforBase)
             assert device_class.vendor() == "Luxafor"

@@ -15,4 +15,3 @@ class StatusIndicator(PlantronicsBase):
     supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
         (0x047F, 0xD005): "Status Indicator",
     }
-

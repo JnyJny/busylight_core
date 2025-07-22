@@ -18,7 +18,6 @@ class Busylight(EposBase):
         (0x1395, 0x0074): "Busylight",
     }
 
-
     @cached_property
     def state(self) -> State:
         """The device state manager for controlling LED patterns."""

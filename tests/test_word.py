@@ -145,18 +145,18 @@ def test_word_str() -> None:
 
 def test_word_str_with_bitfields() -> None:
     """Test Word.__str__() method shows BitField information."""
-    
+
     class TestWord(Word):
         low_bit = BitField(0, 1)
         high_bits = BitField(4, 4)
         read_only = ReadOnlyBitField(2, 2)
-    
+
     word = TestWord(0b11110101, 8)  # 245 in binary
     result = str(word)
-    
+
     # Should contain basic info
     assert "TestWord(length=8, value=0xf5)" in result
-    
+
     # Should contain field information
     assert "Fields:" in result
     assert "low_bit: bits[0:1] = 1" in result
@@ -168,7 +168,7 @@ def test_word_str_no_bitfields() -> None:
     """Test Word.__str__() method without BitFields shows basic info only."""
     word = Word(42, 16)
     result = str(word)
-    
+
     assert "Word(length=16, value=0x2a)" in result
     assert "Fields:" not in result
 

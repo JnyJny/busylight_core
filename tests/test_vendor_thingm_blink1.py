@@ -24,6 +24,7 @@ from busylight_core.vendors.thingm._blink1 import (
     State,
     StopField,
 )
+from busylight_core.vendors.thingm.thingm_base import ThingMBase
 
 
 class TestThingMBlink1Fields:
@@ -528,15 +529,13 @@ class TestThingMBlink1:
 
     def test_vendor_hierarchy(self, blink1) -> None:
         """Test Blink1 inherits from ThingMBase properly."""
-        from busylight_core.vendors.thingm.thingm_base import ThingMBase
-        
         # Test inheritance hierarchy
         assert isinstance(blink1, Blink1)
         assert isinstance(blink1, ThingMBase)
-        
+
         # Test class hierarchy
         assert issubclass(Blink1, ThingMBase)
-        
+
         # Test vendor method comes from ThingMBase
         assert Blink1.vendor() == "ThingM"
         assert ThingMBase.vendor() == "ThingM"
@@ -544,7 +543,7 @@ class TestThingMBlink1:
     def test_method_resolution_order(self) -> None:
         """Test MRO follows expected pattern."""
         mro = Blink1.__mro__
-        
+
         # Should be: Blink1 -> ThingMBase -> Light -> ...
         assert mro[0] == Blink1
         assert mro[1].__name__ == "ThingMBase"

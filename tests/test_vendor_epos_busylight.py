@@ -7,6 +7,7 @@ import pytest
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.vendors.epos import Busylight
 from busylight_core.vendors.epos._busylight import Action, Report, State
+from busylight_core.vendors.epos.epos_base import EposBase
 
 
 class TestEPOSBusylightState:
@@ -220,15 +221,13 @@ class TestEPOSBusylight:
 
     def test_vendor_hierarchy(self, busylight) -> None:
         """Test Busylight inherits from EposBase properly."""
-        from busylight_core.vendors.epos.epos_base import EposBase
-        
         # Test inheritance hierarchy
         assert isinstance(busylight, Busylight)
         assert isinstance(busylight, EposBase)
-        
+
         # Test class hierarchy
         assert issubclass(Busylight, EposBase)
-        
+
         # Test vendor method comes from EposBase
         assert Busylight.vendor() == "EPOS"
         assert EposBase.vendor() == "EPOS"
@@ -236,7 +235,7 @@ class TestEPOSBusylight:
     def test_method_resolution_order(self) -> None:
         """Test MRO follows expected pattern."""
         mro = Busylight.__mro__
-        
+
         # Should be: Busylight -> EposBase -> Light -> ...
         assert mro[0] == Busylight
         assert mro[1].__name__ == "EposBase"
