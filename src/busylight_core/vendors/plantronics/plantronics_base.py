@@ -1,13 +1,13 @@
 """Plantronics vendor base class."""
 
-from busylight_core.vendors.embrava.embrava_base import EmbravaBase
+from busylight_core.vendors.embrava.blynclight_plus import BlynclightPlus
 
 
-class PlantronicsBase(EmbravaBase):
-    """Base class for Plantronics devices.
+class PlantronicsBase(BlynclightPlus):
+    """Base class for Plantronics devices with audio capabilities.
 
-    Plantronics devices are typically OEM versions of Embrava devices
-    with the same functionality but different vendor branding.
+    Plantronics devices are typically OEM versions of Embrava BlynclightPlus
+    devices with full audio and visual functionality but different vendor branding.
     """
 
     @staticmethod

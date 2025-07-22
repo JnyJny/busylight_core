@@ -6,12 +6,12 @@ from .embrava_base import EmbravaBase
 
 
 class Blynclight(EmbravaBase):
-    """Embrava Blynclight USB status light with audio capabilities.
+    """Embrava Blynclight USB status light for basic visual indication.
 
-    The Blynclight combines RGB LED status indication with built-in
-    audio playback, volume control, and flashing patterns. Use this
-    class to control standard Blynclight devices for comprehensive
-    audiovisual status notifications.
+    The standard Blynclight provides RGB LED status indication and flashing
+    patterns. For audio capabilities, use BlynclightPlus or BlynclightMini.
+    Use this class to control basic Blynclight devices for visual-only
+    status notifications.
     """
 
     supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {

@@ -176,98 +176,6 @@ class TestBlynclightDimming:
             assert blynclight.state.dim == 0
 
 
-class TestBlynclightSound:
-    """Test sound functionality."""
-
-    def test_play_sound_default_parameters(self) -> None:
-        """Test play_sound with default parameters."""
-        mock_hardware = create_mock_blynclight_hardware()
-
-        with (
-            patch.object(mock_hardware, "acquire"),
-            patch.object(Blynclight, "reset"),
-            patch.object(Blynclight, "update") as mock_update,
-        ):
-            blynclight = Blynclight(mock_hardware)
-
-            blynclight.play_sound()
-
-            mock_update.assert_called_once()
-            assert blynclight.state.repeat == 0
-            assert blynclight.state.play == 1
-            assert blynclight.state.music == 0
-            assert blynclight.state.mute == 0
-
-    def test_play_sound_custom_parameters(self) -> None:
-        """Test play_sound with custom parameters."""
-        mock_hardware = create_mock_blynclight_hardware()
-
-        with (
-            patch.object(mock_hardware, "acquire"),
-            patch.object(Blynclight, "reset"),
-            patch.object(Blynclight, "update") as mock_update,
-        ):
-            blynclight = Blynclight(mock_hardware)
-
-            blynclight.play_sound(music=5, volume=10, repeat=True)
-
-            mock_update.assert_called_once()
-            assert blynclight.state.repeat == 1
-            assert blynclight.state.play == 1
-            assert blynclight.state.music == 5
-            assert blynclight.state.mute == 0
-
-    def test_stop_sound_method(self) -> None:
-        """Test stop_sound method."""
-        mock_hardware = create_mock_blynclight_hardware()
-
-        with (
-            patch.object(mock_hardware, "acquire"),
-            patch.object(Blynclight, "reset"),
-            patch.object(Blynclight, "update") as mock_update,
-        ):
-            blynclight = Blynclight(mock_hardware)
-            blynclight.state.play = True  # Start playing
-
-            blynclight.stop_sound()
-
-            mock_update.assert_called_once()
-            assert blynclight.state.play == 0
-
-    def test_mute_method(self) -> None:
-        """Test mute method."""
-        mock_hardware = create_mock_blynclight_hardware()
-
-        with (
-            patch.object(mock_hardware, "acquire"),
-            patch.object(Blynclight, "reset"),
-            patch.object(Blynclight, "update") as mock_update,
-        ):
-            blynclight = Blynclight(mock_hardware)
-
-            blynclight.mute()
-
-            mock_update.assert_called_once()
-            assert blynclight.state.mute == 1
-
-    def test_unmute_method(self) -> None:
-        """Test unmute method."""
-        mock_hardware = create_mock_blynclight_hardware()
-
-        with (
-            patch.object(mock_hardware, "acquire"),
-            patch.object(Blynclight, "reset"),
-            patch.object(Blynclight, "update") as mock_update,
-        ):
-            blynclight = Blynclight(mock_hardware)
-            blynclight.state.mute = True  # Start muted
-
-            blynclight.unmute()
-
-            mock_update.assert_called_once()
-            assert blynclight.state.mute == 0
-
-
 class TestBlynclightFlashing:
     """Test flashing functionality."""
 
@@ -399,8 +307,6 @@ class TestBlynclightIntegration:
             # Test sequence of operations
             blynclight.dim()
             blynclight.flash((255, 0, 0), FlashSpeed.medium)
-            blynclight.play_sound(music=3, repeat=True)
-            blynclight.mute()
 
             # Mock super().reset() for the actual reset call
             with patch("busylight_core.vendors.embrava.blynclight.super"):
@@ -410,8 +316,6 @@ class TestBlynclightIntegration:
             assert blynclight.state.off == 1
             assert blynclight.state.dim == 0
             assert blynclight.state.flash == 0
-            assert blynclight.state.play == 0
-            assert blynclight.state.mute == 0
 
     def test_state_interactions(self) -> None:
         """Test interactions between different state settings."""

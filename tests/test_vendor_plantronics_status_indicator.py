@@ -7,6 +7,7 @@ import pytest
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.vendors.embrava._blynclight import FlashSpeed
 from busylight_core.vendors.embrava.blynclight import Blynclight
+from busylight_core.vendors.embrava.blynclight_plus import BlynclightPlus
 from busylight_core.vendors.embrava.embrava_base import EmbravaBase
 from busylight_core.vendors.plantronics import StatusIndicator
 from busylight_core.vendors.plantronics.plantronics_base import PlantronicsBase
@@ -273,18 +274,19 @@ class TestPlantronicsStatusIndicator:
 
     def test_class_hierarchy(self) -> None:
         """Test the class hierarchy is correct."""
-        # StatusIndicator should inherit from PlantronicsBase which inherits from EmbravaBase
+        # StatusIndicator should inherit from PlantronicsBase which inherits from BlynclightPlus
 
         assert issubclass(StatusIndicator, PlantronicsBase)
+        assert issubclass(StatusIndicator, BlynclightPlus)
         assert issubclass(StatusIndicator, EmbravaBase)
 
         # Should have the expected method resolution order
         status_mro = StatusIndicator.__mro__
 
-        # StatusIndicator -> PlantronicsBase -> EmbravaBase -> Light -> ...
+        # StatusIndicator -> PlantronicsBase -> BlynclightPlus -> EmbravaBase -> Light -> ...
         assert status_mro[0] == StatusIndicator
         assert status_mro[1] == PlantronicsBase
-        assert status_mro[2] == EmbravaBase
+        assert status_mro[2] == BlynclightPlus
 
     def test_module_path_vendor_detection(self) -> None:
         """Test that vendor detection works via module path."""
