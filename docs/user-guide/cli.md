@@ -281,12 +281,12 @@ try:
     
 except NoLightsFound:
     print("Please connect a busylight device")
-except LightUnavailable as e:
-    print(f"Device unavailable: {e}")
-except LightUnsupported as e:
-    print(f"Device not supported: {e}")
-except InvalidHardwareInfo as e:
-    print(f"Hardware error: {e}")
+except LightUnavailable as error:
+    print(f"Device unavailable: {error}")
+except LightUnsupported as error:
+    print(f"Device not supported: {error}")
+except InvalidHardwareInfo as error:
+    print(f"Hardware error: {error}")
 ```
 
 ### Debug Logging
@@ -404,8 +404,8 @@ def set_all_lights(color, flash=False):
                 light.flash(color, count=2)
             else:
                 light.on(color)
-        except Exception as e:
-            print(f"Failed to control {light.name}: {e}")
+        except Exception as error:
+            print(f"Failed to control {light.name}: {error}")
 
 # Set all lights to green
 set_all_lights((0, 255, 0))
