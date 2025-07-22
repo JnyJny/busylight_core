@@ -133,6 +133,31 @@ patterns.
 - ✅ Complete vendor base class hierarchy for all vendors
 - ✅ Enhanced async task management with prioritization and error handling
 
+### Docstring Format
+
+Use **Sphinx reStructuredText format** focusing on programmer intent:
+
+```python
+def method(self, param: str) -> bool:
+    """Single-line summary of what this does.
+
+    Explain the programmer's intent - how and why other code should use
+    this. Focus on expected inputs, actions taken, exceptions that might
+    be raised, and how to use returned values.
+
+    :param param: What the user should provide (not the type)
+    :raises SomeError: When this might fail and why
+    :return: How the returned value should be used
+    """
+```
+
+**Key principles:**
+- Document programmer intent, not implementation details
+- Explain expected inputs and return value usage
+- Type hints handle type information - don't duplicate in docstrings
+- Use compact `:param name: description` format
+- Always document exceptions that callers should handle
+
 ### Vendor Implementation Patterns
 
 The codebase uses three main device implementation patterns, each appropriate
@@ -143,3 +168,7 @@ for different hardware complexity:
 3. **Multi-LED devices** (BlinkStick, Luxafor): Array-based LED management
 
 These patterns should be preserved rather than consolidated.
+
+## TODO and Reminders
+
+- Review `.github/workflows/release.yaml` for auto-generate-changelog task and TYPE variable describing the tags used to recognize important commit messages and use those tags in commits.
