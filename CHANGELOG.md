@@ -1,5 +1,46 @@
 # CHANGELOG
 
+## [v0.12.0](https://github.com/JnyJny/busylight-core/releases/tag/v0.12.0) - 2025-07-22 20:27:29
+
+## Changes since v0.11.0
+
+- v0.12.0 (6a836bb)
+- v0.11.1 (325417c)
+- docs(CHANGELOG): update release notes (d6c8bb5)
+- Merge pull request #11 from JnyJny/fix/embrava-device-capabilities (69d58e2)
+- Merge branch 'main' into fix/embrava-device-capabilities (8e08ab1)
+- test: Update tests to match corrected device capabilities (303e0f5)
+- v0.10.0 (08c757d)
+## Full Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for complete release notes.
+
+
+## What's Changed
+* fix: Correct Embrava device capabilities and update tests by @JnyJny in https://github.com/JnyJny/busylight-core/pull/11
+
+
+**Full Changelog**: https://github.com/JnyJny/busylight-core/compare/v0.11.0...v0.12.0
+
+### Bug Fixes
+
+- general:
+  - Correct audio capabilities across Embrava Blynclight variants ([d88e806](https://github.com/JnyJny/busylight-core/commit/d88e8068077a6b9a8f827a96e055e671140884af)) ([#10](https://github.com/JnyJny/busylight-core/pull/10))
+
+### Documentation
+
+- general:
+  - Updated light and init docstrings ([645e592](https://github.com/JnyJny/busylight-core/commit/645e592f02dec10d188602b27e860187c740b970))
+  - Updated README examples. ([f083f06](https://github.com/JnyJny/busylight-core/commit/f083f063dbef420d0fcb0f26bcaecb80eb695c4f))
+  - Update project documentation with docstring format guidance ([84e8cce](https://github.com/JnyJny/busylight-core/commit/84e8cce1a1e64c45694b014373fc8bd56af81ff1)) ([#9](https://github.com/JnyJny/busylight-core/pull/9))
+  - Update project documentation with docstring format guidance ([ccabfc8](https://github.com/JnyJny/busylight-core/commit/ccabfc899a4778a1cb5d4e46d09e561d54acde8f))
+
+### Refactor
+
+- general:
+  - Standardize docstrings to Sphinx reStructuredText format ([64f182f](https://github.com/JnyJny/busylight-core/commit/64f182f184f52329294ea14901a758348eab4b09)) ([#9](https://github.com/JnyJny/busylight-core/pull/9))
+  - Standardize docstrings to Sphinx reStructuredText format ([c3b10a4](https://github.com/JnyJny/busylight-core/commit/c3b10a4364870c8bfd82f00e10d77f2310ece607))
+
 ## [v0.9.2](https://github.com/JnyJny/busylight-core/releases/tag/v0.9.2) - 2025-07-22 16:15:24
 
 ## [v0.9.1](https://github.com/JnyJny/busylight-core/releases/tag/v0.9.1) - 2025-07-22 01:20:47
