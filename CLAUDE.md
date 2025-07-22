@@ -1,25 +1,30 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when
+working with code in this repository.
 
 ## Project Overview
 
-This is `busylight_core`, a Python library for controlling USB-connected status lights (busylights) from various vendors. The project provides a unified interface for controlling different hardware devices through a plugin-style architecture where each vendor implements the abstract `Light` class.
+This is `busylight_core`, a Python library for controlling
+USB-connected status lights (busylights) from various vendors. The
+project provides a unified interface for controlling different
+hardware devices through a plugin-style architecture where each vendor
+implements the abstract `Light` class.
 
 ## Development Commands
 
-The project uses [Poe the Poet](https://poethepoet.natn.io) for task automation. Run `poe` without arguments to see all available tasks.
+The project uses [Poe the Poet](https://poethepoet.natn.io) for task
+automation. Run `poe` without arguments to see all available tasks.
 
 ### Essential Commands
 - `poe test` - Run test suite with pytest
+- `poe ruff-format` - Run ruff format on src and tests
+- `poe ruff-check` - Run ruff check on src and tests
 - `poe ruff` - Run code formatting and linting (check + format)
-- `poe mypy` - Run mypy type checking
-- `poe ty` - Run ty type checking  
-- `poe qc` - Run all quality checks (test + ruff + mypy + ty)
 - `poe coverage` - Generate and open HTML coverage report
 
 ### Development Setup
-- `uv sync` - Install dependencies and create virtual environment
+- `uv sync --all-groups` - Install dependencies and create virtual environment
 - `direnv allow` - Enable automatic venv activation (optional but recommended)
 
 ### Documentation
@@ -78,4 +83,63 @@ The library supports multiple connection types defined in `hardware.py`:
 
 ## Testing
 
-Tests are located in `tests/` directory with vendor-specific examples in `tests/vendor_examples/`. The project uses pytest with coverage reporting.
+Tests are located in `tests/` directory with vendor-specific examples
+in `tests/vendor_examples/`. The project uses pytest with coverage
+reporting.
+
+## Code Quality and Architecture Notes
+
+<!-- EJO claude's evaluation take with a grain of salt -->
+### Excellent Architecture - Avoid Over-Engineering
+
+This codebase demonstrates **exemplary software architecture** with minimal
+code duplication. What may initially appear as "duplicate code" across vendor
+implementations is typically one of:
+
+1. **Necessary device-specific configuration** (device IDs, hardware detection)
+2. **Well-designed inheritance patterns** that properly share functionality
+3. **Type-safe plugin architecture** where separate classes enable discovery
+
+**True code duplication is minimal (~5-10%)** and consists primarily of:
+- BlinkStick `claims()` methods (~50 lines total)
+- Vendor base class `vendor()` methods (~15 lines total)
+
+### Design Principles Prioritized
+
+The current architecture correctly prioritizes:
+- ✅ **Clarity**: Each device class is self-contained and obvious
+- ✅ **Type safety**: Static analysis works well with separate classes
+- ✅ **Maintainability**: Device-specific issues are isolated
+- ✅ **Plugin architecture**: Discovery mechanism relies on separate classes
+- ✅ **Hardware abstraction**: Complex device differences are properly
+  encapsulated
+
+### What NOT to do
+
+**Avoid template/mixin consolidation efforts** that would:
+- Make inheritance hierarchies confusing
+- Compromise type safety for marginal code savings
+- Create complex abstractions for naturally device-specific logic
+- Break the plugin discovery mechanism
+
+The apparent "duplication" serves important architectural purposes.
+Device-specific classes should remain separate even when they share similar
+patterns.
+
+### Successful Refactorings Completed
+
+- ✅ Enhanced `Word.__str__()` with BitField introspection for better debugging
+- ✅ Consistent naming across vendor classes (removed underscores)
+- ✅ Complete vendor base class hierarchy for all vendors
+- ✅ Enhanced async task management with prioritization and error handling
+
+### Vendor Implementation Patterns
+
+The codebase uses three main device implementation patterns, each appropriate
+for different hardware complexity:
+
+1. **Simple devices** (CompuLab): ColorableMixin + simple protocol
+2. **Complex devices** (Embrava, Kuando): Word/BitField state management
+3. **Multi-LED devices** (BlinkStick, Luxafor): Array-based LED management
+
+These patterns should be preserved rather than consolidated.
