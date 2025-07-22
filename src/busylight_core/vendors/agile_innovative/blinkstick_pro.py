@@ -25,17 +25,10 @@ class BlinkStickPro(BlinkStickBase):
 
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
-        """Check if the hardware describes a BlinkStick Pro."""
-        claim = super().claims(hardware)
-
-        try:
-            major, _ = cls.get_version(hardware.serial_number)
-        except ValueError:
-            return False
-
-        return claim and major == 2
+        """Return True if the hardware describes a BlinkStick Pro."""
+        return cls._claims(hardware, 2)
 
     @cached_property
     def state(self) -> State:
-        """Get the current state of the BlinkStick Pro."""
+        """The state of the BlinkStick Pro."""
         return State.blinkstick_pro()

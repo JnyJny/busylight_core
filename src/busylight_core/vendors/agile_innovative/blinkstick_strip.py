@@ -25,17 +25,10 @@ class BlinkStickStrip(BlinkStickBase):
 
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
-        """Check if the hardware describes a BlinkStick Strip."""
-        claim = super().claims(hardware)
-
-        try:
-            major, _ = cls.get_version(hardware.serial_number)
-        except ValueError:
-            return False
-
-        return claim and major == 3 and hardware.release_number == 0x201
+        """Return True if the hardware describes a BlinkStick Strip."""
+        return cls._claims(hardware, 3, 0x201)
 
     @cached_property
     def state(self) -> State:
-        """Get the current state of the BlinkStick Strip."""
+        """The state of the BlinkStick Strip."""
         return State.blinkstick_strip()
