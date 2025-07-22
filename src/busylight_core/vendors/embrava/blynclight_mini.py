@@ -2,14 +2,15 @@
 
 from typing import ClassVar
 
-from .embrava_base import EmbravaBase
+from .blynclight_plus import BlynclightPlus
 
 
-class BlynclightMini(EmbravaBase):
+class BlynclightMini(BlynclightPlus):
     """Embrava Blynclight Mini status light controller.
 
-    A smaller version of the Blynclight with the same functionality
-    as the standard Blynclight device.
+    A smaller version of the Blynclight with the similar functionality
+    as the Blynclight Plus device.
+
     """
 
     supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
