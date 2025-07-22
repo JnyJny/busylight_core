@@ -59,24 +59,34 @@ class Light(abc.ABC, TaskableMixin):
           allows the base class to identify subclasses which do not
           support any specific hardware and act appropriately.
 
+    Note: If the subclasses are not imported the package __init__, the
+          abc.ABC.__subclasses__ machinery will not find them and your
+          new lights will not be recognized.
+
     The Light class has been designed to be helpful for discovering
     and managing USB connected lights without having to know aprori
-    details of the hardware present.
+    details of the hardware present. In the vast majority of cases,
+    you are not expected to create Light subclass instances directly
+    and rely on these classmethods to discover and use lights.
 
-    - Light.available_hardware() lists devices discovered
-    - Light.all_lights() returns all discovered lights ready for use
-    - Light.first_light() returns the first available light
+    - Light.available_hardware() provides a list of recognized hardware.
+    - Light.all_lights() returns all discovered lights ready for use.
+    - Light.first_light() returns the first available light.
 
     If you know what devices you have connected and want to access
-    them directly, you can use the Light subclasses directly.
+    them directly, you can use the Light subclasses directly using
+    the same class methods.
 
     ```python
     from busylight_core.vendors.embrava import Blynclight
     from busylight_core.vendors.luxafor import Flag
+    from busylight_core.vendors.thingm import Blink1
 
     blynclight = Blynclight.first_light()
     flag = Flag.first_light()
+    all_blink1s = Blink1.all_lights()
     ```
+
     """
 
     supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {}

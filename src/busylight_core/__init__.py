@@ -12,10 +12,9 @@ Developers, adding support for a new device will entail:
 
 Refer to any of the existing vendor packages as an example.
 
-Please note, if the subclasses are not imported here, the
-abc.ABC.__subclasses__ machinery will not find them and your
-new lights will not be recognized.
-
+Note: If the subclasses are not imported here, the
+      abc.ABC.__subclasses__ machinery will not find them and your new
+      lights will not be recognized.
 """
 
 from loguru import logger
