@@ -200,3 +200,5 @@ cython_debug/
 
 tst.py
 plan.md
+
+scripts/
