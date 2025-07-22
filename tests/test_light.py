@@ -65,9 +65,9 @@ def test_light_classmethod_supported_lights() -> None:
             assert isinstance(product_name, str)
 
 
-def test_light_classmethod_available_lights() -> None:
-    """Test that Light.available_lights() returns a dict of subclass to devices."""
-    results = Light.available_lights()
+def test_light_classmethod_available_hardware() -> None:
+    """Test that Light.available_hardware() returns a dict of subclass to devices."""
+    results = Light.available_hardware()
 
     assert isinstance(results, dict)
 

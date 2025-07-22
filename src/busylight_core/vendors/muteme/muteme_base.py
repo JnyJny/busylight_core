@@ -13,16 +13,30 @@ class MuteMeBase(Light):
 
     Provides common functionality for all MuteMe devices including
     button support, device detection, and simple RGB control.
+    Use this as a base class when implementing new MuteMe variants.
     """
 
     @staticmethod
     def vendor() -> str:
-        """Return the vendor name for MuteMe devices."""
+        """Return the vendor name for MuteMe devices.
+
+        Provides the official vendor branding for user interfaces
+        and device identification.
+
+        :return: Official vendor name string
+        """
         return "MuteMe"
 
     @cached_property
     def state(self) -> "State":
-        """The device state manager for controlling light behavior."""
+        """Device state manager for controlling light behavior.
+
+        Returns a State instance that manages RGB color values and
+        other device-specific properties. Use this to modify device
+        state before calling update() to apply changes.
+
+        :return: State instance for managing device properties
+        """
         return State()
 
     @cached_property

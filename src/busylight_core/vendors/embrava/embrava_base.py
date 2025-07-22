@@ -96,10 +96,14 @@ class EmbravaBase(Light):
         color: tuple[int, int, int],
         speed: FlashSpeed | None = None,
     ) -> None:
-        """Flash the light with the specified color and speed.
+        """Start flashing pattern with specified color and timing.
 
-        :param color: RGB color tuple to flash
-        :param speed: Flashing speed (default is slow)
+        Activates the device's built-in flash pattern with the given
+        color and speed. The device will alternate between the color
+        and off state at the specified rate.
+
+        :param color: RGB color tuple for flash pattern
+        :param speed: Flash timing rate (defaults to slow if not specified)
         """
         speed = speed or FlashSpeed.slow
 

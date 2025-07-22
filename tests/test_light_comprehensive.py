@@ -52,7 +52,7 @@ class TestLightFirstLight:
         mock_hardware = create_mock_hardware()
 
         with (
-            patch.object(MockLightSubclass, "available_lights") as mock_available,
+            patch.object(MockLightSubclass, "available_hardware") as mock_available,
             patch.object(
                 MockLightSubclass,
                 "__init__",

@@ -9,10 +9,12 @@ from .thingm_base import ThingMBase
 
 
 class Blink1(ThingMBase):
-    """ThingM Blink(1) status light controller.
+    """ThingM Blink(1) USB RGB LED with feature report control.
 
-    The Blink(1) is a USB-connected RGB LED device that uses
-    feature reports for communication and supports various effects.
+    The Blink(1) uses HID feature reports for communication and supports
+    advanced effects like fading and pattern playback. Use this class to
+    control Blink(1) devices for sophisticated status indication with
+    smooth color transitions and custom effects.
     """
 
     supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {
@@ -21,7 +23,14 @@ class Blink1(ThingMBase):
 
     @cached_property
     def state(self) -> State:
-        """The device state manager."""
+        """Device state manager for Blink(1) control.
+
+        Returns a State instance that manages color, timing, and effect
+        settings for the Blink(1). Use this to configure device behavior
+        before calling update() to apply changes.
+
+        :return: State instance for managing device properties
+        """
         return State()
 
     def __bytes__(self) -> bytes:

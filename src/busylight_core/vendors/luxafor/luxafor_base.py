@@ -7,28 +7,37 @@ from busylight_core.light import Light
 
 
 class LuxaforBase(Light):
-    """Base class for Luxafor devices.
+    """Base class for Luxafor USB status light devices.
 
     Provides common functionality for all Luxafor devices including
     the Flag, Mute, Orb, Bluetooth, and BusyTag product lines.
+    Use this as a base class when implementing new Luxafor device
+    variants that share the core USB protocol and feature set.
     """
 
     @staticmethod
     def vendor() -> str:
-        """Return the vendor name for Luxafor devices."""
+        """Return the vendor name for Luxafor devices.
+
+        Provides the official vendor branding for user interfaces
+        and device identification.
+
+        :return: Official vendor name string
+        """
         return "Luxafor"
 
     @classmethod
     def claims(cls, hardware: Hardware, product_check: bool = True) -> bool:
-        """Return True if the hardware matches Luxafor criteria.
+        """Check if hardware is a compatible Luxafor device.
 
-        The product_check argument will short-circuit checking
-        the hardware product string for Luxafor device names.
-        This is used primarily by the busytag implementation
-        which does not require the product string check.
+        Performs enhanced device identification by checking both the USB
+        vendor/product ID and the product name string. Use product_check=False
+        to bypass product name verification for devices like BusyTag that
+        may have inconsistent product strings.
 
-        :param hardware: The Hardware instance to check.
-        :product_check: Whether to check the product string.
+        :param hardware: Hardware instance to test for compatibility
+        :param product_check: Whether to verify product name string matches
+        :return: True if hardware is a supported Luxafor device
         """
         result = super().claims(hardware)
 

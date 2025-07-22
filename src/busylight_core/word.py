@@ -4,10 +4,26 @@ import array
 
 
 class Word:
-    """A class representing a word of bits, with methods for bit manipulation."""
+    """Binary data structure for device state management with BitField support.
+
+    Provides bit-level manipulation of binary data with named field access
+    through BitField descriptors. Use this as a base class for device state
+    objects that need to pack/unpack complex binary protocols into structured,
+    named fields.
+    """
 
     def __init__(self, value: int = 0, length: int = 8) -> None:
-        """Initialize a Word of length bits with the given value."""
+        """Create a Word instance for binary data manipulation.
+
+        Initializes a binary word with the specified bit length and initial value.
+        The length must be a multiple of 8 to align with byte boundaries. Use this
+        to create state objects for devices that use binary communication protocols.
+
+
+        :param value: Initial integer value to store in the word
+        :param length: Total bit length, must be multiple of 8
+        :raises ValueError: If length is not a positive multiple of 8
+        """
         if length <= 0 or length % 8 != 0:
             msg = "length must be a multiple of 8"
             raise ValueError(msg)
@@ -97,10 +113,24 @@ class Word:
 
 
 class ReadOnlyBitField:
-    """A class representing a read-only bit field within a word."""
+    """Descriptor for read-only named bit fields within Word instances.
+
+    Creates a named field that provides read-only access to specific bit ranges
+    within a Word. Use this for device state fields that should not be modified
+    by user code, such as status indicators or hardware-controlled values.
+    """
 
     def __init__(self, offset: int, width: int = 1) -> None:
-        """Initialize a bitfield with the given offset and width."""
+        """Create a read-only bit field descriptor.
+
+        Defines a named field that maps to specific bit positions within a Word.
+        The field will be accessible as a regular attribute on Word instances
+        but will raise AttributeError on assignment attempts.
+
+
+        :param offset: Starting bit position within the word (0-based from LSB)
+        :param width: Number of consecutive bits to include in the field
+        """
         self.field = slice(offset, offset + width)
         self.offset = offset  # Store for introspection
         self.width = width  # Store for introspection
@@ -119,7 +149,12 @@ class ReadOnlyBitField:
 
 
 class BitField(ReadOnlyBitField):
-    """A class representing a mutable bit field within a word."""
+    """Descriptor for mutable named bit fields within Word instances.
+
+    Creates a named field that provides read/write access to specific bit ranges
+    within a Word. Use this for device control fields that can be modified by
+    user code, such as color values, effect settings, or device configuration.
+    """
 
     def __set__(self, instance: Word, value: int) -> None:
         instance[self.field] = value
