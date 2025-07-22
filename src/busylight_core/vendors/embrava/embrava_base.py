@@ -1,17 +1,15 @@
 """Embrava Blynclight family base class."""
 
 from functools import cached_property
-from typing import TYPE_CHECKING
 
 from busylight_core.light import Light
 
-if TYPE_CHECKING:
-    from ._blynclight import FlashSpeed, State
+from ._blynclight import FlashSpeed, State
 
 
 class EmbravaBase(Light):
     """Base class for Embrava Blynclight family devices.
-    
+
     Provides common functionality for all Blynclight devices including
     sound playback, volume control, dim/bright control, and flash patterns.
     """
@@ -24,7 +22,6 @@ class EmbravaBase(Light):
     @cached_property
     def state(self) -> "State":
         """The device state manager."""
-        from ._blynclight import State
         return State()
 
     def __bytes__(self) -> bytes:
@@ -94,14 +91,16 @@ class EmbravaBase(Light):
         with self.batch_update():
             self.state.mute = False
 
-    def flash(self, color: tuple[int, int, int], speed: "FlashSpeed | None" = None) -> None:
+    def flash(
+        self,
+        color: tuple[int, int, int],
+        speed: FlashSpeed | None = None,
+    ) -> None:
         """Flash the light with the specified color and speed.
 
         :param color: RGB color tuple to flash
         :param speed: Flashing speed (default is slow)
         """
-        from ._blynclight import FlashSpeed
-        
         speed = speed or FlashSpeed.slow
 
         with self.batch_update():

@@ -5,7 +5,7 @@ from busylight_core.light import Light
 
 class AgileInnovativeBase(Light):
     """Base class for Agile Innovative devices.
-    
+
     Provides common functionality for all Agile Innovative devices,
     primarily the BlinkStick product line.
     """

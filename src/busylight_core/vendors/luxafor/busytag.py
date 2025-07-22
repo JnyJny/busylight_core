@@ -21,13 +21,8 @@ class BusyTag(ColorableMixin, LuxaforBase):
 
     @classmethod
     def claims(cls, hardware) -> bool:
-        """Use standard device ID claim method for BusyTag.
-        
-        BusyTag doesn't use the complex product string parsing that
-        other Luxafor devices require.
-        """
-        return hardware.device_id in cls.supported_device_ids
-
+        """Return True if the hardware matches the BusyTag criteria."""
+        return super().claims(hardware, product_check=False)
 
     @property
     def command(self) -> str:

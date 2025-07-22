@@ -2,17 +2,15 @@
 
 import struct
 from functools import cached_property
-from typing import TYPE_CHECKING
 
 from busylight_core.light import Light
 
-if TYPE_CHECKING:
-    from ._muteme import State
+from ._muteme import State
 
 
 class MuteMeBase(Light):
     """Base class for MuteMe family devices.
-    
+
     Provides common functionality for all MuteMe devices including
     button support, device detection, and simple RGB control.
     """
@@ -25,7 +23,6 @@ class MuteMeBase(Light):
     @cached_property
     def state(self) -> "State":
         """The device state manager for controlling light behavior."""
-        from ._muteme import State
         return State()
 
     @cached_property

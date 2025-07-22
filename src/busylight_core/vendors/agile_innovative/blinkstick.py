@@ -23,14 +23,13 @@ class BlinkStick(BlinkStickBase):
     @classmethod
     def claims(cls, hardware: Hardware) -> bool:
         """Return True if the hardware matches a BlinkStick."""
-        claims = super().claims(hardware)
-
+        if not super().claims(hardware):
+            return False
         try:
             major, _ = cls.get_version(hardware.serial_number)
         except ValueError:
             return False
-
-        return claims and major == 1
+        return major == 1
 
     @cached_property
     def state(self) -> State:

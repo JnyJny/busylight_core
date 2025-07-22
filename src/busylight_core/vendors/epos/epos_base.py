@@ -5,7 +5,7 @@ from busylight_core.light import Light
 
 class EposBase(Light):
     """Base class for EPOS devices.
-    
+
     Provides common functionality for all EPOS devices,
     primarily the Busylight product line.
     """

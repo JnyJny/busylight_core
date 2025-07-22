@@ -1,7 +1,5 @@
 """Luxafor vendor base class."""
 
-from typing import ClassVar
-
 from loguru import logger
 
 from busylight_core.hardware import Hardware
@@ -10,7 +8,7 @@ from busylight_core.light import Light
 
 class LuxaforBase(Light):
     """Base class for Luxafor devices.
-    
+
     Provides common functionality for all Luxafor devices including
     the Flag, Mute, Orb, Bluetooth, and BusyTag product lines.
     """
@@ -21,15 +19,23 @@ class LuxaforBase(Light):
         return "Luxafor"
 
     @classmethod
-    def claims(cls, hardware: Hardware) -> bool:
-        """Check if this class claims the given hardware device.
+    def claims(cls, hardware: Hardware, product_check: bool = True) -> bool:
+        """Return True if the hardware matches Luxafor criteria.
 
-        This implementation handles Luxafor's device identification pattern
-        by checking the product string against supported device names.
+        The product_check argument will short-circuit checking
+        the hardware product string for Luxafor device names.
+        This is used primarily by the busytag implementation
+        which does not require the product string check.
 
-        :param hardware: A hardware instance
+        :param hardware: The Hardware instance to check.
+        :product_check: Whether to check the product string.
         """
-        if not super().claims(hardware):
+        result = super().claims(hardware)
+
+        if not product_check:
+            return result
+
+        if not result:
             return False
 
         try:

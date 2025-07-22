@@ -34,24 +34,6 @@ class BlinkStickBase(AgileInnovativeBase):
         """Return the vendor name for this device."""
         return "Agile Innovative"
 
-    @classmethod
-    def _claims(
-        cls, hardware: Hardware, major: int, release_number: int | None = None
-    ) -> bool:
-        """Return True if the hardware matches the BlinkStick criteria."""
-
-        claim = super().claims(hardware)
-
-        try:
-            major, _ = cls.get_version(hardware.serial_number)
-        except ValueError:
-            return False
-
-        if release_number is None:
-            return claim and major == major
-
-        return claim and major == major and hardware.release_number == release_number
-
     @property
     def state(self) -> State:
         """BlinkStick state property."""

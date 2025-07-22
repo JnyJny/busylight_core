@@ -5,7 +5,7 @@ from busylight_core.light import Light
 
 class KuandoBase(Light):
     """Base class for Kuando devices.
-    
+
     Provides common functionality for all Kuando devices,
     primarily the Busylight product line.
     """
