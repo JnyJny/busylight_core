@@ -28,7 +28,7 @@ from typing import TYPE_CHECKING, ClassVar
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
 
-from functools import cache, cached_property, lru_cache
+from functools import cache, cached_property
 
 from loguru import logger
 
@@ -92,7 +92,7 @@ class Light(abc.ABC, TaskableMixin):
     supported_device_ids: ClassVar[dict[tuple[int, int], str]] = {}
 
     @classmethod
-    @lru_cache(maxsize=1)
+    @cache
     def vendor(cls) -> str:
         """Get the vendor name for this device class.
 
@@ -109,7 +109,7 @@ class Light(abc.ABC, TaskableMixin):
         return cls.__module__.split(".")[-2].title()
 
     @classmethod
-    @lru_cache(maxsize=1)
+    @cache
     def unique_device_names(cls) -> list[str]:
         """Get all unique marketing names for devices supported by this class.
 
@@ -122,7 +122,7 @@ class Light(abc.ABC, TaskableMixin):
         return sorted(set(cls.supported_device_ids.values()))
 
     @classmethod
-    @lru_cache(maxsize=1)
+    @cache
     def unique_device_ids(cls) -> list[tuple[int, int]]:
         """Get all unique vendor/product ID pairs supported by this class.
 
@@ -163,7 +163,7 @@ class Light(abc.ABC, TaskableMixin):
         return sorted(subclasses, key=lambda s: s.__module__)
 
     @classmethod
-    @lru_cache(maxsize=1)
+    @cache
     def supported_lights(cls) -> dict[str, list[str]]:
         """Return a dictionary of supported lights by vendor.
 
