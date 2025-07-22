@@ -56,13 +56,11 @@ python3 -m pip install busylight_core
 ```python
 from busylight_core import Light
 
-# Find all connected lights
-lights = Light.available()
-print(f"Found {len(lights)} device(s)")
+lights = Light.all_lights()
 
-# Control a specific device
-if lights:
-    light = lights[0]
+print(f"Found {len(lights)} light(s)")
+
+for light in lights:
     light.on((255, 0, 0))  # Turn on red
     light.off()            # Turn off
 ```
@@ -73,16 +71,20 @@ if lights:
 ```python
 from busylight_core import Light
 
+red = (255, 0, 0)
+green = (0, 128, 0)
+yellow = (255, 255, 0)
+
 light = Light.first_light()
 
-# Available - green
-light.on((0, 255, 0))
+# Available
+light.on(green)
 
-# In meeting - red  
-light.on((255, 0, 0))
+# In meeting
+light.on(red)
 
-# Away - yellow
-light.on((255, 255, 0))
+# Away
+light.on(yellow)
 
 light.off()
 ```
