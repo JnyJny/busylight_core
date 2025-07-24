@@ -49,7 +49,7 @@ For detailed installation instructions, see [Installation](getting-started/insta
 ## Documentation
 
 - [Getting Started](getting-started/quickstart.md) - Quick start guide
-- [Features](user-guide/advanced-features.md) - Detailed feature documentation
+- [Features](user-guide/features.md) - Detailed feature documentation
 - [API Reference](reference/index.md) - Complete API documentation
 - [Contributing](contributing.md) - How to contribute to this project
 

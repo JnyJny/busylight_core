@@ -90,16 +90,12 @@ light.off()
 ```
 
 
-## Documentation
-
 For detailed documentation including API reference, advanced usage examples, and device-specific information:
 
-- **Full Documentation**: [https://JnyJny.github.io/busylight_core/](https://JnyJny.github.io/busylight_core/)
-- **Installation Guide**: [Getting Started](https://JnyJny.github.io/busylight_core/getting-started/installation/)
-- **Quick Start Guide**: [Usage Guide](https://JnyJny.github.io/busylight_core/getting-started/quickstart/)
-- **Device Capabilities**: [Device Support](https://JnyJny.github.io/busylight_core/user-guide/device-capabilities/)
-- **Examples**: [Usage Examples](https://JnyJny.github.io/busylight_core/user-guide/examples/)
-- **API Reference**: [API Docs](https://JnyJny.github.io/busylight_core/reference/)
+- **Full Documentation**: [https://JnyJny.github.io/busylight_core/][docs-busylight-core]
+- **Installation Guide**: [Getting Started][docs-getting-started]
+- **Quick Start Guide**: [Usage Guide][docs-quick-start]
+- **API Reference**: [API Docs][docs-api-reference]
 
 ## Development
 
@@ -177,3 +173,10 @@ the previous step's success.
 [poe]: https://poethepoet.natn.io
 [uv]: https://docs.astral.sh/uv/
 [direnv]: https://direnv.net
+<!-- documentation links -->
+[docs-busylight-core]: https://jnyjny.github.io/busylight-core/
+[docs-getting-started]: https://jnyjny.github.io/busylight-core/getting-started/installation/
+[docs-quick-start]: https://jnyjny.github.io/busylight-core/getting-started/installation/
+[docs-feature-guide]: https://jnyjny.github.io/busylight-core/user-guide/features/
+[docs-api-reference]: https://jnyjny.github.io/busylight-core/reference/
+

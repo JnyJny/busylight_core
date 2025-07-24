@@ -79,7 +79,7 @@ nav:
     - Quick Start: getting-started/quickstart.md
     - Configuration: getting-started/configuration.md
   - User Guide:
-    - Features: user-guide/advanced-features.md
+    - Features: user-guide/features.md
     - Device Capabilities: user-guide/device-capabilities.md
     - Examples: user-guide/examples.md
   - API Reference: reference/
