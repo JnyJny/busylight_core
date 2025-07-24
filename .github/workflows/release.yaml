@@ -15,15 +15,32 @@ permissions:
   pull-requests: read
 
 jobs:
+  get-python-versions:
+    name: Get Python test versions from pyproject.toml
+    runs-on: ubuntu-latest
+    outputs:
+      python-versions: ${{ steps.extract.outputs.versions }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+      - name: Extract Python test versions
+        id: extract
+        run: |
+          # Extract Python list and convert to JSON for GitHub Actions
+          python_list=$(uv run toml get --toml-path pyproject.toml tool.busylight-core.ci.test-python-versions)
+          json_versions=$(echo "$python_list" | python -c "import ast, json, sys; print(json.dumps(ast.literal_eval(sys.stdin.read().strip())))")
+          echo "versions=$json_versions" >> $GITHUB_OUTPUT
+
   test:
     name: Test
+    needs: get-python-versions
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
-        # TODO: Extract these versions from pyproject.toml requires-python (>=3.11,<4.0)
-        python-version: ['3.11', '3.12', '3.13']
+        python-version: ${{ fromJSON(needs.get-python-versions.outputs.python-versions) }}
 
     steps:
       - uses: actions/checkout@v4
