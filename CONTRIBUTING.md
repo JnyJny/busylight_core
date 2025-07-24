@@ -3,10 +3,6 @@
 We welcome contributions to busylight-core! This guide will help you get
 started with development, testing, and submitting changes.
 
-**Note:** All docstrings have been updated to use consistent Sphinx
-reStructuredText format focused on programmer intent rather than redundant
-type information already covered by type hints.
-
 We have issues labeled as [Good First Issue][good-first-issue] and
 [Help Wanted][help-wanted] which are good opportunities for new
 contributors.
@@ -16,9 +12,9 @@ contributors.
 ### Prerequisites
 
 - Python 3.11+ 
-- [uv](https://docs.astral.sh/uv/) for dependency management
+- [uv][astra-uv] for dependency management
 - Git for version control
-- Optional: [direnv](https://direnv.net/) for automatic environment activation
+- Optional: [direnv][direnv] for automatic environment activation
 
 ### Initial Setup
 
@@ -47,7 +43,7 @@ contributors.
 
 ### Available Commands
 
-The project uses [Poe the Poet](https://poethepoet.natn.io) for task
+The project uses [Poe the Poet][poe-the-poet]  for task
 automation. Run `poe` without arguments to see all available tasks:
 
 **Code Quality:**
@@ -196,8 +192,7 @@ test: add comprehensive tests for multi-LED devices
 
 ### Formatting and Linting
 
-The project uses [Ruff](https://docs.astral.sh/ruff/) for code formatting
-and linting:
+The project uses [ruff][astral-ruff] for code formatting and linting:
 
 - **Line length:** 80 characters for markdown, flexible for code
 - **Docstrings:** Sphinx reStructuredText format with single-line summary
@@ -207,7 +202,7 @@ and linting:
 ### Code Conventions
 
 - **Descriptive variable names** that explain purpose, not implementation
-- **Minimal comments** - prefer clear code and comprehensive docstrings
+- **No comments** - prefer clear code and comprehensive docstrings
 - **Exception handling:** Use descriptive variable names (`error` not `e`)
 - **Clean exceptions:** Use `contextlib.suppress` instead of `try/except/pass`
 
@@ -308,6 +303,7 @@ Releases are handled through Poe tasks and GitHub Actions:
    - GitHub Actions: `get-python-versions` → `test` → `build` → [`publish`, `github-release`] → `docs`
    - Parallel execution: PyPI publishing and GitHub release creation run simultaneously
    - Documentation deployment: Only triggered after successful releases
+   <!-- add a mermaid diagram here for the ci/cd pipline -->
 
 ### Changelog
 
@@ -323,7 +319,6 @@ The CHANGELOG.md is automatically updated using conventional commits:
 - **GitHub Discussions:** Ask questions and share ideas
 - **Issues:** Report bugs or request features
 - **Code Review:** All PRs receive thorough review and feedback
-- **Discord/Slack:** Real-time discussion (if available)
 
 ## Code of Conduct
 
@@ -338,5 +333,9 @@ to provide guidance on getting familiar with the codebase.
 
 <!-- End Links -->
 
+[astral-ruff]: https://docs.astral.sh/ruff
+[astral-uv]: https://docs.astral.sh/uv
+[direnv]: https://direnv.net/
 [good-first-issue]: https://github.com/JnyJny/busylight_core/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22
 [help-wanted]: https://github.com/JnyJny/busylight_core/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22
+[poe-the-poet]: https://poethepoet.natn.io

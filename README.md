@@ -89,7 +89,6 @@ light.on(yellow)
 light.off()
 ```
 
-
 For detailed documentation including API reference, advanced usage examples, and device-specific information:
 
 - **Full Documentation**: [https://JnyJny.github.io/busylight_core/][docs-busylight-core]
@@ -105,55 +104,8 @@ using [direnv][direnv]. Development activites such as linting and testing
 are automated via [Poe The Poet][poethepoet], run `poe` after cloning
 this repo for a list of tasks.
 
-### Clone
-```console
-git clone https://github.com/JnyJny/busylight_core
-cd busylight_core
-```
-### Allow Direnv _optional_ but recommended
-```console
-direnv allow
-```
-
-### Install Dependencies
-```console
-uv sync --all-groups
-```
-### Run `poe`
-```console
-poe --help
-```
-
-### Release Management
-
-This project uses automated release management with GitHub Actions:
-
-#### Version Bumping
-- `poe publish_patch` - Bump patch version, commit, tag, and push
-- `poe publish_minor` - Bump minor version, commit, tag, and push
-- `poe publish_major` - Bump major version, commit, tag, and push
-
-Any of the publish tasks will trigger testing, publishing to PyPi, and
-a GitHub release.
-
-#### Release Notes
-- `poe changelog` - Generate changelog since last tag
-- `poe release-notes` - Generate release notes file
-
-#### Automatic Releases
-When you push a version tag (e.g., `v1.0.0`), the unified GitHub Actions workflow will:
-1. **Test** - Run tests across all supported Python versions and OS combinations
-2. **Publish** - Build and publish to PyPI (only if tests pass)
-3. **GitHub Release** - Create GitHub release with auto-generated notes and artifacts (only if PyPI publish succeeds)
-
-This ensures a complete release pipeline where each step depends on
-the previous step's success.
-
-#### MkDocs Documentation
-- `poe docs-serve` - Serve documentation locally
-- `poe docs-build` - Build documentation
-- `poe docs-deploy` - Deploy to GitHub Pages
-
+Check out [CONTRIBUTING.md][docs-contributing] for more development
+details.
 
 <hr>
 
@@ -179,4 +131,5 @@ the previous step's success.
 [docs-quick-start]: https://jnyjny.github.io/busylight-core/getting-started/installation/
 [docs-feature-guide]: https://jnyjny.github.io/busylight-core/user-guide/features/
 [docs-api-reference]: https://jnyjny.github.io/busylight-core/reference/
+[docs-contributing]: https://github.com/JnyJny/busylight-core/blob/main/CONTRIBUTING.md
 
