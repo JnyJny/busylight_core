@@ -49,30 +49,6 @@ The workflows require:
 - Environment named "pypi" matching PyPI trusted publisher setup
 - GitHub Pages enabled for documentation deployment
 
-## Tricksy Jinja Formatting
-
-The release.yaml workflow uses some Jinja templating that needs to be
-hidden from cookiecutter to ensure the proper rendering of the file.
-
-For instance this line will cause cookiecutter to choke when
-attempting to render the file:
-
-
-```yaml
-  runs-on: ${{ matrix.os }}
-```
-
-There are a couple of ways to fix this, I chose to enclose the
-offending lines with Jinja `raw` and `endraw` tags as described
-[here][jinja-whitespace-control].
-
-Checkout [this post][jinja-tricks] for a great breakdown of all the
-different ways this problem can be addressed.
-
 <!-- End Links -->
 [pypi]: https://pypi.org
 [trusted-publisher]: https://docs.pypi.org/trusted-publishers/
-[uv]: https://docs.astral.sh/uv/
-[semantic-version]: https://semver.org
-[jinja-tricks]: https://github.com/cookiecutter/cookiecutter/issues/1624#issuecomment-2031117503
-[jinja-whitespace-control]: https://jinja.palletsprojects.com/en/stable/templates/#whitespace-control
