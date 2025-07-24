@@ -27,8 +27,14 @@ jobs:
       - name: Extract Python test versions
         id: extract
         run: |
-          versions=$(uv run toml get --toml-path pyproject.toml tool.busylight_core.ci.test-python-versions)
-          echo "versions=$versions" >> $GITHUB_OUTPUT
+          # Try to extract test versions from pyproject.toml, fallback to default if missing
+          if versions=$(uv run toml get --toml-path pyproject.toml tool.busylight_core.ci.test-python-versions 2>/dev/null); then
+            echo "Using Python versions from pyproject.toml: $versions"
+            echo "versions=$versions" >> $GITHUB_OUTPUT
+          else
+            echo "No test-python-versions found in pyproject.toml, using default versions"
+            echo 'versions=["3.11", "3.12", "3.13"]' >> $GITHUB_OUTPUT
+          fi
 
   test:
     name: Test
