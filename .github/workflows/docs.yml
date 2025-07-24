@@ -33,8 +33,14 @@ jobs:
         run: |
           # Check if Pages is already enabled, if not enable it
           if ! gh api repos/:owner/:repo/pages >/dev/null 2>&1; then
-            echo "Enabling GitHub Pages with GitHub Actions build type..."
-            gh api --method POST repos/:owner/:repo/pages -f build_type=workflow
+            echo "GitHub Pages not enabled, attempting to enable..."
+            if gh api --method POST repos/:owner/:repo/pages -f build_type=workflow 2>/dev/null; then
+              echo "Successfully enabled GitHub Pages with GitHub Actions build type"
+            else
+              echo "Failed to enable GitHub Pages automatically - may need manual setup"
+              echo "See: https://docs.github.com/en/pages/getting-started-with-github-pages/enabling-github-pages-for-your-repository"
+              exit 1
+            fi
           else
             echo "GitHub Pages already enabled"
           fi
