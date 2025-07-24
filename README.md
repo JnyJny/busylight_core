@@ -32,7 +32,7 @@ looking for a command-line interface to control your lights? Check out
 | **CompuLab** | fit-statUSB |
 | **EPOS** | Busylight |
 | **Embrava** | Blynclight, Blynclight Mini, Blynclight Plus |
-| **Kuando** | Busylight Alpha, Busylight Omega, Mute |
+| **Kuando** | Busylight Alpha, Busylight Omega |
 | **Luxafor** | Flag, Mute, Orb, Bluetooth |
 | **MuteMe** | MuteMe, MuteMe Mini, MuteSync |
 | **Plantronics** | Status Indicator |
