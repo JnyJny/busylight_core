@@ -24,7 +24,7 @@ After [installing](installation.md) busylight_core, you can start controlling li
 from busylight_core import Light
 
 # Find all connected lights
-lights = Light.available()
+lights = Light.all_lights()
 print(f"Found {len(lights)} device(s)")
 
 # Control the first light found
@@ -32,6 +32,8 @@ if lights:
     light = lights[0]
     light.on((255, 0, 0))  # Turn on red
     light.off()           # Turn off
+else:
+    print("No compatible lights found. Check your device connection.")
 ```
 
 ## Discovering Your Device
@@ -42,12 +44,18 @@ Check what lights are connected to your system:
 from busylight_core import Light
 
 # Get all available lights
-lights = Light.available()
+lights = Light.all_lights()
 
-for i, light in enumerate(lights):
-    print(f"Light {i}: {light.vendor} {light.name}")
-    print(f"  Device ID: {light.device_id}")
-    print(f"  Connection: {light.hardware.device_type}")
+if lights:
+    for i, light in enumerate(lights):
+        print(f"Light {i}: {light.vendor()} {light.name}")
+        print(f"  Device ID: {light.device_id}")
+        print(f"  Hardware: {light.hardware.manufacturer_string}")
+else:
+    print("No lights found. Try:")
+    print("1. Check USB connection")
+    print("2. On Linux, ensure udev rules are configured")
+    print("3. Try running with sudo (not recommended for production)")
 ```
 
 ## Basic Light Control
@@ -57,42 +65,66 @@ for i, light in enumerate(lights):
 Control your light with RGB colors:
 
 ```python
-from busylight_core import Light
+from busylight_core import Light, NoLightsFoundError
 
-light = Light.first_light()  # Get the first available light
-
-# Basic colors (RGB tuples)
-light.on((255, 0, 0))    # Red
-light.on((0, 255, 0))    # Green  
-light.on((0, 0, 255))    # Blue
-light.on((255, 255, 0))  # Yellow
-light.on((255, 0, 255))  # Magenta
-light.on((0, 255, 255))  # Cyan
-light.on((255, 255, 255)) # White
-
-# Turn off
-light.off()
+try:
+    light = Light.first_light()  # Get the first available light
+    
+    # Basic colors (RGB tuples, values 0-255)
+    light.on((255, 0, 0))    # Red
+    light.on((0, 255, 0))    # Green  
+    light.on((0, 0, 255))    # Blue
+    light.on((255, 255, 0))  # Yellow
+    light.on((255, 0, 255))  # Magenta
+    light.on((0, 255, 255))  # Cyan
+    light.on((255, 255, 255)) # White
+    
+    # Turn off
+    light.off()
+    
+except NoLightsFoundError:
+    print("No lights available")
 ```
 
 ### Flash Patterns
 
-Create attention-getting flash patterns:
+Create attention-getting flash patterns (device-dependent):
 
 ```python
-light.flash((255, 0, 0), count=3)        # Flash red 3 times
-light.flash((0, 255, 0), duration=0.5)   # Flash green with custom timing
+# Flash patterns work on devices with hardware flash support
+try:
+    light = Light.first_light()
+    
+    # Check if device supports flashing
+    if hasattr(light, 'flash'):
+        light.flash((255, 0, 0))  # Flash red (device-specific timing)
+        print("Device supports hardware flash")
+    else:
+        # Software flash fallback
+        import time
+        for _ in range(3):
+            light.on((255, 0, 0))
+            time.sleep(0.5)
+            light.off()
+            time.sleep(0.5)
+        print("Using software flash fallback")
+        
+except NoLightsFoundError:
+    print("No lights available")
 ```
+
+
+## Device Compatibility
+
+Different devices have different capabilities. Use the [Device Capabilities](../user-guide/device-capabilities.md) guide to understand what features your hardware supports.
 
 ## Configuration
 
 Busylight Core can be configured using environment variables or a configuration file. See [Configuration](configuration.md) for details.
 
-## Examples
-
-For more detailed examples including async usage, multi-device control, and advanced features, see the [Examples](../user-guide/examples.md) page.
-
 ## Next Steps
 
-- Learn about [Advanced Features](../user-guide/examples.md)
+- Learn about specific device capabilities: [Device Capabilities](../user-guide/device-capabilities.md)
+- See comprehensive examples: [Examples](../user-guide/examples.md) 
 - Check out the [API Reference](../reference/index.md)
 - Read the [Contributing Guide](../contributing.md) if you want to contribute
