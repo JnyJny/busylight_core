@@ -22,6 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
+        # TODO: Extract these versions from pyproject.toml requires-python (>=3.11,<4.0)
         python-version: ['3.11', '3.12', '3.13']
 
     steps:
@@ -31,6 +32,7 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:          
           python-version: ${{ matrix.python-version }}
+          enable-cache: true
 
       - name: Run tests - ${{ matrix.python-version }} - ${{ matrix.os }}        
         run: |
@@ -61,7 +63,7 @@ jobs:
         with:
           name: dist-files
           path: dist/
-          retention-days: 1
+          retention-days: 1  # Minimum allowed, but artifacts are only needed within same workflow
 
   publish:
     name: Publish to PyPI
@@ -120,18 +122,20 @@ jobs:
       - name: Generate release notes
         id: release_notes
         run: |
+          set -euo pipefail
+          
           # Get the tag name
           TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "Generating release notes for tag: $TAG_NAME"
           
           # Get the previous tag
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 ${TAG_NAME}^ 2>/dev/null || echo "")
-          
-          # Generate changelog
-          if [[ -n "$PREVIOUS_TAG" ]]; then
+          if PREVIOUS_TAG=$(git describe --tags --abbrev=0 ${TAG_NAME}^ 2>/dev/null); then
+            echo "Previous tag found: $PREVIOUS_TAG"
             echo "## Changes since $PREVIOUS_TAG" >> release_notes.md
             echo "" >> release_notes.md
             git log --pretty=format:"- %s (%h)" ${PREVIOUS_TAG}..${TAG_NAME} >> release_notes.md
           else
+            echo "No previous tag found, generating initial release notes"
             echo "## Initial Release" >> release_notes.md
             echo "" >> release_notes.md
             echo "- Initial release of busylight_core" >> release_notes.md
@@ -139,11 +143,15 @@ jobs:
           
           # Check if there's a CHANGELOG.md file
           if [[ -f "CHANGELOG.md" ]]; then
+            echo "Adding CHANGELOG.md reference"
             echo "" >> release_notes.md
             echo "## Full Changelog" >> release_notes.md
             echo "" >> release_notes.md
             echo "See [CHANGELOG.md](CHANGELOG.md) for complete release notes." >> release_notes.md
           fi
+          
+          echo "Generated release notes:"
+          cat release_notes.md
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
