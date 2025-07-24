@@ -415,6 +415,18 @@ class Light(abc.ABC, TaskableMixin):
         """The write method used by this light."""
         return self.hardware.handle.write
 
+    def release(self) -> None:
+        """Release the light's exclusive access to the hardware.
+
+        If the light was acquired in exclusive mode, this method releases
+        the hardware resource, allowing other processes to access it.
+        If the light was not acquired in exclusive mode, no action is taken.
+        """
+        if self._exclusive:
+            logger.debug(f"Releasing exclusive access to {self.name}")
+            self.hardware.release()
+            self._exclusive = False
+
     @contextlib.contextmanager
     def exclusive_access(self) -> Generator[None, None, None]:
         """Manage exclusive access to the light.
