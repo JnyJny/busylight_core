@@ -19,16 +19,18 @@ test (matrix) → build → [publish, github-release] (parallel) → docs
 Main CI/CD pipeline triggered on version tags (e.g., `v1.2.3`).
 
 **Stages:**
-1. **test** - Matrix testing across OS/Python versions (Ubuntu, macOS, Windows × Python 3.11-3.13)
-2. **build** - Single package build, uploads artifacts for reuse
-3. **publish** - Publishes to PyPI using cached artifacts (parallel with github-release)
-4. **github-release** - Creates GitHub release with changelog (parallel with publish)
-5. **deploy-docs** - Triggers documentation deployment after successful release
+1. **get-python-versions** - Extracts Python test versions from pyproject.toml
+2. **test** - Matrix testing across OS/Python versions (Ubuntu, macOS, Windows × extracted versions)
+3. **build** - Single package build, uploads artifacts for reuse
+4. **publish** - Publishes to PyPI using cached artifacts (parallel with github-release)
+5. **github-release** - Creates GitHub release with changelog (parallel with publish)
+6. **deploy-docs** - Triggers documentation deployment after successful release
 
 **Key optimizations:**
 - Package built once and reused via artifact caching
 - Parallel execution of publish and release jobs
 - Consolidated changelog generation
+- Dynamic Python version matrix from pyproject.toml
 - ~3x faster than sequential builds
 
 ### docs.yml
@@ -51,6 +53,22 @@ The two workflows communicate via GitHub's repository dispatch mechanism:
 3. This ensures documentation is only rebuilt for actual releases, not every code change
 
 **Manual Override**: The docs workflow can also be triggered manually via `workflow_dispatch` for ad-hoc documentation updates without doing a release.
+
+## Python Version Configuration
+
+The test matrix Python versions are configured in `pyproject.toml`:
+
+```toml
+[tool.busylight_core.ci]
+test-python-versions = ["3.11", "3.12", "3.13"]
+```
+
+**Benefits:**
+- Single source of truth for Python test versions
+- Automatic CI updates when versions change
+- Graceful fallback to default versions if config missing
+
+**Fallback:** If the configuration section is missing, the workflow defaults to `["3.11", "3.12", "3.13"]`.
 
 ## Requirements
 
