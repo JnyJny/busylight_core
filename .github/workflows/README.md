@@ -42,6 +42,16 @@ Documentation deployment workflow.
 - Builds MkDocs documentation
 - Deploys to GitHub Pages only after successful PyPI publish and GitHub release
 
+## Workflow Communication
+
+The two workflows communicate via GitHub's repository dispatch mechanism:
+
+1. **release.yaml** → **docs.yml**: After successful publish and GitHub release, the `deploy-docs` job sends a `repository_dispatch` event with type `release-complete`
+2. **docs.yml** listens for this event and automatically builds/deploys documentation
+3. This ensures documentation is only rebuilt for actual releases, not every code change
+
+**Manual Override**: The docs workflow can also be triggered manually via `workflow_dispatch` for ad-hoc documentation updates without doing a release.
+
 ## Requirements
 
 The workflows require:
