@@ -29,6 +29,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Enable GitHub Pages if not already enabled
+        run: |
+          # Check if Pages is already enabled, if not enable it
+          if ! gh api repos/:owner/:repo/pages >/dev/null 2>&1; then
+            echo "Enabling GitHub Pages with GitHub Actions build type..."
+            gh api --method POST repos/:owner/:repo/pages -f build_type=workflow
+          else
+            echo "GitHub Pages already enabled"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:

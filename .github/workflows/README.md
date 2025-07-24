@@ -47,9 +47,8 @@ Documentation deployment workflow.
 The workflows require:
 - PyPI project with [trusted publisher][trusted-publisher] configured
 - Environment named "pypi" matching PyPI trusted publisher setup
-- [GitHub Pages enabled][github-pages] for documentation deployment
+- GitHub Pages for documentation deployment (automatically enabled by docs workflow)
 
 <!-- End Links -->
 [pypi]: https://pypi.org
 [trusted-publisher]: https://docs.pypi.org/trusted-publishers/
-[github-pages]: https://docs.github.com/en/pages/getting-started-with-github-pages/enabling-github-pages-for-your-repository
