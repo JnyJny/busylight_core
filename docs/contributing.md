@@ -30,8 +30,6 @@ uv run poe check
 
 # Or run individual tools
 uv run poe ruff      # Linting and formatting
-uv run poe mypy      # Type checking
-uv run poe ty        # Additional type checking
 ```
 
 ### Testing
@@ -166,9 +164,5 @@ Please be respectful and constructive in all interactions. We want to maintain a
 ## License
 
 By contributing to Busylight Core for Humans, you agree that your contributions will be licensed under the same license as the project.
-
-## Recognition
-
-Contributors will be recognized in the project's README and release notes.
 
 Thank you for contributing to Busylight Core for Humans!

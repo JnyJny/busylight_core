@@ -49,7 +49,7 @@ For detailed installation instructions, see [Installation](getting-started/insta
 ## Documentation
 
 - [Getting Started](getting-started/quickstart.md) - Quick start guide
-- [Advanced Features](user-guide/cli.md) - Detailed feature documentation
+- [Features](user-guide/advanced-features.md) - Detailed feature documentation
 - [API Reference](reference/index.md) - Complete API documentation
 - [Contributing](contributing.md) - How to contribute to this project
 
@@ -59,4 +59,3 @@ This project is licensed under the Apache-2.0 license.
 ## Support
 
 - [GitHub Issues](https://github.com/JnyJny/busylight_core/issues)
-- [GitHub Repository](https://github.com/JnyJny/busylight_core)
