@@ -95,7 +95,9 @@ light.off()
 For detailed documentation including API reference, advanced usage examples, and device-specific information:
 
 - **Full Documentation**: [https://JnyJny.github.io/busylight_core/](https://JnyJny.github.io/busylight_core/)
-- **Quick Start Guide**: [Getting Started](https://JnyJny.github.io/busylight_core/getting-started/quickstart/)
+- **Installation Guide**: [Getting Started](https://JnyJny.github.io/busylight_core/getting-started/installation/)
+- **Quick Start Guide**: [Usage Guide](https://JnyJny.github.io/busylight_core/getting-started/quickstart/)
+- **Device Capabilities**: [Device Support](https://JnyJny.github.io/busylight_core/user-guide/device-capabilities/)
 - **Examples**: [Usage Examples](https://JnyJny.github.io/busylight_core/user-guide/examples/)
 - **API Reference**: [API Docs](https://JnyJny.github.io/busylight_core/reference/)
 
