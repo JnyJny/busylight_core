@@ -20,6 +20,14 @@ Python library for controlling USB status lights from various vendors using a pl
 3. Import in vendor __init__.py and main __init__.py
 4. Discovery uses abc.ABC.__subclasses__()
 
+## Release Workflow
+Pipeline: `get-python-versions` → `test` → `build` → [`publish`, `github-release`] → `docs`
+
+- **Python versions**: Configure test matrix in `[tool.busylight_core.ci].test-python-versions`
+- **Artifact caching**: Package built once, reused by publish/release jobs
+- **Parallel execution**: Publish and GitHub release run simultaneously  
+- **Docs deployment**: Triggered only after successful releases
+
 ## Code Guidelines
 
 **Architecture**: **DO NOT** consolidate vendor classes - this breaks plugin discovery and type safety.
