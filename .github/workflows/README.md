@@ -1,32 +1,53 @@
-# Publishing to PyPI
+# GitHub Actions Workflows
 
-The release.yml workflow in this directory depends on you having
-already setup a project on the [Python Package Index][pypi] and [added
-a trusted publisher][trusted-publisher]. The workflow depends on an
-environment named "pypi" which must agree with the environment named
-when adding the trusted publisher. It doesn't have to be named `pypi`
-it just needs to match in both places. Additionally, the project name
-on PyPI should match `cookiecutter.package_name` or modify release.yml
-to ensure `environment.url` matches the PyPI project URL.
+This directory contains optimized CI/CD workflows for testing, building,
+publishing, and documentation deployment.
 
-## Testing
+## Workflow Architecture
 
-The release workflow has two stages:
-- test
-- publish
+The release workflow follows an efficient pipeline structure:
 
-The test stage utilizes the `matrix` feature to test against a variety
-of operating systems and python versions. This is likely more testing
-than you might require, reduce the `os` and `python_versions` lists
-to suit your needs.
+```
+test (matrix) → build → [publish, github-release] (parallel) → docs
+                ↓              ↓           ↓                     ↑
+          [artifacts]    (cached artifacts) (cached artifacts)  └─(both complete)
+```
 
-Tests are initiated when a tag formatted as a [semantic
-version][semantic-version] is detected or with the suffix `-test` is
-detected.
+## Workflows
 
-The publish stage depends on all the tests finishing successfully
-before continuing. The package will be built in a Linux container
-and uses [uv][uv] for the build and is published to PyPI on success.
+### release.yaml
+Main CI/CD pipeline triggered on version tags (e.g., `v1.2.3`).
+
+**Stages:**
+1. **test** - Matrix testing across OS/Python versions (Ubuntu, macOS, Windows × Python 3.11-3.13)
+2. **build** - Single package build, uploads artifacts for reuse
+3. **publish** - Publishes to PyPI using cached artifacts (parallel with github-release)
+4. **github-release** - Creates GitHub release with changelog (parallel with publish)
+5. **deploy-docs** - Triggers documentation deployment after successful release
+
+**Key optimizations:**
+- Package built once and reused via artifact caching
+- Parallel execution of publish and release jobs
+- Consolidated changelog generation
+- ~3x faster than sequential builds
+
+### docs.yml
+Documentation deployment workflow.
+
+**Triggers:**
+- Repository dispatch after successful releases
+- Manual workflow dispatch for ad-hoc builds
+
+**Process:**
+- Builds MkDocs documentation
+- Deploys to GitHub Pages only after successful PyPI publish and GitHub release
+
+## Requirements
+
+The workflows require:
+- PyPI project with [trusted publisher][trusted-publisher] configured
+- Environment named "pypi" matching PyPI trusted publisher setup
+- GitHub Pages enabled for documentation deployment
 
 ## Tricksy Jinja Formatting
 

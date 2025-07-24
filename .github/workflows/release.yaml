@@ -36,9 +36,38 @@ jobs:
         run: |
           uv run --all-extras pytest
 
-  publish:
-    name: Build & Publish
+  build:
+    name: Build Package
     needs: test
+    if: |
+      github.ref_type == 'tag' &&
+      startsWith(github.ref, 'refs/tags/v') &&
+      !endsWith(github.ref, '-test') &&
+      success()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv and set Python version
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+
+      - name: Build package
+        run: |
+          uv build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+          retention-days: 1
+
+  publish:
+    name: Publish to PyPI
+    needs: build
     if: |
       github.ref_type == 'tag' &&
       startsWith(github.ref, 'refs/tags/v') &&
@@ -50,46 +79,18 @@ jobs:
       url: https://pypi.org/project/busylight_core
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install uv and set Python version.
-        uses: astral-sh/setup-uv@v6
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          python-version: 3.8
-
-      - name: Build package.
-        run: |
-          uv build
+          name: dist-files
+          path: dist/
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
 
-  generate-changelog:
-    name: Generate Changelog
-    needs: publish
-    if: |
-      github.ref_type == 'tag' &&
-      startsWith(github.ref, 'refs/tags/v') &&
-      !endsWith(github.ref, '-test') &&
-      success()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Auto-generate Changelog
-        uses: BobAnkh/auto-generate-changelog@v1.2.5
-        with:
-          REPO_NAME: 'JnyJny/busylight-core'
-          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PATH: 'CHANGELOG.md'
-          COMMIT_MESSAGE: 'docs(CHANGELOG): update release notes'
-          TYPE: 'feat:Feature,bug:Bug Fixes,fix:Bug Fixes,docs:Documentation,refactor:Refactor,perf:Performance Improvements'
-
   github-release:
-    name: Create GitHub Release
-    needs: publish
+    name: Create GitHub Release & Update Changelog
+    needs: build
     if: |
       github.ref_type == 'tag' &&
       startsWith(github.ref, 'refs/tags/v') &&
@@ -103,15 +104,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          python-version: 3.8
+          name: dist-files
+          path: dist/
 
-      - name: Build package
-        run: |
-          uv build
-          
+      - name: Auto-generate Changelog
+        uses: BobAnkh/auto-generate-changelog@v1.2.5
+        with:
+          REPO_NAME: 'JnyJny/busylight-core'
+          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PATH: 'CHANGELOG.md'
+          COMMIT_MESSAGE: 'docs(CHANGELOG): update release notes'
+          TYPE: 'feat:Feature,bug:Bug Fixes,fix:Bug Fixes,docs:Documentation,refactor:Refactor,perf:Performance Improvements'
 
       - name: Generate release notes
         id: release_notes
@@ -150,5 +156,23 @@ jobs:
           prerelease: false
           generateReleaseNotes: true
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-docs:
+    name: Deploy Documentation
+    needs: [publish, github-release]
+    if: |
+      github.ref_type == 'tag' &&
+      startsWith(github.ref, 'refs/tags/v') &&
+      !endsWith(github.ref, '-test') &&
+      success()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger docs deployment
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: release-complete
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
 
 
