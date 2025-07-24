@@ -52,9 +52,6 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Set up Python
-        run: uv python install 3.13
-
       - name: Install dependencies
         run: uv sync --group docs
 
