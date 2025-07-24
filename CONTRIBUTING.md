@@ -275,6 +275,22 @@ poe docs-deploy
 
 ## Releases
 
+### Python Version Configuration
+
+The CI/CD test matrix uses Python versions configured in `pyproject.toml`:
+
+```toml
+[tool.busylight_core.ci]
+test-python-versions = ["3.11", "3.12", "3.13"]
+```
+
+**Benefits:**
+- Single source of truth for CI test versions
+- Automatic workflow updates when versions change
+- Graceful fallback if configuration missing
+
+**Note:** Changing these versions affects all CI/CD testing across the project.
+
 ### For Maintainers
 
 Releases are handled through Poe tasks and GitHub Actions:
@@ -286,10 +302,12 @@ Releases are handled through Poe tasks and GitHub Actions:
    poe publish_major   # 0.2.0 → 1.0.0
    ```
 
-2. **Automated process:**
+2. **Automated CI/CD pipeline:**
    - Version bump in pyproject.toml
    - Git commit, tag, and push
-   - GitHub Actions: test → publish to PyPI → generate changelog → create release
+   - GitHub Actions: `get-python-versions` → `test` → `build` → [`publish`, `github-release`] → `docs`
+   - Parallel execution: PyPI publishing and GitHub release creation run simultaneously
+   - Documentation deployment: Only triggered after successful releases
 
 ### Changelog
 
