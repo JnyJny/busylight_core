@@ -28,7 +28,7 @@ jobs:
         id: extract
         run: |
           # Extract Python list and convert to JSON for GitHub Actions
-          python_list=$(uv run toml get --toml-path pyproject.toml tool.busylight-core.ci.test-python-versions)
+          python_list=$(uv run toml get --toml-path pyproject.toml tool.busylight_core.ci.test-python-versions)
           json_versions=$(echo "$python_list" | python -c "import ast, json, sys; print(json.dumps(ast.literal_eval(sys.stdin.read().strip())))")
           echo "versions=$json_versions" >> $GITHUB_OUTPUT
 

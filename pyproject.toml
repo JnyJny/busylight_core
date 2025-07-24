@@ -144,7 +144,7 @@ docs-deploy.help = "[Documentation] Deploy documentation to GitHub Pages."
 
 # Tool Options
 
-[tool.busylight-core.ci]
+[tool.busylight_core.ci]
 test-python-versions = ["3.11", "3.12", "3.13"]
 
 [tool.pytest.ini_options]
