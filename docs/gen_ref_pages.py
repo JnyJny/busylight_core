@@ -66,7 +66,6 @@ with mkdocs_gen_files.open("reference/index.md", "w") as index_file:
     # Core modules (excluding light since it's featured above)
     core_modules = [
         ("busylight_core", "Busylight_Core"),
-        ("busylight_core.hardware", "Hardware"),
         ("busylight_core.exceptions", "Exceptions"),
         ("busylight_core.settings", "Settings"),
     ]
@@ -121,10 +120,11 @@ with mkdocs_gen_files.open("reference/index.md", "w") as index_file:
 
             index_file.write("\n")
 
-    index_file.write("## Utilities\n\n")
+    index_file.write("## Low Level Components\n\n")
 
-    # Utility modules
+    # Low level modules
     utility_modules = [
+        ("busylight_core.hardware", "Hardware"),
         ("busylight_core.hid", "HID"),
         ("busylight_core.word", "Word"),
     ]
@@ -134,87 +134,80 @@ with mkdocs_gen_files.open("reference/index.md", "w") as index_file:
         if parts in nav_dict:
             index_file.write(f"- [{display_name}]({nav_dict[parts]})\n")
 
-# Create custom SUMMARY with better organization
+# Create a proper navigation structure for the left sidebar
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
-    nav_file.write("# API Reference\n\n")
-
-    # Highlight the main Light class first
-    nav_file.write("## Main Classes\n\n")
-    nav_file.write("**Primary interface for controlling busylights:**\n\n")
-
+    nav_file.write("* [API Reference](index.md)\n")
+    
     # Main Light class
     light_parts = ("busylight_core", "light")
     if light_parts in nav_dict:
-        nav_file.write(f"- **[Light Class]({nav_dict[light_parts]})** - Main abstract base class for all busylight devices\n")
-
-    nav_file.write("\n## Core Components\n\n")
-
-    # Core modules (excluding light since it's featured above)
+        nav_file.write(f"* [Light Class]({nav_dict[light_parts]})\n")
+    
+    # Core Components
     core_modules = [
-        ("busylight_core", "Busylight_Core"),
-        ("busylight_core.hardware", "Hardware"),
+        ("busylight_core", "Busylight Core"),
         ("busylight_core.exceptions", "Exceptions"),
-        ("busylight_core.settings", "Settings"),
     ]
-
+    
     for module, display_name in core_modules:
         parts = tuple(module.split("."))
         if parts in nav_dict:
-            nav_file.write(f"- [{display_name}]({nav_dict[parts]})\n")
-
-    nav_file.write("\n## Mixins\n\n")
-
+            nav_file.write(f"* [{display_name}]({nav_dict[parts]})\n")
+    
     # Mixins
     mixin_modules = [
-        ("busylight_core.mixins.colorable", "Colorable"),
-        ("busylight_core.mixins.taskable", "Taskable"),
+        ("busylight_core.mixins.colorable", "Colorable Mixin"),
+        ("busylight_core.mixins.taskable", "Taskable Mixin"),
     ]
-
+    
     for module, display_name in mixin_modules:
         parts = tuple(module.split("."))
         if parts in nav_dict:
-            nav_file.write(f"- [{display_name}]({nav_dict[parts]})\n")
-
-    nav_file.write("\n## Hardware Vendors\n\n")
-
-    # Vendor modules
+            nav_file.write(f"* [{display_name}]({nav_dict[parts]})\n")
+    
+    # Hardware Vendors with submodules
+    nav_file.write("* Vendors\n")
     for vendor_module, (vendor_name, vendor_desc) in VENDOR_INFO.items():
         vendor_parts = ("busylight_core", "vendors", vendor_module)
         if vendor_parts in nav_dict:
-            nav_file.write(f"### {vendor_name}\n\n")
-
-            # Find all submodules for this vendor
-            vendor_submodules = []
+            nav_file.write(f"    * [{vendor_name}]({nav_dict[vendor_parts]})\n")
+            
+            # Find device submodules for this vendor
+            vendor_devices = []
             for parts, path in nav_dict.items():
                 if (len(parts) >= 4 and
                     parts[0] == "busylight_core" and
                     parts[1] == "vendors" and
                     parts[2] == vendor_module and
-                    parts != vendor_parts):
-
+                    parts != vendor_parts and
+                    not parts[-1].startswith("_") and  # Skip private modules
+                    not parts[-1].endswith("_base")):  # Skip base classes
+                    
                     # Get the actual class name (last part)
                     class_name = parts[-1]
-                    # Convert snake_case to Title Case and clean up
+                    # Convert snake_case to Title Case
                     display_name = class_name.replace("_", " ").title()
-                    if display_name.startswith("Blynclight"):
-                        display_name = display_name.replace("Blynclight", "Blynclight ")
-                    vendor_submodules.append((display_name, path, parts))
-
-            # Sort and display submodules
-            for display_name, path, parts in sorted(vendor_submodules):
-                nav_file.write(f"- [{display_name}]({path})\n")
-
-            nav_file.write("\n")
-
-    nav_file.write("## Utilities\n\n")
-
-    # Utility modules
+                    vendor_devices.append((display_name, path))
+            
+            # Sort and add device submodules
+            for display_name, path in sorted(vendor_devices):
+                nav_file.write(f"        * [{display_name}]({path})\n")
+    
+    # Low Level Components
+    nav_file.write("* Low Level\n")
     utility_modules = [
+        ("busylight_core.hardware", "Hardware"),
         ("busylight_core.hid", "HID"),
         ("busylight_core.word", "Word"),
     ]
-
+    
     for module, display_name in utility_modules:
         parts = tuple(module.split("."))
         if parts in nav_dict:
-            nav_file.write(f"- [{display_name}]({nav_dict[parts]})\n")
+            nav_file.write(f"    * [{display_name}]({nav_dict[parts]})\n")
+
+# Copy CHANGELOG.md from project root to docs directory to keep it in sync
+changelog_source = Path(__file__).parent.parent / "CHANGELOG.md"
+if changelog_source.exists():
+    with mkdocs_gen_files.open("changelog.md", "w") as changelog_file:
+        changelog_file.write(changelog_source.read_text())

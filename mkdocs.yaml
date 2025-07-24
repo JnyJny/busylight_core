@@ -5,6 +5,7 @@ site_url: https://JnyJny.github.io/busylight_core/
 
 repo_name: JnyJny/busylight_core
 repo_url: https://github.com/JnyJny/busylight_core
+edit_uri: blob/main/
 
 theme:
   name: material
@@ -78,9 +79,10 @@ nav:
     - Quick Start: getting-started/quickstart.md
     - Configuration: getting-started/configuration.md
   - User Guide:
-    - CLI Usage: user-guide/cli.md
+    - Features: user-guide/advanced-features.md
+    - Device Capabilities: user-guide/device-capabilities.md
     - Examples: user-guide/examples.md
-  - API Reference: reference/index.md
+  - API Reference: reference/
   - Contributing: contributing.md
   - Changelog: changelog.md
 
@@ -105,6 +107,16 @@ markdown_extensions:
   - toc:
       permalink: true
 
+
+validation:
+  nav:
+    omitted_files: ignore
+    not_found: warn
+    absolute_links: info
+  links:
+    not_found: ignore
+    anchors: ignore
+    unrecognized_links: ignore
 
 extra:
   version:

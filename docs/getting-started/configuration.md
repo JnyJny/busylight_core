@@ -1,52 +1,71 @@
 # Configuration
 
-Busylight Core for Humans uses Pydantic Settings for configuration management, which allows you to configure the application using environment variables, configuration files, or both.
+Busylight Core is a Python library for controlling USB status lights. It does not require external configuration files.
 
-## Environment Variables
+## Library Usage
 
-You can configure busylight_core using environment variables:
+Import and use the library directly in your Python code:
 
-```bash
-export BUSYLIGHT_CORE_SETTING_NAME=value
-busylight_core [command]
+```python
+from busylight_core import Light, NoLightsFoundError
+
+try:
+    # Get the first available light
+    light = Light.first_light()
+    
+    # Turn on red
+    light.on((255, 0, 0))
+    
+    # Turn off
+    light.off()
+    
+except NoLightsFoundError:
+    print("No lights found")
 ```
 
-## Configuration File
+## Device Initialization
 
-You can also use a configuration file. Create a `.env` file in your project directory:
+All Light devices support `reset` and `exclusive` parameters during initialization:
 
-```bash
-# .env
-BUSYLIGHT_CORE_SETTING_NAME=value
+```python
+from busylight_core import Light, NoLightsFoundError
+
+try:
+    # Standard initialization - resets device and acquires exclusive access
+    light = Light.first_light()
+    
+    # Explicitly control initialization behavior
+    light = Light.first_light(reset=True, exclusive=True)   # Default behavior
+    light = Light.first_light(reset=False, exclusive=False) # No reset, shared access
+    
+except NoLightsFoundError:
+    print("No lights found")
 ```
 
-## Available Settings
+**Parameters:**
+- `reset=True`: Reset device to known state during initialization (default)
+- `exclusive=True`: Acquire exclusive access to prevent interference (default)
 
-The following settings are available:
+## Logging
 
-### Logging Settings
+Busylight Core uses [loguru](https://loguru.readthedocs.io/) for logging. Control logging output:
 
-- `BUSYLIGHT_CORE_LOG_LEVEL`: Set the logging level (default: INFO)
-- `BUSYLIGHT_CORE_LOG_FILE`: Path to log file (default: busylight_core.log)
-### Application Settings
+```python
+from loguru import logger
+from busylight_core import Light
 
-Add your application-specific settings here.
+# Enable busylight_core logging (disabled by default)
+logger.enable("busylight_core")
 
-## Priority Order
+# Use the library - debug information will now be shown
+lights = Light.all_lights()
 
-Settings are loaded in the following priority order (highest to lowest):
-
-1. Environment variables
-2. Configuration file (`.env`)
-3. Default values
-
-## Example
-
-```bash
-# Set log level to DEBUG
-export BUSYLIGHT_CORE_LOG_LEVEL=DEBUG
-
-# Run the CLI
-busylight_core [command]
+# Disable logging again
+logger.disable("busylight_core")
 ```
 
+## Next Steps
+
+- Learn about device capabilities in [Device Capabilities](../user-guide/device-capabilities.md)
+- See usage examples in [Examples](../user-guide/examples.md)
+- Check the [API Reference](../reference/index.md) for complete method documentation
