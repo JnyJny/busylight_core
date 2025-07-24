@@ -49,10 +49,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install uv and set Python version
+      - name: Install uv
         uses: astral-sh/setup-uv@v6
-        with:
-          python-version: "3.11"
 
       - name: Build package
         run: |
