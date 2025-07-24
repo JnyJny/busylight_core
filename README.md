@@ -41,7 +41,7 @@ looking for a command-line interface to control your lights? Check out
 
 ## Installation
 
-### Install with uv
+### Add to Your Project with uv
 ```console
 uv add busylight_core
 ```
