@@ -101,7 +101,7 @@ For detailed documentation including API reference, advanced usage examples, and
 This project and it's virtual environment is managed using [uv][uv] and
 is configured to support automatic activation of virtual environments
 using [direnv][direnv]. Development activites such as linting and testing
-are automated via [Poe The Poet][poethepoet], run `poe` after cloning
+are automated via [Poe The Poet][poe-the-poet], run `poe` after cloning
 this repo for a list of tasks.
 
 Check out [CONTRIBUTING.md][docs-contributing] for more development
@@ -122,7 +122,7 @@ details.
 [badge-python-version]: https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2FJnyJny%2Fbusylight_core%2Fmain%2Fpyproject.toml
 [badge-license]: https://img.shields.io/github/license/JnyJny/busylight_core
 [badge-monthly-downloads]: https://img.shields.io/pypi/dm/busylight_core
-[poe]: https://poethepoet.natn.io
+[poe-the-poet]: https://poethepoet.natn.io
 [uv]: https://docs.astral.sh/uv/
 [direnv]: https://direnv.net
 <!-- documentation links -->
