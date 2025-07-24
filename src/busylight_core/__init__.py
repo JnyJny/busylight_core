@@ -15,7 +15,10 @@ Refer to any of the existing vendor packages as an example.
 Note: If the subclasses are not imported here, the
       abc.ABC.__subclasses__ machinery will not find them and your new
       lights will not be recognized.
+
 """
+
+from importlib.metadata import version
 
 from loguru import logger
 
@@ -43,6 +46,8 @@ from .vendors.luxafor import Bluetooth, BusyTag, Flag, Mute, Orb
 from .vendors.muteme import MuteMe, MuteMeMini, MuteSync
 from .vendors.plantronics import StatusIndicator
 from .vendors.thingm import Blink1
+
+version = version("busylight-core")
 
 __all__ = [
     "Blink1",
@@ -74,6 +79,7 @@ __all__ = [
     "NoLightsFoundError",
     "Orb",
     "StatusIndicator",
+    "version",
 ]
 
 logger.disable("busylight_core")
