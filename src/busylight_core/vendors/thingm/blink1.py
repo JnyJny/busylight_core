@@ -4,7 +4,7 @@ from collections.abc import Callable
 from functools import cached_property
 from typing import ClassVar
 
-from ._blink1 import LEDS, Action, Report, State
+from .implementation import LEDS, Action, Report, State
 from .thingm_base import ThingMBase
 
 

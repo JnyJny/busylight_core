@@ -5,8 +5,8 @@ from typing import ClassVar
 
 from busylight_core import Hardware
 
-from ._blinkstick import State
 from .blinkstick_base import BlinkStickBase
+from .implementation import State
 
 
 class BlinkStick(BlinkStickBase):

@@ -3,7 +3,7 @@
 from functools import cached_property
 from typing import ClassVar
 
-from ._flag import LEDS, State
+from .implementation import LEDS, State
 from .luxafor_base import LuxaforBase
 
 

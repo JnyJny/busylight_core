@@ -6,8 +6,8 @@ import pytest
 
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.vendors.epos import Busylight
-from busylight_core.vendors.epos._busylight import Action, Report, State
 from busylight_core.vendors.epos.epos_base import EPOSBase
+from busylight_core.vendors.epos.implementation import Action, Report, State
 
 
 class TestEPOSBusylightState:

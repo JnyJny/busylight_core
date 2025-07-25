@@ -7,7 +7,7 @@ import pytest
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.light import Light
 from busylight_core.vendors.luxafor import Bluetooth, BusyTag, Flag, Mute, Orb
-from busylight_core.vendors.luxafor._flag import Command, State
+from busylight_core.vendors.luxafor.implementation import Command, State
 from busylight_core.vendors.luxafor.luxafor_base import LuxaforBase
 
 
@@ -130,7 +130,9 @@ class TestLuxaforFlagState:
         state.leds = 1
         state.color = (255, 128, 64)
 
-        with patch("busylight_core.vendors.luxafor._flag.logger") as mock_logger:
+        with patch(
+            "busylight_core.vendors.luxafor.implementation.state.logger"
+        ) as mock_logger:
             with pytest.raises(ValueError, match="Unsupported command: 99"):
                 bytes(state)
 
@@ -147,7 +149,9 @@ class TestLuxaforFlagState:
         state.leds = 1
         state.color = (255, 128, 64)
 
-        with patch("busylight_core.vendors.luxafor._flag.logger") as mock_logger:
+        with patch(
+            "busylight_core.vendors.luxafor.implementation.state.logger"
+        ) as mock_logger:
             with pytest.raises(
                 ValueError, match=f"Unsupported command: {mock_command}"
             ):

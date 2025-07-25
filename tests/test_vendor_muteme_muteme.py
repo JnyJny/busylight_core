@@ -7,7 +7,7 @@ import pytest
 
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.vendors.muteme import MuteMe
-from busylight_core.vendors.muteme._muteme import (
+from busylight_core.vendors.muteme.implementation import (
     BlinkBit,
     BlueBit,
     DimBit,

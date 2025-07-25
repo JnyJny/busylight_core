@@ -6,7 +6,7 @@ import pytest
 
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.vendors.thingm import Blink1
-from busylight_core.vendors.thingm._blink1 import (
+from busylight_core.vendors.thingm.implementation import (
     LEDS,
     Action,
     ActionField,

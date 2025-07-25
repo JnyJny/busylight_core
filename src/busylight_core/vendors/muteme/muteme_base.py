@@ -5,7 +5,7 @@ from functools import cached_property
 
 from busylight_core.light import Light
 
-from ._muteme import State
+from .implementation import State
 
 
 class MuteMeBase(Light):
