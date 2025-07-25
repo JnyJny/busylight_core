@@ -45,9 +45,33 @@ for path in sorted(src.rglob("*.py")):
     # Store in our dict for later use
     nav_dict[parts] = doc_path.as_posix()
 
-    with mkdocs_gen_files.open(full_doc_path, "w") as fd:
-        ident = ".".join(parts)
-        fd.write(f"::: {ident}")
+    # Special handling for vendor implementation modules
+    if (len(parts) >= 4 and 
+        parts[0] == "busylight_core" and 
+        parts[1] == "vendors" and 
+        parts[3] == "implementation" and
+        len(parts) == 4):  # This is the main implementation __init__.py
+        
+        vendor_name = parts[2]
+        if vendor_name in VENDOR_INFO:
+            display_name, description = VENDOR_INFO[vendor_name]
+            
+            with mkdocs_gen_files.open(full_doc_path, "w") as fd:
+                fd.write(f"# {display_name} Implementation\n\n")
+                fd.write(f"{description}\n\n")
+                fd.write("This module contains the low-level implementation details for ")
+                fd.write(f"{display_name} devices, including enumerations, bit fields, ")
+                fd.write("and state management classes.\n\n")
+                fd.write("## Available Components\n\n")
+                fd.write(f"::: {'.'.join(parts)}\n")
+                fd.write("    options:\n")
+                fd.write("      show_root_heading: false\n")
+                fd.write("      show_source: false\n")
+                fd.write("      heading_level: 3\n")
+    else:
+        with mkdocs_gen_files.open(full_doc_path, "w") as fd:
+            ident = ".".join(parts)
+            fd.write(f"::: {ident}")
 
     mkdocs_gen_files.set_edit_path(full_doc_path, path)
 
@@ -166,12 +190,19 @@ with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
             
             # Find device submodules for this vendor
             vendor_devices = []
+            implementation_parts = None
+            
             for parts, path in nav_dict.items():
                 if (len(parts) >= 4 and
                     parts[0] == "busylight_core" and
                     parts[1] == "vendors" and
                     parts[2] == vendor_module and
                     parts != vendor_parts):
+                    
+                    # Check if this is the implementation module
+                    if len(parts) == 4 and parts[3] == "implementation":
+                        implementation_parts = (parts, path)
+                        continue
                     
                     # Get the actual class name (last part)
                     class_name = parts[-1]
@@ -180,9 +211,17 @@ with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
                     if class_name.startswith("_") or class_name.endswith("_base"):
                         continue
                     
+                    # Skip implementation submodules (they'll be handled separately)
+                    if len(parts) >= 5 and parts[3] == "implementation":
+                        continue
+                    
                     # Convert snake_case to Title Case
                     display_name = class_name.replace("_", " ").title()
                     vendor_devices.append((display_name, path))
+            
+            # Add implementation link first if it exists
+            if implementation_parts:
+                nav_file.write(f"    * [Implementation]({implementation_parts[1]})\n")
             
             # Sort and add device submodules
             for display_name, path in sorted(vendor_devices):
