@@ -61,41 +61,28 @@ with mkdocs_gen_files.open("reference/index.md", "w") as index_file:
     if light_parts in nav_dict:
         index_file.write(f"- **[Light Class]({nav_dict[light_parts]})** - Main abstract base class for all busylight devices\n\n")
 
-    index_file.write("## Vendor Lights Classes (Recommended)\n\n")
+    index_file.write("## Vendor Lights Classes\n\n")
     index_file.write("**Direct vendor access for production use:**\n\n")
     
     # Vendor Lights classes - primary interface for vendor-specific access
     vendor_lights_classes = [
-        ("AgileInnovativeLights", "All BlinkStick devices"),
-        ("CompuLabLights", "CompuLab fit-statUSB devices"),
-        ("EmbravaLights", "All Embrava Blynclight devices"),
-        ("EPOSLights", "EPOS Busylight devices"),
-        ("KuandoLights", "Kuando Busylight Alpha/Omega devices"),
-        ("LuxaforLights", "All Luxafor devices (Flag, Mute, Orb, etc.)"),
-        ("MuteMeLights", "MuteMe button devices"),
-        ("PlantronicsLights", "Plantronics Status Indicator devices"),
-        ("ThingMLights", "ThingM Blink(1) devices"),
+        ("AgileInnovativeLights", "All BlinkStick devices", "agile_innovative"),
+        ("CompuLabLights", "CompuLab fit-statUSB devices", "compulab"),
+        ("EmbravaLights", "All Embrava Blynclight devices", "embrava"),
+        ("EPOSLights", "EPOS Busylight devices", "epos"),
+        ("KuandoLights", "Kuando Busylight Alpha/Omega devices", "kuando"),
+        ("LuxaforLights", "All Luxafor devices (Flag, Mute, Orb, etc.)", "luxafor"),
+        ("MuteMeLights", "MuteMe button devices", "muteme"),
+        ("PlantronicsLights", "Plantronics Status Indicator devices", "plantronics"),
+        ("ThingMLights", "ThingM Blink(1) devices", "thingm"),
     ]
     
-    for class_name, description in vendor_lights_classes:
-        # Link to the main busylight_core module since that's where they're re-exported
-        main_parts = ("busylight_core",)
-        if main_parts in nav_dict:
-            index_file.write(f"- **[{class_name}]({nav_dict[main_parts]})** - {description}\n")
+    for class_name, description, vendor_module in vendor_lights_classes:
+        # Link to the vendor-specific module page
+        vendor_parts = ("busylight_core", "vendors", vendor_module)
+        if vendor_parts in nav_dict:
+            index_file.write(f"- **[{class_name}]({nav_dict[vendor_parts]})** - {description}\n")
     
-    index_file.write("\n## Core Components\n\n")
-
-    # Core modules (excluding light since it's featured above)
-    core_modules = [
-        ("busylight_core", "Busylight_Core"),
-        ("busylight_core.exceptions", "Exceptions"),
-        ("busylight_core.settings", "Settings"),
-    ]
-
-    for module, display_name in core_modules:
-        parts = tuple(module.split("."))
-        if parts in nav_dict:
-            index_file.write(f"- [{display_name}]({nav_dict[parts]})\n")
 
     index_file.write("\n## Mixins\n\n")
 
@@ -130,6 +117,11 @@ with mkdocs_gen_files.open("reference/index.md", "w") as index_file:
 
                     # Get the actual class name (last part)
                     class_name = parts[-1]
+                    
+                    # Skip private modules (starting with _) and base classes (ending with _base)
+                    if class_name.startswith("_") or class_name.endswith("_base"):
+                        continue
+                    
                     # Convert snake_case to Title Case and clean up
                     display_name = class_name.replace("_", " ").title()
                     if display_name.startswith("Blynclight"):
@@ -142,7 +134,7 @@ with mkdocs_gen_files.open("reference/index.md", "w") as index_file:
 
             index_file.write("\n")
 
-    index_file.write("## Low Level Components\n\n")
+    index_file.write("## Support\n\n")
 
     # Low level modules
     utility_modules = [
@@ -165,36 +157,39 @@ with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     if light_parts in nav_dict:
         nav_file.write(f"* [Light Class]({nav_dict[light_parts]})\n")
     
-    # Vendor Lights Classes (prominent placement)
-    nav_file.write("* Vendor Lights Classes\n")
-    vendor_lights_classes = [
-        ("AgileInnovativeLights", "AgileInnovative Lights"),
-        ("CompuLabLights", "CompuLab Lights"),
-        ("EmbravaLights", "Embrava Lights"),
-        ("EPOSLights", "EPOS Lights"),
-        ("KuandoLights", "Kuando Lights"),
-        ("LuxaforLights", "Luxafor Lights"),
-        ("MuteMeLights", "MuteMe Lights"),
-        ("PlantronicsLights", "Plantronics Lights"),
-        ("ThingMLights", "ThingM Lights"),
-    ]
     
-    # Link to main module since that's where they're documented
-    main_parts = ("busylight_core",)
-    if main_parts in nav_dict:
-        for class_name, display_name in vendor_lights_classes:
-            nav_file.write(f"    * [{display_name}]({nav_dict[main_parts]})\n")
+    # Hardware Vendors with submodules (no parent "Vendors" section)
+    for vendor_module, (vendor_name, vendor_desc) in VENDOR_INFO.items():
+        vendor_parts = ("busylight_core", "vendors", vendor_module)
+        if vendor_parts in nav_dict:
+            nav_file.write(f"* [{vendor_name}]({nav_dict[vendor_parts]})\n")
+            
+            # Find device submodules for this vendor
+            vendor_devices = []
+            for parts, path in nav_dict.items():
+                if (len(parts) >= 4 and
+                    parts[0] == "busylight_core" and
+                    parts[1] == "vendors" and
+                    parts[2] == vendor_module and
+                    parts != vendor_parts):
+                    
+                    # Get the actual class name (last part)
+                    class_name = parts[-1]
+                    
+                    # Skip private modules (starting with _) and base classes (ending with _base)
+                    if class_name.startswith("_") or class_name.endswith("_base"):
+                        continue
+                    
+                    # Convert snake_case to Title Case
+                    display_name = class_name.replace("_", " ").title()
+                    vendor_devices.append((display_name, path))
+            
+            # Sort and add device submodules
+            for display_name, path in sorted(vendor_devices):
+                nav_file.write(f"    * [{display_name}]({path})\n")
     
-    # Core Components
-    core_modules = [
-        ("busylight_core", "Busylight Core"),
-        ("busylight_core.exceptions", "Exceptions"),
-    ]
-    
-    for module, display_name in core_modules:
-        parts = tuple(module.split("."))
-        if parts in nav_dict:
-            nav_file.write(f"* [{display_name}]({nav_dict[parts]})\n")
+    # Support Components
+    nav_file.write("* Support\n")
     
     # Mixins
     mixin_modules = [
@@ -205,38 +200,14 @@ with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     for module, display_name in mixin_modules:
         parts = tuple(module.split("."))
         if parts in nav_dict:
-            nav_file.write(f"* [{display_name}]({nav_dict[parts]})\n")
+            nav_file.write(f"    * [{display_name}]({nav_dict[parts]})\n")
     
-    # Hardware Vendors with submodules
-    nav_file.write("* Vendors\n")
-    for vendor_module, (vendor_name, vendor_desc) in VENDOR_INFO.items():
-        vendor_parts = ("busylight_core", "vendors", vendor_module)
-        if vendor_parts in nav_dict:
-            nav_file.write(f"    * [{vendor_name}]({nav_dict[vendor_parts]})\n")
-            
-            # Find device submodules for this vendor
-            vendor_devices = []
-            for parts, path in nav_dict.items():
-                if (len(parts) >= 4 and
-                    parts[0] == "busylight_core" and
-                    parts[1] == "vendors" and
-                    parts[2] == vendor_module and
-                    parts != vendor_parts and
-                    not parts[-1].startswith("_") and  # Skip private modules
-                    not parts[-1].endswith("_base")):  # Skip base classes
-                    
-                    # Get the actual class name (last part)
-                    class_name = parts[-1]
-                    # Convert snake_case to Title Case
-                    display_name = class_name.replace("_", " ").title()
-                    vendor_devices.append((display_name, path))
-            
-            # Sort and add device submodules
-            for display_name, path in sorted(vendor_devices):
-                nav_file.write(f"        * [{display_name}]({path})\n")
+    # Exceptions
+    exceptions_parts = ("busylight_core", "exceptions")
+    if exceptions_parts in nav_dict:
+        nav_file.write(f"    * [Exceptions]({nav_dict[exceptions_parts]})\n")
     
-    # Low Level Components
-    nav_file.write("* Low Level\n")
+    # Low-level utility modules
     utility_modules = [
         ("busylight_core.hardware", "Hardware"),
         ("busylight_core.hid", "HID"),
