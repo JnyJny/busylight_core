@@ -31,6 +31,7 @@ from .exceptions import (
 from .hardware import Hardware
 from .light import Light
 from .vendors.agile_innovative import (
+    AgileInnovativeLights,
     BlinkStick,
     BlinkStickFlex,
     BlinkStickNano,
@@ -38,18 +39,19 @@ from .vendors.agile_innovative import (
     BlinkStickSquare,
     BlinkStickStrip,
 )
-from .vendors.compulab import FitStatUSB
-from .vendors.embrava import Blynclight, BlynclightMini, BlynclightPlus
-from .vendors.epos import Busylight
-from .vendors.kuando import BusylightAlpha, BusylightOmega
-from .vendors.luxafor import Bluetooth, BusyTag, Flag, Mute, Orb
-from .vendors.muteme import MuteMe, MuteMeMini, MuteSync
-from .vendors.plantronics import StatusIndicator
-from .vendors.thingm import Blink1
+from .vendors.compulab import CompuLabLights, FitStatUSB
+from .vendors.embrava import Blynclight, BlynclightMini, BlynclightPlus, EmbravaLights
+from .vendors.epos import Busylight, EPOSLights
+from .vendors.kuando import BusylightAlpha, BusylightOmega, KuandoLights
+from .vendors.luxafor import Bluetooth, BusyTag, Flag, LuxaforLights, Mute, Orb
+from .vendors.muteme import MuteMe, MuteMeLights, MuteMeMini, MuteSync
+from .vendors.plantronics import PlantronicsLights, StatusIndicator
+from .vendors.thingm import Blink1, ThingMLights
 
 version = version("busylight-core")
 
 __all__ = [
+    "AgileInnovativeLights",
     "Blink1",
     "BlinkStick",
     "BlinkStickFlex",
@@ -65,20 +67,28 @@ __all__ = [
     "Busylight",
     "BusylightAlpha",
     "BusylightOmega",
+    "CompuLabLights",
+    "EPOSLights",
+    "EmbravaLights",
     "FitStatUSB",
     "Flag",
     "Hardware",
     "HardwareUnsupportedError",
     "InvalidHardwareError",
+    "KuandoLights",
     "Light",
     "LightUnavailableError",
+    "LuxaforLights",
     "Mute",
     "MuteMe",
+    "MuteMeLights",
     "MuteMeMini",
     "MuteSync",
     "NoLightsFoundError",
     "Orb",
+    "PlantronicsLights",
     "StatusIndicator",
+    "ThingMLights",
     "version",
 ]
 

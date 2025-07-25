@@ -4,10 +4,10 @@ from functools import cached_property
 from typing import ClassVar
 
 from ._busylight import Action, Report, State
-from .epos_base import EposBase
+from .epos_base import EPOSBase
 
 
-class Busylight(EposBase):
+class Busylight(EPOSBase):
     """EPOS Busylight status light controller.
 
     The EPOS Busylight is a USB-connected RGB LED device that provides
