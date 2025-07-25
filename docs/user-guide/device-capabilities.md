@@ -26,14 +26,20 @@ Professional meeting status lights with audio capabilities.
 
 **Usage Example:**
 ```python
-from busylight_core import Blynclight
+from busylight_core import EmbravaLights, Blynclight
 
-# Find Blynclight devices
+# Get all Embrava devices (any model)
+embrava_lights = EmbravaLights.all_lights()
+if embrava_lights:
+    light = embrava_lights[0]
+    light.on((255, 0, 0), sound=True)  # Red with audio alert
+    light.flash((255, 255, 0))         # Flash yellow
+
+# Or get specific Blynclight devices only
 blynclights = Blynclight.all_lights()
 if blynclights:
     light = blynclights[0]
-    light.on((255, 0, 0), sound=True)  # Red with audio alert
-    light.flash((255, 255, 0))         # Flash yellow
+    light.dim()  # Reduce brightness
 ```
 
 ### Kuando (2 devices)
@@ -46,15 +52,19 @@ High-quality Nordic design with keepalive requirements.
 
 **Usage Example:**
 ```python
-from busylight_core import BusylightAlpha, BusylightOmega
+from busylight_core import KuandoLights, BusylightAlpha
 
-# Kuando devices need keepalive
-alpha_lights = BusylightAlpha.all_lights()
-omega_lights = BusylightOmega.all_lights()
-
-for light in alpha_lights + omega_lights:
+# Get all Kuando devices (any model)
+kuando_lights = KuandoLights.all_lights()
+for light in kuando_lights:
     light.on((0, 255, 0))
     light.keepalive()  # Required for Kuando devices
+
+# Or get specific Alpha devices only
+alpha_lights = BusylightAlpha.all_lights()
+if alpha_lights:
+    alpha = alpha_lights[0]
+    alpha.flash((255, 165, 0), speed="fast")
 ```
 
 ### Luxafor (5 devices)
@@ -70,9 +80,15 @@ Versatile devices with multi-LED support and button input.
 
 **Usage Example:**
 ```python
-from busylight_core import Flag
+from busylight_core import LuxaforLights, Flag
 
-# Multi-LED control with Flag
+# Get all Luxafor devices (any model)
+luxafor_lights = LuxaforLights.all_lights()
+if luxafor_lights:
+    light = luxafor_lights[0]
+    light.on((0, 0, 255))  # Works on any Luxafor device
+
+# Multi-LED control with Flag specifically
 flags = Flag.all_lights()
 if flags:
     flag = flags[0]
@@ -95,9 +111,15 @@ Flexible multi-LED strips and matrices for creative applications.
 
 **Usage Example:**
 ```python
-from busylight_core import BlinkStickPro
+from busylight_core import AgileInnovativeLights, BlinkStickPro
 
-# Multi-LED animations
+# Get all BlinkStick devices (any variant)
+blinkstick_lights = AgileInnovativeLights.all_lights()
+if blinkstick_lights:
+    light = blinkstick_lights[0]
+    light.on((255, 0, 255))  # Works on any BlinkStick
+
+# Multi-LED animations with BlinkStick Pro specifically
 strips = BlinkStickPro.all_lights()
 if strips:
     strip = strips[0]
@@ -116,9 +138,15 @@ Popular maker-friendly device with advanced programming.
 
 **Usage Example:**
 ```python
-from busylight_core import Blink1
+from busylight_core import ThingMLights, Blink1
 
-# Advanced fade effects
+# Get all ThingM devices (currently just Blink1)
+thingm_lights = ThingMLights.all_lights()
+if thingm_lights:
+    light = thingm_lights[0]
+    light.on((255, 255, 255))  # Bright white
+
+# Advanced fade effects with Blink1 specifically
 blink1s = Blink1.all_lights()
 if blink1s:
     blink = blink1s[0]
@@ -138,27 +166,63 @@ Specialized mute button devices with status indication.
 
 **Usage Example:**
 ```python
-from busylight_core import MuteMe
+from busylight_core import MuteMeLights, MuteMe
 
-# Button state monitoring
+# Get all MuteMe devices (any model)
+muteme_lights = MuteMeLights.all_lights()
+for light in muteme_lights:
+    if light.is_button and light.button_pressed():
+        light.on((255, 0, 0))  # Red when muted
+    else:
+        light.on((0, 255, 0))  # Green when unmuted
+
+# Or get specific MuteMe Original devices
 muteme_devices = MuteMe.all_lights()
 if muteme_devices:
     mute = muteme_devices[0]
-    if mute.is_button and mute.button_pressed():
-        mute.on((255, 0, 0))  # Red when muted
-    else:
-        mute.on((0, 255, 0))  # Green when unmuted
+    mute.on((0, 255, 255))  # Cyan status
 ```
 
 ### Other Vendors
 
 **EPOS Busylight** - Professional conferencing light
-**Plantronics Status Indicator** - Call center indicator  
+```python
+from busylight_core import EPOSLights
+epos_lights = EPOSLights.all_lights()
+```
+
+**Plantronics Status Indicator** - Call center indicator
+```python
+from busylight_core import PlantronicsLights
+plantronics_lights = PlantronicsLights.all_lights()
+```
+
 **CompuLab fit-statUSB** - Industrial status indicator
+```python
+from busylight_core import CompuLabLights
+compulab_lights = CompuLabLights.all_lights()
+```
 
 ## Common Usage Patterns
 
 ### Device Detection and Selection
+
+**Vendor-Specific Selection (Recommended):**
+```python
+from busylight_core import EmbravaLights, LuxaforLights, AgileInnovativeLights
+
+# Get devices by vendor (most efficient)
+embrava_devices = EmbravaLights.all_lights()     # All Embrava devices
+luxafor_devices = LuxaforLights.all_lights()     # All Luxafor devices
+blinkstick_devices = AgileInnovativeLights.all_lights()  # All BlinkStick variants
+
+# Get first device from specific vendor
+if embrava_devices:
+    primary_light = embrava_devices[0]
+    primary_light.on((255, 0, 0), sound=True)  # Use Embrava-specific features
+```
+
+**Unified Selection (When vendor doesn't matter):**
 ```python
 from busylight_core import Light
 

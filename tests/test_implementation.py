@@ -11,7 +11,7 @@ from busylight_core.vendors.agile_innovative.agile_innovative_base import (
 )
 from busylight_core.vendors.compulab.compulab_base import CompuLabBase
 from busylight_core.vendors.embrava.embrava_base import EmbravaBase
-from busylight_core.vendors.epos.epos_base import EposBase
+from busylight_core.vendors.epos.epos_base import EPOSBase
 from busylight_core.vendors.kuando.kuando_base import KuandoBase
 from busylight_core.vendors.luxafor.luxafor_base import LuxaforBase
 from busylight_core.vendors.muteme.muteme_base import MuteMeBase
@@ -216,7 +216,7 @@ def test_vendor_base_class_hierarchies() -> None:
         "Agile Innovative": AgileInnovativeBase,
         "CompuLab": CompuLabBase,
         "Embrava": EmbravaBase,
-        "EPOS": EposBase,
+        "EPOS": EPOSBase,
         "Kuando": KuandoBase,
         "Luxafor": LuxaforBase,
         "MuteMe": MuteMeBase,

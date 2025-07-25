@@ -53,6 +53,7 @@ python3 -m pip install busylight_core
 
 ## Usage
 
+**Basic usage (any compatible device):**
 ```python
 from busylight_core import Light
 
@@ -65,6 +66,31 @@ for light in lights:
     light.off()            # Turn off
 ```
 
+**Vendor-specific usage (recommended for production):**
+```python
+from busylight_core import EmbravaLights, LuxaforLights, KuandoLights
+
+# Get all Embrava devices
+embrava_lights = EmbravaLights.all_lights()
+if embrava_lights:
+    light = embrava_lights[0]
+    light.on((255, 0, 0), sound=True)  # Red with audio alert
+    light.dim()  # Reduce brightness
+
+# Get all Luxafor devices  
+luxafor_lights = LuxaforLights.all_lights()
+for light in luxafor_lights:
+    light.on((0, 255, 0))  # Green
+
+# Get first Kuando device
+try:
+    kuando_light = KuandoLights.first_light()
+    kuando_light.on((0, 0, 255))  # Blue
+    kuando_light.keepalive()  # Required for Kuando devices
+except NoLightsFoundError:
+    print("No Kuando devices found")
+```
+
 ### Common Use Cases
 
 **Meeting Status Indicator:**
@@ -75,18 +101,40 @@ red = (255, 0, 0)
 green = (0, 128, 0)
 yellow = (255, 255, 0)
 
+# Any device approach
 light = Light.first_light()
 
 # Available
 light.on(green)
 
-# In meeting
+# In meeting  
 light.on(red)
 
 # Away
 light.on(yellow)
 
 light.off()
+```
+
+**Enhanced Meeting Status with Audio (Embrava devices):**
+```python
+from busylight_core import EmbravaLights, NoLightsFoundError
+
+try:
+    light = EmbravaLights.first_light()
+    
+    # Available (quiet green)
+    light.on((0, 255, 0))
+    
+    # In meeting (red with audio alert)
+    light.on((255, 0, 0), sound=True)
+    
+    # Away (dim yellow)
+    light.on((255, 255, 0))
+    light.dim()
+    
+except NoLightsFoundError:
+    print("No Embrava devices found")
 ```
 
 For detailed documentation including API reference, advanced usage examples, and device-specific information:

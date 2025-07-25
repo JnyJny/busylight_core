@@ -61,7 +61,29 @@ with mkdocs_gen_files.open("reference/index.md", "w") as index_file:
     if light_parts in nav_dict:
         index_file.write(f"- **[Light Class]({nav_dict[light_parts]})** - Main abstract base class for all busylight devices\n\n")
 
-    index_file.write("## Core Components\n\n")
+    index_file.write("## Vendor Lights Classes (Recommended)\n\n")
+    index_file.write("**Direct vendor access for production use:**\n\n")
+    
+    # Vendor Lights classes - primary interface for vendor-specific access
+    vendor_lights_classes = [
+        ("AgileInnovativeLights", "All BlinkStick devices"),
+        ("CompuLabLights", "CompuLab fit-statUSB devices"),
+        ("EmbravaLights", "All Embrava Blynclight devices"),
+        ("EPOSLights", "EPOS Busylight devices"),
+        ("KuandoLights", "Kuando Busylight Alpha/Omega devices"),
+        ("LuxaforLights", "All Luxafor devices (Flag, Mute, Orb, etc.)"),
+        ("MuteMeLights", "MuteMe button devices"),
+        ("PlantronicsLights", "Plantronics Status Indicator devices"),
+        ("ThingMLights", "ThingM Blink(1) devices"),
+    ]
+    
+    for class_name, description in vendor_lights_classes:
+        # Link to the main busylight_core module since that's where they're re-exported
+        main_parts = ("busylight_core",)
+        if main_parts in nav_dict:
+            index_file.write(f"- **[{class_name}]({nav_dict[main_parts]})** - {description}\n")
+    
+    index_file.write("\n## Core Components\n\n")
 
     # Core modules (excluding light since it's featured above)
     core_modules = [
@@ -142,6 +164,26 @@ with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     light_parts = ("busylight_core", "light")
     if light_parts in nav_dict:
         nav_file.write(f"* [Light Class]({nav_dict[light_parts]})\n")
+    
+    # Vendor Lights Classes (prominent placement)
+    nav_file.write("* Vendor Lights Classes\n")
+    vendor_lights_classes = [
+        ("AgileInnovativeLights", "AgileInnovative Lights"),
+        ("CompuLabLights", "CompuLab Lights"),
+        ("EmbravaLights", "Embrava Lights"),
+        ("EPOSLights", "EPOS Lights"),
+        ("KuandoLights", "Kuando Lights"),
+        ("LuxaforLights", "Luxafor Lights"),
+        ("MuteMeLights", "MuteMe Lights"),
+        ("PlantronicsLights", "Plantronics Lights"),
+        ("ThingMLights", "ThingM Lights"),
+    ]
+    
+    # Link to main module since that's where they're documented
+    main_parts = ("busylight_core",)
+    if main_parts in nav_dict:
+        for class_name, display_name in vendor_lights_classes:
+            nav_file.write(f"    * [{display_name}]({nav_dict[main_parts]})\n")
     
     # Core Components
     core_modules = [
