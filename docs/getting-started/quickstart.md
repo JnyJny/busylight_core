@@ -20,6 +20,7 @@ uv add busylight_core
 
 After [installing](installation.md) busylight_core, you can start controlling lights in your Python code:
 
+**Option 1: Any compatible device (recommended for simple use cases)**
 ```python
 from busylight_core import Light
 
@@ -36,10 +37,33 @@ else:
     print("No compatible lights found. Check your device connection.")
 ```
 
+**Option 2: Vendor-specific devices (recommended for production)**
+```python
+from busylight_core import EmbravaLights, LuxaforLights
+
+# Get devices from specific vendors
+embrava_lights = EmbravaLights.all_lights()
+luxafor_lights = LuxaforLights.all_lights()
+
+# Use Embrava devices if available
+if embrava_lights:
+    light = embrava_lights[0]
+    light.on((255, 0, 0), sound=True)  # Red with audio (Embrava-specific)
+    light.dim()  # Reduce brightness
+elif luxafor_lights:
+    light = luxafor_lights[0] 
+    light.on((255, 0, 0))  # Red light
+    # Check for multi-LED support
+    if hasattr(light, 'on') and 'led' in light.on.__annotations__:
+        for i in range(6):  # Flag has 6 LEDs
+            light.on((0, 255, 0), led=i)  # Green on each LED
+else:
+    print("No Embrava or Luxafor devices found")
+```
+
 ## Discovering Your Device
 
-Check what lights are connected to your system:
-
+**Check all connected devices:**
 ```python
 from busylight_core import Light
 
@@ -58,12 +82,38 @@ else:
     print("3. Try running with sudo (not recommended for production)")
 ```
 
+**Check devices by vendor:**
+```python
+from busylight_core import (
+    EmbravaLights, KuandoLights, LuxaforLights, 
+    AgileInnovativeLights, ThingMLights, MuteMeLights
+)
+
+# Check what vendors you have connected
+vendors = [
+    ("Embrava", EmbravaLights),
+    ("Kuando", KuandoLights), 
+    ("Luxafor", LuxaforLights),
+    ("BlinkStick", AgileInnovativeLights),
+    ("ThingM", ThingMLights),
+    ("MuteMe", MuteMeLights),
+]
+
+for vendor_name, vendor_class in vendors:
+    devices = vendor_class.all_lights()
+    if devices:
+        print(f"{vendor_name}: {len(devices)} device(s)")
+        for device in devices:
+            print(f"  - {device.name}")
+    else:
+        print(f"{vendor_name}: No devices found")
+```
+
 ## Basic Light Control
 
 ### Colors
 
-Control your light with RGB colors:
-
+**Universal approach (works with any device):**
 ```python
 from busylight_core import Light, NoLightsFoundError
 
@@ -86,11 +136,35 @@ except NoLightsFoundError:
     print("No lights available")
 ```
 
+**Vendor-specific approach (recommended for specific features):**
+```python
+from busylight_core import EmbravaLights, KuandoLights, NoLightsFoundError
+
+# Embrava devices with audio
+try:
+    light = EmbravaLights.first_light()
+    light.on((255, 0, 0), sound=True)  # Red with sound
+    light.dim()  # Reduce brightness
+    light.bright()  # Restore brightness
+except NoLightsFoundError:
+    print("No Embrava devices found")
+
+# Kuando devices with keepalive
+try:
+    light = KuandoLights.first_light()
+    light.on((0, 255, 0))
+    light.keepalive()  # Required for Kuando devices
+except NoLightsFoundError:
+    print("No Kuando devices found")
+```
+
 ### Flash Patterns
 
-Create attention-getting flash patterns (device-dependent):
-
+**Universal approach with fallback:**
 ```python
+from busylight_core import Light, NoLightsFoundError
+import time
+
 # Flash patterns work on devices with hardware flash support
 try:
     light = Light.first_light()
@@ -101,7 +175,6 @@ try:
         print("Device supports hardware flash")
     else:
         # Software flash fallback
-        import time
         for _ in range(3):
             light.on((255, 0, 0))
             time.sleep(0.5)
@@ -111,6 +184,28 @@ try:
         
 except NoLightsFoundError:
     print("No lights available")
+```
+
+**Vendor-specific flash patterns:**
+```python
+from busylight_core import EmbravaLights, KuandoLights
+
+# Embrava devices have configurable flash speeds
+try:
+    light = EmbravaLights.first_light()
+    light.flash((255, 165, 0))  # Orange flash with default speed
+    # Some Embrava devices support speed control
+    # light.flash((255, 0, 0), speed="fast")
+except NoLightsFoundError:
+    print("No Embrava devices found")
+
+# Kuando devices have built-in flash patterns  
+try:
+    light = KuandoLights.first_light()
+    light.flash((255, 0, 255))  # Magenta flash
+    light.keepalive()  # Don't forget keepalive for Kuando
+except NoLightsFoundError:
+    print("No Kuando devices found")
 ```
 
 
