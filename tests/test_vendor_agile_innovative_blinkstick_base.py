@@ -6,13 +6,13 @@ import pytest
 
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.vendors.agile_innovative import BlinkStick
-from busylight_core.vendors.agile_innovative._blinkstick import State
 from busylight_core.vendors.agile_innovative.agile_innovative_base import (
     AgileInnovativeBase,
 )
 from busylight_core.vendors.agile_innovative.blinkstick_base import (
     BlinkStickBase,
 )
+from busylight_core.vendors.agile_innovative.implementation import State
 
 
 class TestBlinkStick:

@@ -3,8 +3,8 @@
 from functools import cached_property
 from typing import ClassVar
 
-from ._busylight import Action, Report, State
 from .epos_base import EPOSBase
+from .implementation import Action, Report, State
 
 
 class Busylight(EPOSBase):

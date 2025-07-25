@@ -205,6 +205,10 @@ lint.ignore = [
   # use-of-assert (S101)
   "S101"
 ]
+"**/implementation/*" = [
+  # missing-docstring-in-init (D107)
+  "D107"
+]
 
 
 

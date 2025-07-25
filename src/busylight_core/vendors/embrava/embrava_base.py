@@ -4,7 +4,7 @@ from functools import cached_property
 
 from busylight_core.light import Light
 
-from ._blynclight import FlashSpeed, State
+from .implementation import FlashSpeed, State
 
 
 class EmbravaBase(Light):

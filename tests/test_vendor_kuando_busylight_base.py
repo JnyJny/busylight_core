@@ -8,8 +8,8 @@ import pytest
 from busylight_core.hardware import ConnectionType, Hardware
 from busylight_core.mixins import ColorableMixin
 from busylight_core.vendors.kuando import BusylightAlpha, BusylightOmega
-from busylight_core.vendors.kuando._busylight import OpCode, Ring, State, Step
 from busylight_core.vendors.kuando.busylight_base import BusylightBase, _keepalive
+from busylight_core.vendors.kuando.implementation import OpCode, Ring, State, Step
 from busylight_core.vendors.kuando.kuando_base import KuandoBase
 
 

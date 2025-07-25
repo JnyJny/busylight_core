@@ -5,10 +5,10 @@ from unittest.mock import Mock, patch
 import pytest
 
 from busylight_core.hardware import ConnectionType, Hardware
-from busylight_core.vendors.embrava._blynclight import FlashSpeed
 from busylight_core.vendors.embrava.blynclight import Blynclight
 from busylight_core.vendors.embrava.blynclight_plus import BlynclightPlus
 from busylight_core.vendors.embrava.embrava_base import EmbravaBase
+from busylight_core.vendors.embrava.implementation import FlashSpeed
 from busylight_core.vendors.plantronics import StatusIndicator
 from busylight_core.vendors.plantronics.plantronics_base import PlantronicsBase
 

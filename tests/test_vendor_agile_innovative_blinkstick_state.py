@@ -1,6 +1,6 @@
 """Tests for Agile Innovative BlinkStick State implementation."""
 
-from busylight_core.vendors.agile_innovative._blinkstick import State
+from busylight_core.vendors.agile_innovative.implementation import State
 
 
 class TestBlinkStickState:

@@ -5,7 +5,7 @@ from functools import cached_property
 
 from busylight_core.mixins import ColorableMixin
 
-from ._busylight import State
+from .implementation import State
 from .kuando_base import KuandoBase
 
 

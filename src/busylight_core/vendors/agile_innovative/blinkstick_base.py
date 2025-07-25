@@ -1,7 +1,7 @@
 """Base BlinkStick Implementation"""
 
-from ._blinkstick import State
 from .agile_innovative_base import AgileInnovativeBase
+from .implementation import State
 
 
 class BlinkStickBase(AgileInnovativeBase):

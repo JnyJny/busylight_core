@@ -3,8 +3,8 @@
 from unittest.mock import Mock, patch
 
 from busylight_core.hardware import ConnectionType, Hardware
-from busylight_core.vendors.embrava._blynclight import FlashSpeed, State
 from busylight_core.vendors.embrava.blynclight import Blynclight
+from busylight_core.vendors.embrava.implementation import FlashSpeed, State
 
 
 def create_mock_blynclight_hardware() -> Mock:

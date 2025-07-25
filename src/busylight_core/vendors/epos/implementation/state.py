@@ -1,35 +1,22 @@
-"""EPOS Busylight Implementation Details"""
+"""EPOS Busylight device state management.
 
-from enum import Enum
+This module defines the State class that manages command construction
+for EPOS Busylight devices, including dual-LED control and device configuration.
+"""
 
-from busylight_core.word import BitField, Word
+from busylight_core.word import Word
 
-
-class Action(int, Enum):
-    SetColor = 0x1202
-
-
-class Report(int, Enum):
-    ONE: int = 1
-
-
-class ReportField(BitField):
-    """An 8-bit report field."""
-
-
-class ActionField(BitField):
-    """An 8-bit action."""
-
-
-class ColorField(BitField):
-    """An 8-bit color value."""
-
-
-class OnField(BitField):
-    """A 1-bit field that toggles the light on."""
+from .fields import ActionField, ColorField, OnField, ReportField
 
 
 class State(Word):
+    """Complete device state for EPOS Busylight commands.
+
+    The State class manages command construction for EPOS devices.
+    It supports dual-LED control with independent color settings for
+    each LED, allowing for more complex status indication patterns.
+    """
+
     def __init__(self) -> None:
         super().__init__(0, 80)
 
@@ -48,25 +35,31 @@ class State(Word):
 
     @property
     def color0(self) -> tuple[int, int, int]:
-        """Return the first LED color as a tuple of RGB values."""
+        """Get the first LED color as a tuple of RGB values."""
         return (self.red0, self.green0, self.blue0)
 
     @color0.setter
     def color0(self, color: tuple[int, int, int]) -> None:
+        """Set the first LED color from RGB tuple."""
         self.red0, self.green0, self.blue0 = color
 
     @property
     def color1(self) -> tuple[int, int, int]:
-        """Return the second LED color as a tuple of RGB values."""
+        """Get the second LED color as a tuple of RGB values."""
         return (self.red1, self.green1, self.blue1)
 
     @color1.setter
     def color1(self, color: tuple[int, int, int]) -> None:
+        """Set the second LED color from RGB tuple."""
         self.red1, self.green1, self.blue1 = color
 
     @property
     def color(self) -> tuple[int, int, int]:
-        """The first non-black LED color as a tuple of RGB values."""
+        """Get the first non-black LED color as a tuple of RGB values.
+
+        Returns the color of the first LED that has a non-zero color value,
+        or black (0,0,0) if both LEDs are off.
+        """
         for color in (self.color0, self.color1):
             if any(color):
                 return color
@@ -74,5 +67,6 @@ class State(Word):
 
     @color.setter
     def color(self, color: tuple[int, int, int]) -> None:
+        """Set both LEDs to the same color."""
         self.color0 = color
         self.color1 = color
